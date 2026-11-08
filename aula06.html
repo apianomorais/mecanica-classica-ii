@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 6: Referenciais em rotação e forças fictícias | Mecânica Clássica II</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611081928">
+<script src="assets/js/comum.js?v=202611081928"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Mecânica Clássica II <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html">Início</a>
+      <span class="grupo">Corpos rígidos</span>
+      <a href="aula01.html" class="num" title="Módulo 1: Cinemática dos corpos rígidos">1</a>
+      <a href="aula02.html" class="num" title="Módulo 2: Centro de massa e momentos de inércia">2</a>
+      <a href="aula03.html" class="num" title="Módulo 3: Momento angular, torque e equações de movimento">3</a>
+      <a href="aula04.html" class="num" title="Módulo 4: Conservação e equilíbrio estático">4</a>
+      <span class="grupo">Referenciais</span>
+      <a href="aula05.html" class="num" title="Módulo 5: Matrizes de rotação e transformações de coordenadas">5</a>
+      <a href="aula06.html" class="num ativo" title="Módulo 6: Referenciais em rotação e forças fictícias">6</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+<aside class="lateral">
+  <h4>Neste módulo</h4>
+  <ol>
+    <li><a href="#s1">1. Referenciais que transladam</a></li>
+    <li><a href="#s2">2. O pêndulo no trem acelerado</a></li>
+    <li><a href="#s3">3. A força de maré</a></li>
+    <li><a href="#s4">4. Sizígia, quadratura e marés extremas</a></li>
+    <li><a href="#s5">5. O teorema do transporte</a></li>
+    <li><a href="#s6">6. Velocidade e aceleração no girante</a></li>
+    <li><a href="#s7">7. As quatro forças de inércia</a></li>
+    <li><a href="#s8">8. A centrífuga</a></li>
+    <li><a href="#s9">9. Coriolis</a></li>
+    <li><a href="#s10">10. A Terra como referencial girante</a></li>
+    <li><a href="#s11">11. Desvios: queda livre e projéteis</a></li>
+    <li><a href="#s12">12. O pêndulo de Foucault</a></li>
+    <li><a href="#s13">13. Exercícios resolvidos</a></li>
+    <li><a href="#s14">14. Exercícios propostos</a></li>
+  </ol>
+</aside>
+
+<main class="conteudo">
+
+  <p class="chapeu">Módulo 6 · Sistemas de coordenadas em movimento</p>
+  <h1>Referenciais em rotação e forças fictícias</h1>
+  <p class="subtitulo">A segunda lei de Newton vale em referenciais inerciais, e o laboratório
+  onde ela é ensinada gira junto com a Terra. Este módulo mostra o preço dessa trapaça: quatro
+  termos extras, que não são forças mas se comportam como se fossem, e que explicam desde o
+  giro de um furacão até as marés dos oceanos, passando pelos seis minutos de arco que a vertical
+  de um prédio não aponta para o centro do planeta.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Objetivos</span>
+    <ul>
+      <li>Montar a gravidade efetiva num referencial que acelera em translação;</li>
+      <li>Obter a força de maré como resíduo e expandi-la em polinômios de Legendre;</li>
+      <li>Aplicar o teorema do transporte para derivar num referencial girante;</li>
+      <li>Obter a aceleração relativa com os quatro termos de inércia;</li>
+      <li>Distinguir centrífuga, Coriolis, Euler e a translação da origem;</li>
+      <li>Calcular \(g\) efetivo e o desvio do fio de prumo com a latitude;</li>
+      <li>Estimar o desvio para leste de um corpo em queda;</li>
+      <li>Explicar o pêndulo de Foucault e o papel do \(\sen\lambda\).</li>
+    </ul>
+  </div>
+
+  <hr class="linha">
+
+  <!-- ================================================== -->
+  <h2 id="s1">1. Referenciais que transladam</h2>
+
+  <p>Comece pelo caso mais simples, em que o referencial \(S'\) apenas translada em relação
+  ao inercial \(S\), sem girar. Com \(\vet{R}_0\) a posição da origem de \(S'\), as posições
+  se somam, \(\vet{r}=\vet{R}_0+\vet{r}\,'\), e derivando duas vezes,
+  \(\vet{a}=\vet{A}_0+\vet{a}\,'\). Levando à segunda lei,</p>
+
+  <p>\[m\vet{a}\,'=\vet{F}-m\vet{A}_0.\]</p>
+
+  <p>Quem está dentro de \(S'\) e insiste em usar \(\vet{F}=m\vet{a}\) precisa acrescentar o
+  termo \(-m\vet{A}_0\) à lista de forças. É o que se sente num elevador que arranca ou num
+  ônibus que freia: nada empurra o passageiro para trás, mas tudo se passa como se
+  empurrasse.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que chamá-las de fictícias</span>
+    <p>Uma força de verdade tem um agente. Identifica-se quem a exerce, e a terceira lei
+    garante uma reação em algum lugar. As forças de inércia não têm nada disso: não há agente,
+    não há reação, e elas desaparecem inteiramente quando se muda de referencial. São um
+    artefato de contabilidade, o preço de usar uma equação fora do domínio em que ela
+    vale.</p>
+    <p>Isso não as torna irrelevantes. Para quem está dentro do referencial girante, elas
+    produzem efeitos perfeitamente mensuráveis, e qualquer previsão feita sem elas estará
+    errada. Einstein levou essa observação ao limite ao notar que a força de inércia de um
+    referencial acelerado é localmente indistinguível da gravidade, o que virou o princípio
+    de equivalência da relatividade geral.</p>
+  </div>
+
+
+  <!-- ================================================== -->
+  <h2 id="s2">2. O pêndulo no trem acelerado</h2>
+
+  <p>Um pêndulo simples de massa \(m\) e comprimento \(\ell\) está pendurado dentro de um
+  vagão que acelera com \(\vet{A}\) constante. Visto de fora, as únicas forças sobre a massa
+  são a tração \(\vet{T}\) e o peso \(m\vet{g}\). Visto de dentro, entra também a força de
+  inércia \(-m\vet{A}\), e a equação de movimento fica</p>
+
+  <p>\[m\vet{a}_{\rm rel}=\vet{T}+m\vet{g}-m\vet{A}.\]</p>
+
+  <p>As duas últimas parcelas são ambas proporcionais à massa, o que permite juntá-las numa
+  só:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Gravidade efetiva</span>
+    \[\vet{g}_{\rm ef}=\vet{g}-\vet{A},\qquad
+    \left|\vet{g}_{\rm ef}\right|=\sqrt{g^2+A^2},\qquad
+    \tg\beta=\frac{A}{g}.\]
+  </div>
+
+  <p>Dentro do vagão, tudo se passa como se a gravidade tivesse mudado de módulo e de
+  direção. O fio em repouso aponta ao longo de \(\vet{g}_{\rm ef}\), inclinado de \(\beta\)
+  para trás, e as pequenas oscilações ocorrem em torno dessa nova vertical com frequência</p>
+
+  <p>\[\omega=\sqrt{\frac{g_{\rm ef}}{\ell}}
+  =\left(\frac{g^2+A^2}{\ell^2}\right)^{1/4}.\]</p>
+
+  <p>Para \(A=3{,}0\) m/s² e \(\ell=1{,}0\) m: \(\beta=17{,}0^\circ\),
+  \(g_{\rm ef}=10{,}26\) m/s² e o período cai de 2,006 s para 1,962 s. O passageiro que não
+  soubesse estar acelerando concluiria, com toda a coerência, que a gravidade do lugar é 4,6%
+  maior e aponta 17° fora da vertical do prédio. Não há experimento <em>local</em> que o
+  desminta, e essa impossibilidade é o princípio de equivalência.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. A força de maré</h2>
+
+  <p>O centro da Terra não é um ponto inercial: ele está em queda livre em direção à Lua.
+  Um referencial preso a ele acelera com \(\vet{A}_0=GM_L\vers{D}/D^2\), e a seção 1 diz
+  exatamente o que fazer com isso. Para uma massa \(m\) na superfície, a distância à Lua é
+  \(d\), não \(D\), e o que sobra depois do desconto é</p>
+
+  <div class="destaque">
+    <span class="anuncio">Força de maré</span>
+    \[\vet{F}_{\rm maré}=-\frac{GM_Lm}{d^2}\vers{d}+\frac{GM_Lm}{D^2}\vers{D}.\]
+    Maré não é a atração da Lua: é a <em>diferença</em> entre a atração local e a atração no
+    centro da Terra.
+  </div>
+
+  <p>A razão \(R/D\) vale 0,0166 para o sistema Terra e Lua, de modo que a expansão em
+  potências dela converge depressa. Escrevendo \(d\) pela lei dos cossenos e expandindo
+  \(1/d^2\), os coeficientes que aparecem são os <strong>polinômios de Legendre</strong>,</p>
+
+  <p>\[\frac{1}{d}=\frac{1}{D}\sum_{n=0}^{\infty}
+  \left(\frac{R}{D}\right)^{n}P_n\!\left(\cos\theta\right),\]</p>
+
+  <p>e o termo \(n=0\) é constante, o \(n=1\) é cancelado exatamente pelo desconto da
+  aceleração do centro, e o primeiro que sobrevive é o de \(P_2\). Daí a maré ser um efeito
+  <strong>quadrupolar</strong>. Em componentes, com \(\theta\) medido a partir da direção da
+  Lua,</p>
+
+  <p>\[a_r=\frac{GM_LR}{D^3}\left(3\cos^2\theta-1\right),\qquad
+  a_\theta=-\frac{3}{2}\,\frac{GM_LR}{D^3}\,\sen2\theta.\]</p>
+
+  <div data-widget="mare"></div>
+
+  <p>A figura responde de uma vez à pergunta que mais incomoda quem estuda marés: por que
+  são <strong>duas</strong> por dia, e não uma. A água do lado próximo é puxada mais que o
+  centro, e a do lado distante é puxada menos; nos dois casos ela se afasta do centro, e as
+  protuberâncias aparecem em lados opostos. A Terra gira por baixo desse par fixo, e cada
+  ponto passa por duas marés altas a cada volta.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Quem levanta a água não é a componente radial</span>
+    <p>A aceleração de maré radial máxima vale 1,1 μm/s², ou uma parte em nove milhões de
+    \(g\). Erguer o oceano contra a gravidade com isso é impensável, e quem faz a conta
+    ingênua conclui, corretamente, que o efeito radial é desprezível.</p>
+    <p>O trabalho é feito pela componente <strong>tangencial</strong>, máxima a 45° da
+    direção da Lua. Ela é igualmente minúscula, mas não tem nada contra o que lutar: age
+    paralelamente à superfície, onde nenhuma força a equilibra, e empurra a água
+    horizontalmente rumo aos dois pontos de maré alta ao longo de milhares de quilômetros. É
+    o acúmulo sobre essa escala que produz a maré.</p>
+  </div>
+
+  <h3>A altura da maré, por um argumento de equilíbrio</h3>
+
+  <p>Imagine dois tubos sem paredes, um vertical de altura \(h\) e outro horizontal ao longo
+  da superfície, ambos cheios de água. A coluna vertical estabelece na base uma pressão
+  excedente \(\varrho gh\); a água do tubo horizontal, para ficar estática, precisa que a
+  componente tangencial da maré equilibre essa mesma pressão. Impondo a igualdade e
+  integrando ao longo do arco de um ponto de maré baixa a um de maré alta,</p>
+
+  <div class="destaque">
+    <span class="anuncio">Maré de equilíbrio</span>
+    \[\Delta h=\frac{3}{2}\,\frac{GM_LR^2}{g\,D^3}.\]
+  </div>
+
+  <p>Com os números da Lua isso dá 53,5 cm, e com os do Sol, 24,6 cm. São valores modestos, e
+  deliberadamente: a maré de equilíbrio supõe um oceano global sem continentes nem inércia.
+  Marés reais de vários metros, como os 16 m da baía de Fundy, vêm de ressonância das bacias
+  oceânicas e de estrangulamento em estreitos, que são hidrodinâmica e não estática.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. Sizígia, quadratura e marés extremas</h2>
+
+  <p>A amplitude da maré vai com \(M/D^3\), e não com \(M/D^2\) como a atração. Essa potência
+  a mais no denominador muda o ranking: o Sol tem 27 milhões de vezes a massa da Lua e perde
+  para ela, porque está 389 vezes mais longe. A razão é</p>
+
+  <p>\[\frac{a_{\rm Lua}}{a_{\rm Sol}}
+  =\frac{M_L}{M_S}\left(\frac{D_S}{D_L}\right)^3=2{,}18.\]</p>
+
+  <p>As duas contribuições se superpõem. Na lua nova e na lua cheia, Sol e Lua estão
+  alinhados com a Terra e as marés se somam, dando a <strong>maré de sizígia</strong>, a mais
+  alta do mês. Nos quartos, os dois astros formam 90° e as contribuições se subtraem, dando a
+  <strong>maré de quadratura</strong>. Os botões do simulador mostram as quatro
+  configurações.</p>
+
+  <h3>Quando a maré deixa de ser suave</h3>
+
+  <p>A aceleração diferencial entre dois pontos separados de \(h\) vale \(2GMh/r^3\), e esse
+  cubo no denominador torna o efeito irrelevante longe e catastrófico perto. Para uma pessoa
+  de 1,80 m na superfície de uma estrela de nêutrons de 1,4 massas solares e 10 km de
+  raio,</p>
+
+  <p>\[\Delta a=\frac{2GMh}{r^3}=6{,}7\cruz10^{8}\ {\rm m/s^2},\]</p>
+
+  <p>o que sobre 70 kg dá \(4{,}7\cruz10^{10}\) N, quase \(10^{8}\) vezes o peso da mesma
+  pessoa na Terra. Nenhuma estrutura material resiste, e o corpo é estirado ao longo da
+  direção radial e comprimido na transversal, num processo que ganhou o nome de
+  <strong>espaguetificação</strong>.</p>
+
+  <p>Para buracos negros a conta tem uma inversão instrutiva. O raio de Schwarzschild é
+  \(r_s=2GM/c^2\), que para uma massa solar vale 2,95 km. Avaliando a maré <em>no
+  horizonte</em>,</p>
+
+  <p>\[\Delta a\big|_{r_s}=\frac{2GMh}{r_s^3}=\frac{c^6h}{4G^2M^2},\]</p>
+
+  <p>que é inversamente proporcional ao <strong>quadrado</strong> da massa. Num buraco negro
+  estelar a espaguetificação começa a cerca de 170 km, umas 57 vezes o horizonte, e o viajante
+  é destruído muito antes de chegar lá. Já em Sagitário A*, com 4,3 milhões de massas solares
+  e horizonte de \(1{,}27\cruz10^{10}\) m, a maré no horizonte vale \(10^{-3}\) m/s²: seria
+  possível atravessá-lo sem sentir nada. Buracos negros maiores são, nesse sentido preciso,
+  mais gentis.</p>
+
+  <p>O mesmo cálculo, aplicado a um satélite em vez de a uma pessoa, dá o <strong>limite de
+  Roche</strong>: a distância abaixo da qual a maré do planeta vence a coesão gravitacional
+  do satélite e o despedaça. Os anéis de Saturno estão dentro do limite de Roche do planeta,
+  e é por isso que são anéis em vez de luas.</p>
+  <!-- ================================================== -->
+  <h2 id="s5">5. O teorema do transporte</h2>
+
+  <p>O caso girante exige uma ferramenta, e ela já apareceu no módulo 1. Seja \(\vet{Q}\) um
+  vetor qualquer e sejam \(\vers{e}\,'_i\) os versores do referencial que gira com
+  \(\vet{\omega}\). Escrevendo \(\vet{Q}=\sum_iQ'_i\vers{e}\,'_i\) e derivando no referencial
+  fixo, a regra do produto separa dois pedaços: a variação das componentes, que é o que o
+  observador girante mede, e a variação dos versores, que o módulo 1 mostrou valer
+  \(\dot{\vers{e}}\,'_i=\vet{\omega}\cruz\vers{e}\,'_i\). Daí</p>
+
+  <div class="destaque">
+    <span class="anuncio">Teorema do transporte</span>
+    \[\left(\der{\vet{Q}}{t}\right)_{\!\rm fixo}
+    =\left(\der{\vet{Q}}{t}\right)_{\!\rm gir}+\vet{\omega}\cruz\vet{Q}.\]
+    Vale para qualquer vetor: posição, velocidade, momento angular, campo magnético.
+  </div>
+
+  <p>A leitura é que o operador de derivada temporal muda de forma ao se trocar de
+  referencial, ganhando um termo \(\vet{\omega}\cruz\). Tudo o que vem a seguir é aplicar
+  essa regra duas vezes.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. Velocidade e aceleração no girante</h2>
+
+  <p>Aplique o teorema à posição. Com \(\vet{v}_{\rm rel}\) a velocidade medida por quem
+  gira,</p>
+
+  <p>\[\vet{v}=\vet{v}_{\rm rel}+\vet{\omega}\cruz\vet{r}.\]</p>
+
+  <p>Aplique-o de novo, agora a essa própria igualdade, lembrando de derivar cada parcela com
+  a regra completa:</p>
+
+  <p>\[\vet{a}=\left(\der{}{t}\right)_{\!\rm gir}
+  \left(\vet{v}_{\rm rel}+\vet{\omega}\cruz\vet{r}\right)
+  +\vet{\omega}\cruz\left(\vet{v}_{\rm rel}+\vet{\omega}\cruz\vet{r}\right),\]</p>
+
+  <p>e reunindo os termos semelhantes,</p>
+
+  <div class="destaque">
+    <span class="anuncio">Aceleração em referencial girante</span>
+    \[\vet{a}=\vet{a}_{\rm rel}
+    +2\vet{\omega}\cruz\vet{v}_{\rm rel}
+    +\vet{\omega}\cruz\left(\vet{\omega}\cruz\vet{r}\right)
+    +\dot{\vet{\omega}}\cruz\vet{r}.\]
+  </div>
+
+  <p>O fator 2 do segundo termo não é um detalhe estético: uma das parcelas vem de derivar
+  \(\vet{v}_{\rm rel}\) e a outra de derivar \(\vet{\omega}\cruz\vet{r}\), e as duas são
+  iguais. Essa é a origem algébrica do 2 de Coriolis.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. As quatro forças de inércia</h2>
+
+  <p>Multiplique por \(m\), isole \(m\vet{a}_{\rm rel}\) e use \(m\vet{a}=\vet{F}\), válida
+  no referencial inercial. Incluindo também a translação da origem, o resultado completo
+  é</p>
+
+  <div class="destaque">
+    <span class="anuncio">A segunda lei num referencial não inercial</span>
+    \[m\vet{a}_{\rm rel}=\vet{F}
+    \underbrace{-\,m\vet{A}_0}_{\text{translação}}
+    \underbrace{-\,m\vet{\omega}\cruz\left(\vet{\omega}\cruz\vet{r}\right)}_{\text{centrífuga}}
+    \underbrace{-\,2m\vet{\omega}\cruz\vet{v}_{\rm rel}}_{\text{Coriolis}}
+    \underbrace{-\,m\dot{\vet{\omega}}\cruz\vet{r}}_{\text{Euler}}.\]
+  </div>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Termo</th><th>Depende de</th><th>Some quando</th><th>Realiza trabalho</th></tr></thead>
+    <tbody>
+      <tr><td>translação</td><td>aceleração da origem</td><td>a origem não acelera</td><td>sim</td></tr>
+      <tr><td>centrífuga</td><td>posição</td><td>o corpo está no eixo</td><td>sim</td></tr>
+      <tr><td>Coriolis</td><td>velocidade relativa</td><td>o corpo está parado no girante</td><td><strong>não</strong></td></tr>
+      <tr><td>Euler</td><td>posição e \(\dot{\vet{\omega}}\)</td><td>a rotação é uniforme</td><td>sim</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>A última coluna merece atenção. A força de Coriolis é sempre perpendicular a
+  \(\vet{v}_{\rm rel}\), e uma força perpendicular ao deslocamento não realiza trabalho. Ela
+  encurva trajetórias sem jamais alterar a energia cinética medida no referencial girante, o
+  que é exatamente o que um campo magnético faz com uma carga.</p>
+
+  <div data-widget="girante"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. A centrífuga</h2>
+
+  <p>Expandindo o duplo produto vetorial,
+  \(-m\vet{\omega}\cruz\left(\vet{\omega}\cruz\vet{r}\right)
+  =-m\left[\vet{\omega}\left(\vet{\omega}\cdot\vet{r}\right)-\omega^2\vet{r}\right]
+  =m\omega^2\vet{r}_\perp\), onde \(\vet{r}_\perp\) é a componente perpendicular ao eixo.
+  A força aponta para fora <strong>do eixo</strong>, e não do centro, e cresce linearmente
+  com a distância a ele.</p>
+
+  <p>Note que ela existe mesmo para um corpo parado no referencial girante, e é por isso que
+  se faz sentir numa curva de carro ou numa centrífuga de laboratório. Numa ultracentrífuga a
+  30 000 rpm e 10 cm do eixo, \(\omega=3141\) rad/s e \(\omega^2r=9{,}9\cruz10^5\) m/s², cem
+  mil vezes a gravidade, o que basta para separar organelas celulares por densidade.</p>
+
+  <p>Um detalhe de linguagem que vale corrigir: a chamada força centrípeta e a força
+  centrífuga não formam um par de ação e reação. A primeira é real e age no referencial
+  inercial; a segunda é fictícia e só existe no girante. Elas nem sequer aparecem na mesma
+  equação.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. Coriolis</h2>
+
+  <p>A força de Coriolis, \(-2m\vet{\omega}\cruz\vet{v}_{\rm rel}\), tem três propriedades que
+  a distinguem de tudo o mais neste curso. Ela só existe para corpos em movimento relativo.
+  Ela é perpendicular à velocidade, de modo que desvia sem acelerar nem frear. E o seu sentido
+  depende do hemisfério, porque a componente de \(\vet{\omega}\) que importa troca de sinal
+  ao se cruzar o equador.</p>
+
+  <p>No hemisfério norte, um corpo que se move horizontalmente é desviado para a
+  <strong>direita</strong> do seu movimento; no sul, para a esquerda. A regra vale para
+  qualquer direção de movimento, o que é fácil de verificar tomando a componente vertical de
+  \(\vet{\omega}\), que vale \(\omega\sen\lambda\).</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O que Coriolis explica e o que não explica</span>
+    <p><strong>Explica:</strong> o sentido de rotação de ciclones, anti-horário no norte e
+    horário no sul; a necessidade de correção balística em tiros de longo alcance; o desvio
+    sistemático de correntes oceânicas; e a precessão do pêndulo de Foucault.</p>
+    <p><strong>Não explica:</strong> o sentido em que a água gira ao escoar numa pia. A
+    aceleração de Coriolis numa pia é da ordem de \(10^{-5}\) m/s², desprezível diante de
+    qualquer assimetria da bacia ou do movimento residual da água. O efeito só se impõe em
+    escalas grandes de espaço e tempo, e é por isso que ciclones o obedecem e ralos não.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. A Terra como referencial girante</h2>
+
+  <p>A Terra gira uma volta por dia sideral, o que dá \(\omega=2\pi/86\,164=
+  7{,}292\cruz10^{-5}\) rad/s. É pouco, mas o raio é grande, e a centrífuga no equador
+  alcança \(\omega^2R=0{,}0339\) m/s², cerca de 0,35% de \(g\).</p>
+
+  <p>Para um laboratório na latitude \(\lambda\), a distância ao eixo é \(R\cos\lambda\), e a
+  centrífuga aponta para fora do eixo, não para fora do centro. Decompondo-a na vertical e na
+  horizontal do lugar,</p>
+
+  <p>\[g_{\rm ef}=g_0-\omega^2R\cos^2\lambda,\qquad
+  g_{\rm horiz}=\omega^2R\cos\lambda\sen\lambda.\]</p>
+
+  <div data-widget="pesoefetivo"></div>
+
+  <p>A primeira parcela é a conhecida: a balança marca menos no equador. A segunda é
+  horizontal, aponta para o equador e <strong>inclina a vertical</strong>. O fio de prumo não
+  aponta para o centro da Terra em latitude nenhuma, exceto nos polos e no equador, e o
+  desvio \(\left(\omega^2R/2g\right)\sen2\lambda\) é máximo em 45°, onde chega a 5,9 minutos
+  de arco. Num prédio de 200 m isso dá 34 cm, e é a vertical do prumo, não a direção do
+  centro, que topografia e construção civil usam.</p>
+
+  <p>Vale uma ressalva de honestidade. A variação medida de \(g\), de 9,780 m/s² no equador a
+  9,832 nos polos, não se deve apenas à rotação: cerca de um terço dela vem do
+  <strong>achatamento</strong> do planeta, que afasta o equador do centro. As duas causas têm
+  a mesma origem histórica, porque foi a rotação que achatou a Terra, mas são efeitos
+  distintos e o simulador mostra as duas curvas separadas.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. Desvios: queda livre e projéteis</h2>
+
+  <p>Solte um corpo do repouso de uma altura \(h\). Em primeira aproximação ele cai com
+  \(\vet{v}_{\rm rel}\approx-gt\,\vers{z}\), e a força de Coriolis
+  \(-2m\vet{\omega}\cruz\vet{v}_{\rm rel}\) resulta horizontal, apontando para
+  <strong>leste</strong> em qualquer hemisfério. Integrando duas vezes,</p>
+
+  <div class="destaque">
+    <span class="anuncio">Desvio para leste na queda livre</span>
+    \[d_{\rm leste}=\frac{1}{3}\,\omega g\,t^3\cos\lambda,
+    \qquad t=\sqrt{\frac{2h}{g}}.\]
+  </div>
+
+  <p>De uma torre de 100 m no equador, \(t=4{,}52\) s e \(d=2{,}2\) cm. É pequeno, mas foi
+  medido: a primeira confirmação cuidadosa veio de Ferdinand Reich, em 1831, soltando pesos
+  num poço de mina de 158 m em Freiberg e obtendo 28 mm contra os 27,5 mm previstos.</p>
+
+  <p>A explicação sem fórmula ajuda a fixar o sinal. O topo da torre está mais longe do eixo
+  que a base e, girando com a Terra, move-se mais rápido para leste. Ao ser solto, o corpo
+  conserva esse excesso de velocidade para leste e, portanto, chega ao solo adiantado em
+  relação ao pé da torre. Não é uma força misteriosa: é conservação de momento angular vista
+  de um referencial que gira.</p>
+
+  <p>Para projéteis de longo alcance o efeito deixa de ser curiosidade. Um disparo de 20 km
+  em 60 s de voo a 45° de latitude sofre desvio lateral da ordem de dezenas de metros, e
+  artilharia naval de longo alcance sempre corrigiu por latitude e por azimute.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s12">12. O pêndulo de Foucault</h2>
+
+  <p>Em 1851, no Panteão de Paris, Léon Foucault pendurou uma esfera de 28 kg num fio de 67 m
+  e a pôs a oscilar diante do público. Ao longo das horas o plano de oscilação foi girando,
+  riscando a areia do chão em direções sucessivamente diferentes, sem que força horizontal
+  alguma agisse sobre o pêndulo. Foi a primeira demonstração mecânica, visível a olho nu, de
+  que a Terra gira.</p>
+
+  <div data-widget="foucault"></div>
+
+  <p>Decompondo \(\vet{\omega}\) na vertical e na horizontal do lugar, apenas a componente
+  vertical, \(\omega\sen\lambda\), produz desvio dentro do plano horizontal. O plano de
+  oscilação precessa com essa taxa, no sentido oposto ao da rotação local:</p>
+
+  <p>\[\Omega_{\rm prec}=-\,\omega\sen\lambda,\qquad
+  T_{\rm prec}=\frac{23{,}93\ {\rm h}}{\left|\sen\lambda\right|}.\]</p>
+
+  <p>O fator \(\sen\lambda\) é o que transforma a experiência num problema de mecânica. No
+  polo o pêndulo mantém o plano fixo em relação às estrelas e o chão gira sob ele em 23,93 h,
+  o dia sideral. Em Paris, a 48,87°, o período sobe para 31,8 h, pouco menos de 11 graus por
+  hora. E no equador <strong>o pêndulo não precessa</strong>, o que mostra que a experiência
+  mede a componente vertical da rotação, e não a rotação em si.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s13">13. Exercícios resolvidos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 6.1 · Peso no equador e no polo</span>
+    <p>Uma pessoa de 70,0 kg é pesada no polo e no equador com a mesma balança de mola.
+    Supondo a Terra esférica de raio 6371 km, determine a diferença de leitura devida apenas
+    à rotação.</p>
+    <p><strong>Solução.</strong> No polo a distância ao eixo é nula e não há centrífuga. No
+    equador,</p>
+    \[\omega^2R=\left(7{,}292\cruz10^{-5}\right)^2\cruz6{,}371\cruz10^{6}
+    =0{,}03388\ {\rm m/s^2}.\]
+    <p>A balança mede a normal, isto é \(m\left(g_0-\omega^2R\right)\) no equador e
+    \(mg_0\) no polo, de modo que a diferença vale</p>
+    \[\Delta=m\,\omega^2R=70{,}0\cruz0{,}03388=2{,}37\ {\rm N},\]
+    <p>equivalente a 242 g de leitura. É 0,35% do peso, suficiente para ser notado por uma
+    balança de precisão e insuficiente para ser notado por uma pessoa. Note que a <em>massa</em>
+    não mudou em lugar nenhum.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 6.2 · O trem desviado</span>
+    <p>Um trem de 400 t corre a 144 km/h para o norte na latitude 30° N. Determine a força
+    horizontal de Coriolis sobre ele e diga sobre qual trilho ela se apoia.</p>
+    <p><strong>Solução.</strong> A componente vertical de \(\vet{\omega}\) vale
+    \(\omega\sen\lambda\), e com \(v=40{,}0\) m/s a aceleração horizontal é</p>
+    \[a=2\omega v\sen\lambda=2\cruz7{,}292\cruz10^{-5}\cruz40{,}0\cruz0{,}500
+    =2{,}92\cruz10^{-3}\ {\rm m/s^2}.\]
+    <p>A força vale \(F=ma=4{,}00\cruz10^{5}\cruz2{,}92\cruz10^{-3}=1{,}17\cruz10^{3}\) N,
+    pouco mais de uma tonelada-força, dirigida para a <strong>direita</strong> do movimento,
+    isto é, para leste. É o trilho do lado leste que a recebe, e esse desgaste assimétrico é
+    documentado em ferrovias antigas de traçado longitudinal.</p>
+    <p>Compare com o peso: \(1{,}17\cruz10^3\) N contra \(3{,}92\cruz10^6\) N, uma parte em
+    3300. Pequeno, mas cumulativo ao longo de décadas de tráfego.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 6.3 · A pedra no poço de Freiberg</span>
+    <p>Reich soltou pesos num poço de mina de 158 m em Freiberg, latitude 50,9° N, em 1831.
+    Calcule o desvio para leste previsto e compare com os 28 mm que ele mediu.</p>
+    <p><strong>Solução.</strong> O tempo de queda é
+    \(t=\sqrt{2h/g}=\sqrt{2\cruz158/9{,}81}=5{,}676\) s, e</p>
+    \[d=\frac13\omega g t^3\cos\lambda
+    =\frac13\cruz7{,}292\cruz10^{-5}\cruz9{,}81\cruz182{,}9\cruz0{,}6307
+    =0{,}0275\ {\rm m}.\]
+    <p>São 27,5 mm contra os 28 mm medidos, com erro de 2%. Reich repetiu a queda 106 vezes e
+    tomou a média, o que foi essencial: o desvio é da ordem do que qualquer corrente de ar ou
+    assimetria de soltura produz em uma queda isolada.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 6.4 · Foucault em Juazeiro do Norte</span>
+    <p>Qual seria o período de precessão de um pêndulo de Foucault instalado em Juazeiro do
+    Norte, latitude 7,21° S? Compare com Paris e comente a viabilidade da experiência.</p>
+    <p><strong>Solução.</strong> Com \(\sen7{,}21^\circ=0{,}1255\),</p>
+    \[T_{\rm prec}=\frac{23{,}93}{0{,}1255}=190{,}7\ {\rm h}=7{,}95\ \text{dias},\]
+    <p>contra 31,8 h em Paris. A taxa é de apenas 1,89 grau por hora, e o sentido é
+    anti-horário, por ser hemisfério sul.</p>
+    <p>A experiência é possível, mas exigente: em uma hora o plano gira menos de dois graus, e
+    manter o pêndulo oscilando por dias sem que o amortecimento e as assimetrias do suporte
+    introduzam precessão espúria é o problema real. É por isso que pêndulos de Foucault são
+    instalados preferencialmente em latitudes médias e altas.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s14">14. Exercícios propostos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Para resolver</span>
+    <ol>
+      <li><b>6.1</b> Um carrossel de 4,0 m de raio gira a 12 rpm. Uma pessoa de 60 kg está na
+      borda. Determine a força centrífuga que ela sente e compare com o seu peso. Que
+      inclinação do piso tornaria desnecessário o atrito?</li>
+
+      <li><b>6.2</b> Deduza a aceleração em referencial girante aplicando o teorema do
+      transporte duas vezes, com todos os passos. Identifique exatamente de onde vêm as duas
+      contribuições que somam no termo de Coriolis.</li>
+
+      <li><b>6.3</b> Mostre que a força de Coriolis nunca realiza trabalho e que a centrífuga
+      é conservativa, derivando do potencial
+      \(U_{\rm cf}=-\tfrac12m\omega^2r_\perp^2\). Escreva o potencial efetivo de um
+      referencial girante.</li>
+
+      <li><b>6.4</b> Um rio corre para o sul a 2,0 m/s na latitude 20° S. Determine a
+      aceleração de Coriolis e qual das margens sofre mais erosão. Estime, com hipóteses
+      declaradas, a diferença de nível entre as duas margens de um rio de 500 m de
+      largura.</li>
+
+      <li><b>6.5</b> Calcule a que velocidade a Terra precisaria girar para que um corpo no
+      equador ficasse sem peso aparente. Qual seria a duração do dia? Compare com o período de
+      rotação de uma estrela de nêutrons.</li>
+
+      <li><b>6.6</b> Um projétil é disparado horizontalmente para o norte a 800 m/s na
+      latitude 45° N e voa 50 s. Determine o desvio lateral por Coriolis, supondo que a
+      trajetória vertical não seja afetada. Em que direção ele erra?</li>
+
+      <li><b>6.7</b> Mostre que, para um pêndulo de Foucault, só a componente vertical de
+      \(\vet{\omega}\) contribui para a precessão do plano, e que a componente horizontal
+      produz apenas um efeito de segunda ordem na direção vertical.</li>
+
+      <li><b>6.8</b> Uma estação espacial cilíndrica de 100 m de raio gira para simular
+      gravidade. Determine o período necessário para produzir \(g\) na parede. Um astronauta
+      caminha a 1,5 m/s no sentido da rotação: quanto varia o seu peso aparente, e o que ele
+      sente ao subir uma escada de 3 m na direção do eixo?</li>
+
+      <li><b>6.9</b> Discuta em meia página: por que a água do ralo não obedece a Coriolis, se
+      os ciclones obedecem? Construa o argumento comparando a aceleração de Coriolis com as
+      outras acelerações presentes em cada caso, e estime a escala espacial a partir da qual o
+      efeito passa a dominar.</li>
+    </ol>
+  </div>
+
+  <nav class="nav-aulas">
+    <a href="aula05.html"><small>Módulo anterior</small>← 5. Matrizes de rotação</a>
+    <span class="em-breve"><small>Em preparação</small>7. Cálculo variacional</span>
+  </nav>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+<script src="assets/js/widgets.js?v=202611081928"></script>
+</body>
+</html>

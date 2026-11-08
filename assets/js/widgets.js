@@ -3068,6 +3068,752 @@
     registrarRedesenho(desenhar);
   };
 
+
+  /* =================================================================
+     16. O mesmo movimento, visto de dois referenciais
+     Nenhuma força age sobre a bola, e no laboratório ela anda em linha
+     reta. Pôr as duas vistas lado a lado mostra que a curva do disco
+     não está na bola, está no observador, e que as setas de Coriolis e
+     centrífuga são exatamente o que falta para a reta virar espiral.
+     ================================================================= */
+  REGISTRO.girante = function (raiz) {
+    var est = { vista: 'disco', W: 1.1, v: 1.0, t: 0, rodando: true };
+
+    var corpo = moldura(raiz, 'Referencial girante: de onde vem a curva');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, [
+      { rot: 'Quem gira com o disco', v: 'disco' },
+      { rot: 'Quem está no laboratório', v: 'lab' },
+      { rot: 'As duas lado a lado', v: 'ambas' }
+    ], 0, function (v) { est.vista = v; });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'rotação do disco Ω', 0, 2.4, 0.05, 1.1,
+      function (v) { est.W = v; est.t = 0; },
+      function (v) { return F.fmt(v, 2) + ' rad/s'; });
+    deslizante(ctr, 'velocidade de lançamento', 0.3, 2, 0.05, 1,
+      function (v) { est.v = v; est.t = 0; },
+      function (v) { return F.fmt(v, 2) + ' m/s'; });
+    var bt = el('button', { type: 'button', texto: 'lançar de novo' });
+    bt.addEventListener('click', function () { est.t = 0; est.rodando = true; });
+    ctr.appendChild(bt);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'força real sobre a bola', k: 'real' },
+      { rot: 'distância ao centro', k: 'r' },
+      { rot: 'centrífuga por unidade de massa', k: 'cf' },
+      { rot: 'Coriolis por unidade de massa', k: 'co' },
+      { rot: 'razão Coriolis / centrífuga', k: 'raz' },
+      { rot: 'ângulo já girado pelo disco', k: 'ang' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    var TMAX = 2.6;
+    function noLab(t) { return [est.v * t, 0]; }
+    function noDisco(t) {
+      var a = est.W * t, c = Math.cos(a), s = Math.sin(a), q = noLab(t);
+      return [c * q[0] + s * q[1], -s * q[0] + c * q[1]];
+    }
+
+    function painel(ct, cx, cy, esc, girante, t, rotulo1) {
+      var ang = est.W * t;
+      /* o disco, com uma marca que denuncia a rotação */
+      ct.beginPath(); ct.arc(cx, cy, 2.3 * esc, 0, 2 * Math.PI);
+      ct.fillStyle = 'rgba(23,107,93,.07)'; ct.fill();
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2; ct.stroke();
+      var marca = girante ? 0 : ang;
+      for (var k = 0; k < 4; k++) {
+        var a2 = marca + k * Math.PI / 2;
+        ct.beginPath();
+        ct.moveTo(cx, cy);
+        ct.lineTo(cx + 2.3 * esc * Math.cos(a2), cy - 2.3 * esc * Math.sin(a2));
+        ct.strokeStyle = 'rgba(23,107,93,.22)'; ct.lineWidth = 1.2; ct.stroke();
+      }
+
+      /* rastro */
+      ct.beginPath(); ct.strokeStyle = G.COR.bronze; ct.lineWidth = 2.2;
+      for (var j = 0; j <= 160; j++) {
+        var tt = t * j / 160, q = girante ? noDisco(tt) : noLab(tt);
+        (j ? ct.lineTo : ct.moveTo).call(ct, cx + q[0] * esc, cy - q[1] * esc);
+      }
+      ct.stroke();
+
+      var p = girante ? noDisco(t) : noLab(t);
+      var px = cx + p[0] * esc, py = cy - p[1] * esc;
+
+      /* no referencial girante, as duas forças de inércia */
+      if (girante && t > 0.02) {
+        var r = Math.sqrt(p[0] * p[0] + p[1] * p[1]);
+        if (r > 1e-3) {
+          var ur = [p[0] / r, p[1] / r];
+          var acf = est.W * est.W * r;
+          seta(ct, px, py, px + ur[0] * acf * esc * 0.42,
+            py - ur[1] * acf * esc * 0.42, G.COR.vinho, 2.4);
+          /* velocidade relativa: derivada de noDisco */
+          var h = 0.004, q1 = noDisco(t + h), q0 = noDisco(t - h);
+          var vr = [(q1[0] - q0[0]) / (2 * h), (q1[1] - q0[1]) / (2 * h)];
+          /* -2 Ω ẑ × v, com Ω no sentido anti-horário */
+          var aco = [2 * est.W * vr[1], -2 * est.W * vr[0]];
+          seta(ct, px, py, px + aco[0] * esc * 0.42, py - aco[1] * esc * 0.42,
+            G.COR.roxo, 2.4);
+        }
+      }
+
+      ct.beginPath(); ct.arc(px, py, 6, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.bronze; ct.fill();
+      ct.strokeStyle = '#fff'; ct.lineWidth = 1.6; ct.stroke();
+      ct.beginPath(); ct.arc(cx, cy, 3, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.tinta; ct.fill();
+      rotulo(ct, rotulo1, cx, cy + 2.3 * esc + 18, girante ? G.COR.mestra : G.COR.suave);
+    }
+
+    function desenhar() {
+      var alt = 310;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+      var t = Math.min(est.t, TMAX);
+      var duas = est.vista === 'ambas' && Lp > 560;
+
+      if (duas) {
+        var esc = Math.min((Lp / 2 - 40) / 5, (alt - 70) / 5);
+        painel(ct, Lp * 0.25, alt / 2 - 8, esc, true, t, 'visto do disco');
+        painel(ct, Lp * 0.75, alt / 2 - 8, esc, false, t, 'visto do laboratório');
+        ct.strokeStyle = G.COR.grade; ct.lineWidth = 1;
+        ct.beginPath(); ct.moveTo(Lp / 2, 16); ct.lineTo(Lp / 2, alt - 16); ct.stroke();
+      } else {
+        var esc2 = Math.min((Lp - 60) / 5.2, (alt - 60) / 5.2);
+        var gir = est.vista !== 'lab';
+        painel(ct, Lp / 2, alt / 2 - 6, esc2, gir, t,
+          gir ? 'visto do disco' : 'visto do laboratório');
+      }
+
+      if (est.vista !== 'lab') {
+        rotulo(ct, 'centrífuga', 10, 16, G.COR.vinho, 'left');
+        rotulo(ct, 'Coriolis', 10, 32, G.COR.roxo, 'left');
+      }
+
+      var q = noDisco(t), r = Math.sqrt(q[0] * q[0] + q[1] * q[1]);
+      var acf = est.W * est.W * r, aco = 2 * est.W * est.v;
+      mostrar({
+        real: 'nenhuma',
+        r: F.fmt(r, 2) + ' m',
+        cf: F.fmt(acf, 2) + ' m/s²',
+        co: F.fmt(aco, 2) + ' m/s²',
+        raz: r > 0.02 ? F.fmt(aco / acf, 2) : '—',
+        ang: F.fmt(est.W * t * 180 / Math.PI, 0) + '°'
+      });
+    }
+
+    function texto() {
+      nota.innerHTML =
+        '<p>Uma bola desliza sem atrito sobre um disco que gira. Nenhuma força horizontal '
+        + 'age sobre ela, e por isso, <strong>vista do laboratório, ela anda em linha '
+        + 'reta</strong>, como manda a primeira lei. Nada de estranho acontece.</p>'
+        + '<p>Vista de quem gira junto com o disco, a mesma bola descreve uma espiral que se '
+        + 'encurva. Um observador preso ao disco, convencido de estar parado, precisa '
+        + 'explicar essa curva, e para isso inventa forças. É por isso que elas se chamam '
+        + '<em>fictícias</em>: a curva não está na bola, está no observador.</p>'
+        + '<p>Aplicando o teorema do transporte duas vezes à posição, a aceleração medida no '
+        + 'referencial girante satisfaz</p>'
+        + '\\[m\\vet{a}_{\\rm rel}=\\vet{F}'
+        + '\\underbrace{-\\,m\\vet{\\omega}\\cruz\\left(\\vet{\\omega}\\cruz\\vet{r}\\right)}'
+        + '_{\\text{centrífuga}}'
+        + '\\underbrace{-\\,2m\\vet{\\omega}\\cruz\\vet{v}_{\\rm rel}}_{\\text{Coriolis}}'
+        + '\\underbrace{-\\,m\\dot{\\vet{\\omega}}\\cruz\\vet{r}}_{\\text{Euler}}.\\]'
+        + '<p>Com \\(\\vet{F}=\\vet 0\\), como aqui, sobram só as três de inércia, e como '
+        + '\\(\\Omega\\) é constante a de Euler também some. As duas setas desenhadas na '
+        + 'bola são exatamente o que o observador do disco precisa postular para que a '
+        + 'espiral obedeça à segunda lei.</p>'
+        + '<p>Repare na diferença entre elas. A <strong>centrífuga</strong> aponta sempre '
+        + 'para fora, cresce com a distância ao eixo e não depende de a bola estar se '
+        + 'movendo. A <strong>de Coriolis</strong> é perpendicular à velocidade relativa, '
+        + 'some quando a bola está parada no disco e nunca realiza trabalho, porque é sempre '
+        + 'ortogonal ao deslocamento. É ela que encurva, e a centrífuga apenas afasta.</p>';
+      tipografar(corpo);
+    }
+
+    var chaveAnt = '';
+    function quadro() {
+      if (est.rodando) {
+        est.t += 0.016;
+        if (est.t > TMAX + 0.6) est.t = 0;
+      }
+      desenhar();
+      if (est.vista !== chaveAnt) { chaveAnt = est.vista; texto(); }
+      requestAnimationFrame(quadro);
+    }
+
+    texto();
+    requestAnimationFrame(quadro);
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     17. Gravidade efetiva e o fio de prumo
+     A centrífuga da Terra é pequena, mas não é zero, e o que ela faz
+     de mais instrutivo não é diminuir g: é inclinar a vertical. O
+     desvio do fio de prumo é máximo em 45° e vale seis minutos de
+     arco, e nenhuma construção civil ignora isso.
+     ================================================================= */
+  REGISTRO.pesoefetivo = function (raiz) {
+    var OM = 7.2921e-5, RT = 6.371e6, G0 = 9.8144;
+    var est = { vista: 'corte', lat: 45, exag: 60 };
+
+    var corpo = moldura(raiz, 'A Terra gira: g efetivo e o fio de prumo');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, [
+      { rot: 'Corte da Terra', v: 'corte' },
+      { rot: 'Contra a latitude', v: 'curva' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'latitude', -90, 90, 1, 45,
+      function (v) { est.lat = v; desenhar(); },
+      function (v) { return Math.abs(v) + '° ' + (v >= 0 ? 'N' : 'S'); });
+    deslizante(ctr, 'exagero da centrífuga no desenho', 10, 120, 5, 60,
+      function (v) { est.exag = v; desenhar(); },
+      function (v) { return v + ' vezes'; });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'aceleração centrífuga', k: 'ac' },
+      { rot: 'fração de g', k: 'fr' },
+      { rot: 'g efetivo (só a rotação)', k: 'gef' },
+      { rot: 'desvio do fio de prumo', k: 'des' },
+      { rot: 'desvio em minutos de arco', k: 'min' },
+      { rot: 'g medido nessa latitude', k: 'med' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function dados(latg) {
+      var la = latg * Math.PI / 180;
+      var ac = OM * OM * RT * Math.cos(la);
+      var gv = G0 - ac * Math.cos(la);
+      var gh = ac * Math.sin(la);
+      /* fórmula internacional da gravidade, que já inclui o achatamento */
+      var med = 9.780327 * (1 + 0.0053024 * Math.pow(Math.sin(la), 2)
+        - 0.0000058 * Math.pow(Math.sin(2 * la), 2));
+      return { la: la, ac: ac, gv: gv, gh: gh,
+               g: Math.sqrt(gv * gv + gh * gh),
+               des: Math.atan2(Math.abs(gh), gv) * 180 / Math.PI, med: med };
+    }
+
+    function desenhaCorte() {
+      var D = dados(est.lat), alt = 330;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var R = Math.min((alt - 54) / 2, Lp * 0.26);
+      var cx = Lp * (Lp > 620 ? 0.42 : 0.5), cy = alt / 2;
+
+      /* o globo em corte, com o eixo */
+      ct.beginPath(); ct.arc(cx, cy, R, 0, 2 * Math.PI);
+      ct.fillStyle = 'rgba(23,107,93,.08)'; ct.fill();
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2; ct.stroke();
+      ct.beginPath(); ct.moveTo(cx, cy - R * 1.22); ct.lineTo(cx, cy + R * 1.22);
+      ct.strokeStyle = G.COR.suave; ct.lineWidth = 1.6;
+      ct.setLineDash([6, 4]); ct.stroke(); ct.setLineDash([]);
+      ct.beginPath(); ct.moveTo(cx - R, cy); ct.lineTo(cx + R, cy);
+      ct.strokeStyle = G.COR.grade; ct.lineWidth = 1.4; ct.stroke();
+      rotulo(ct, 'eixo', cx, cy - R * 1.22 - 10, G.COR.suave);
+      rotulo(ct, 'equador', cx + R + 4, cy, G.COR.suave, 'left');
+
+      /* o ponto na latitude escolhida */
+      var px = cx + R * Math.cos(D.la), py = cy - R * Math.sin(D.la);
+      ct.beginPath(); ct.arc(px, py, 5, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.tinta; ct.fill();
+
+      /* distância ao eixo */
+      ct.beginPath(); ct.moveTo(cx, py); ct.lineTo(px, py);
+      ct.strokeStyle = G.COR.grade; ct.lineWidth = 1.4;
+      ct.setLineDash([3, 3]); ct.stroke(); ct.setLineDash([]);
+
+      /* os três vetores, com a centrífuga exagerada para ser visível */
+      var ev = R / G0 * 0.85;
+      var ex = est.exag;
+      seta(ct, px, py, px - Math.cos(D.la) * G0 * ev,
+        py + Math.sin(D.la) * G0 * ev, G.COR.azul, 2.6);
+      rotulo(ct, 'atração', px - Math.cos(D.la) * G0 * ev * 1.1,
+        py + Math.sin(D.la) * G0 * ev * 1.1 + 12, G.COR.azul);
+      seta(ct, px, py, px + D.ac * ex * ev, py, G.COR.vinho, 2.6);
+      rotulo(ct, 'centrífuga ×' + ex, px + D.ac * ex * ev + 8, py - 12,
+        G.COR.vinho, 'left');
+      /* a soma, com a mesma exageração na parte centrífuga */
+      var sx = -Math.cos(D.la) * G0 + D.ac * ex;
+      var sy = Math.sin(D.la) * G0;
+      seta(ct, px, py, px + sx * ev, py + sy * ev, G.COR.bronze, 3);
+      rotulo(ct, 'fio de prumo', px + sx * ev * 1.06, py + sy * ev * 1.06 + 14,
+        G.COR.bronze);
+
+      if (Lp > 620) {
+        rotulo(ct, 'latitude ' + Math.abs(est.lat) + '°', Lp * 0.84, 24, G.COR.tinta);
+        rotulo(ct, 'desvio: ' + F.fmt(D.des * 60, 2) + "'", Lp * 0.84, 46, G.COR.bronze);
+        rotulo(ct, 'g = ' + F.fmt(D.g, 4) + ' m/s²', Lp * 0.84, 68, G.COR.mestra);
+      }
+    }
+
+    function desenhaCurva() {
+      var gr = G.eixos(cv, {
+        altura: 320, xmin: 0, xmax: 90, ymin: 0, ymax: 6.6,
+        rotX: 'latitude (graus)',
+        rotY: "desvio do prumo (')   e   100 (g − 9,78)",
+        marcasX: G.marcasLineares(0, 90, 6, 0),
+        formataY: function (v) { return F.fmt(v, 1); }
+      });
+      G.curva(gr, function (l) { return dados(l).des * 60; }, G.COR.bronze, 2.6);
+      G.curva(gr, function (l) { return 100 * (dados(l).g - 9.78); }, G.COR.mestra, 2.6);
+      G.curva(gr, function (l) { return 100 * (dados(l).med - 9.78); },
+        G.COR.azul, 2.2, [6, 5]);
+      G.vertical(gr, Math.abs(est.lat), G.COR.suave, '', true);
+      var ct = gr.ct;
+      rotulo(ct, 'desvio do fio de prumo, máximo em 45°', gr.X(45),
+        gr.Y(dados(45).des * 60) - 15, G.COR.bronze);
+      rotulo(ct, 'só a rotação', gr.X(72), gr.Y(100 * (dados(72).g - 9.78)) + 15,
+        G.COR.mestra);
+      rotulo(ct, 'g medido, com o achatamento', gr.X(58),
+        gr.Y(100 * (dados(58).med - 9.78)) - 14, '#20486c');
+    }
+
+    function desenhar() {
+      var D = dados(est.lat);
+      if (est.vista === 'corte') desenhaCorte();
+      else desenhaCurva();
+      mostrar({
+        ac: F.fmt(D.ac, 4) + ' m/s²',
+        fr: F.pct(D.ac / G0, 3),
+        gef: F.fmt(D.g, 4) + ' m/s²',
+        des: F.fmt(D.des, 4) + '°',
+        min: F.fmt(D.des * 60, 2) + "'",
+        med: F.fmt(D.med, 4) + ' m/s²'
+      });
+
+      nota.innerHTML =
+        '<p>Um laboratório na superfície da Terra gira com ela, a '
+        + '\\(\\omega=7{,}292\\cruz10^{-5}\\) rad/s. Quem trabalha nesse laboratório e '
+        + 'escreve a segunda lei sem correção está num referencial girante, e paga por isso '
+        + 'com duas forças de inércia.</p>'
+        + '<p>A <strong>centrífuga</strong> aponta para fora do eixo, e não do centro da '
+        + 'Terra. Seu módulo é \\(\\omega^2R\\cos\\lambda\\), que no equador vale 0,0339 '
+        + 'm/s², ou 0,35% de \\(g\\). Decompondo-a na vertical e na horizontal do lugar,</p>'
+        + '\\[g_{\\rm ef}=g_0-\\omega^2R\\cos^2\\lambda,\\qquad '
+        + 'g_{\\rm horiz}=\\omega^2R\\cos\\lambda\\sen\\lambda.\\]'
+        + '<p>A primeira parcela é a que todo mundo cita: a balança marca menos no equador. A '
+        + 'segunda é a mais interessante e quase nunca mencionada. Ela é horizontal, aponta '
+        + 'para o equador, e <strong>inclina a vertical</strong>: o fio de prumo não aponta '
+        + 'para o centro da Terra em latitude nenhuma, exceto nos polos e no equador. O '
+        + 'desvio vale \\(\\left(\\omega^2R/2g\\right)\\sen2\\lambda\\), máximo em 45° de '
+        + 'latitude, onde chega a 5,9 minutos de arco. Em ' + Math.abs(est.lat) + '° ele é '
+        + F.fmt(D.des * 60, 2) + " minutos.</p>"
+        + '<p>Seis minutos de arco parecem pouco até se multiplicar por uma altura. No topo '
+        + 'de um prédio de 200 m, essa inclinação dá 34 cm de diferença em relação à direção '
+        + 'do centro da Terra. Topografia e construção civil trabalham com a vertical do fio '
+        + 'de prumo, que é esta, e não com a direção da atração gravitacional.</p>'
+        + '<p>Uma honestidade necessária: a curva tracejada da segunda vista é o \\(g\\) '
+        + 'realmente medido, e ela não coincide com a prevista só pela rotação. A diferença '
+        + 'vem do <strong>achatamento</strong> da Terra, que afasta o equador do centro e '
+        + 'responde por cerca de um terço da variação total de 9,780 a 9,832 m/s². As duas '
+        + 'causas têm a mesma origem histórica, porque foi a rotação que achatou o planeta, '
+        + 'mas são efeitos distintos.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     18. O pêndulo de Foucault
+     A experiência de 1851 é a demonstração mais direta de que a Terra
+     gira, e o fator sen(latitude) é o que a torna um problema de
+     mecânica e não de astronomia: no equador o pêndulo não precessa, e
+     isso é tão instrutivo quanto o caso do polo.
+     ================================================================= */
+  REGISTRO.foucault = function (raiz) {
+    var DIA = 23.9344699;                 // dia sideral, em horas
+    var est = { lat: 48.87, t: 0, rodando: true, vel: 1 };
+
+    var corpo = moldura(raiz, 'O pêndulo de Foucault, visto de cima');
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'latitude', -90, 90, 1, 49,
+      function (v) { est.lat = v; est.t = 0; },
+      function (v) { return Math.abs(v) + '° ' + (v >= 0 ? 'N' : 'S'); });
+    deslizante(ctr, 'velocidade da animação', 0.3, 4, 0.1, 1,
+      function (v) { est.vel = v; }, function (v) { return F.fmt(v, 1) + '×'; });
+    var bt = el('button', { type: 'button', texto: 'pausar' });
+    bt.addEventListener('click', function () {
+      est.rodando = !est.rodando;
+      bt.textContent = est.rodando ? 'pausar' : 'continuar';
+    });
+    ctr.appendChild(bt);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'latitude', k: 'lat' },
+      { rot: 'taxa de precessão', k: 'taxa' },
+      { rot: 'período de uma volta', k: 'per' },
+      { rot: 'sentido', k: 'sent' },
+      { rot: 'já girou', k: 'ja' },
+      { rot: 'no Panteão de Paris', k: 'paris' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function dados() {
+      var s = Math.sin(est.lat * Math.PI / 180);
+      return { s: s, taxa: 15.041 * s, per: Math.abs(s) < 1e-4 ? Infinity : DIA / Math.abs(s) };
+    }
+
+    function desenhar() {
+      var D = dados(), alt = 310;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var R = Math.min((alt - 56) / 2, Lp * 0.3);
+      var cx = Lp / 2, cy = alt / 2 - 2;
+      /* uma volta do plano de oscilação em TMOSTRA segundos de animação */
+      var ang = -D.s * est.t * 0.55;
+
+      /* a areia do chão e as marcas já riscadas */
+      ct.beginPath(); ct.arc(cx, cy, R, 0, 2 * Math.PI);
+      ct.fillStyle = 'rgba(181,131,31,.08)'; ct.fill();
+      ct.strokeStyle = G.COR.suave; ct.lineWidth = 2; ct.stroke();
+
+      var nm = 26;
+      for (var k = 0; k < nm; k++) {
+        var tk = est.t * k / (nm - 1), ak = -D.s * tk * 0.55;
+        ct.beginPath();
+        ct.moveTo(cx + R * 0.94 * Math.cos(ak), cy - R * 0.94 * Math.sin(ak));
+        ct.lineTo(cx - R * 0.94 * Math.cos(ak), cy + R * 0.94 * Math.sin(ak));
+        ct.strokeStyle = 'rgba(168,96,31,' + (0.07 + 0.2 * k / nm) + ')';
+        ct.lineWidth = 1.2; ct.stroke();
+      }
+
+      /* o plano de oscilação agora, e a massa indo e vindo */
+      ct.beginPath();
+      ct.moveTo(cx + R * 0.94 * Math.cos(ang), cy - R * 0.94 * Math.sin(ang));
+      ct.lineTo(cx - R * 0.94 * Math.cos(ang), cy + R * 0.94 * Math.sin(ang));
+      ct.strokeStyle = G.COR.bronze; ct.lineWidth = 2.4; ct.stroke();
+      var u = 0.94 * Math.cos(est.t * 7);
+      var bx = cx + R * u * Math.cos(ang), by = cy - R * u * Math.sin(ang);
+      ct.beginPath(); ct.arc(bx, by, 7, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.bronze; ct.fill();
+      ct.strokeStyle = '#fff'; ct.lineWidth = 1.6; ct.stroke();
+      ct.beginPath(); ct.arc(cx, cy, 3, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.tinta; ct.fill();
+
+      /* a direção inicial, para medir quanto já girou */
+      ct.beginPath();
+      ct.moveTo(cx + R * 1.02, cy); ct.lineTo(cx - R * 1.02, cy);
+      ct.strokeStyle = G.COR.grade; ct.lineWidth = 1.4;
+      ct.setLineDash([5, 4]); ct.stroke(); ct.setLineDash([]);
+
+      rotulo(ct, D.s > 0.001 ? 'gira no sentido horário'
+        : D.s < -0.001 ? 'gira no sentido anti-horário'
+        : 'não gira: aqui o pêndulo não denuncia nada',
+        cx, 16, Math.abs(D.s) < 0.001 ? G.COR.suave : G.COR.bronze);
+      rotulo(ct, 'norte', cx, cy - R - 14, G.COR.suave);
+
+      mostrar({
+        lat: Math.abs(est.lat) + '° ' + (est.lat >= 0 ? 'N' : 'S'),
+        taxa: F.fmt(D.taxa, 2) + '°/h',
+        per: D.per === Infinity ? 'nunca completa' : F.fmt(D.per, 1) + ' h',
+        sent: D.s > 0.001 ? 'horário (hemisfério norte)'
+          : D.s < -0.001 ? 'anti-horário (sul)' : 'nenhum',
+        ja: F.fmt(Math.abs(ang) * 180 / Math.PI % 360, 0) + '°',
+        paris: '31,8 h, a 48,87° N'
+      });
+    }
+
+    function texto() {
+      var D = dados();
+      nota.innerHTML =
+        '<p>Em 1851, no Panteão de Paris, Foucault pendurou uma esfera de 28 kg num fio de '
+        + '67 m e a pôs a oscilar diante do público. Ao longo das horas, o plano de '
+        + 'oscilação foi girando, riscando a areia do chão em direções sucessivamente '
+        + 'diferentes. Nenhuma força horizontal agia sobre o pêndulo, e ainda assim o plano '
+        + 'girava.</p>'
+        + '<p>A explicação é a força de Coriolis. Decompondo \\(\\vet{\\omega}\\) da Terra na '
+        + 'vertical e na horizontal do lugar, só a componente vertical, '
+        + '\\(\\omega\\sen\\lambda\\), produz desvio no plano horizontal. O plano de '
+        + 'oscilação precessa com essa taxa, no sentido oposto ao da rotação local:</p>'
+        + '\\[\\Omega_{\\rm prec}=-\\,\\omega\\sen\\lambda,\\qquad '
+        + 'T_{\\rm prec}=\\frac{23{,}93\\ {\\rm h}}{\\left|\\sen\\lambda\\right|}.\\]'
+        + '<p>O fator \\(\\sen\\lambda\\) é o que transforma a experiência num problema de '
+        + 'mecânica. No polo, \\(\\sen\\lambda=1\\): o pêndulo mantém o plano fixo em relação '
+        + 'às estrelas e o chão gira sob ele em 23,93 h, que é o dia sideral. Em Paris, a '
+        + '48,87°, o período sobe para 31,8 h, pouco menos de 11° por hora, que foi o que o '
+        + 'público viu.</p>'
+        + '<p>No equador, \\(\\sen\\lambda=0\\) e <strong>o pêndulo não precessa</strong>. '
+        + 'Esse caso é tão instrutivo quanto o do polo: a experiência de Foucault não '
+        + 'funciona em todo lugar, e isso mostra que ela mede a componente vertical da '
+        + 'rotação, não a rotação em si. No hemisfério sul o sentido se inverte, porque '
+        + '\\(\\sen\\lambda\\) troca de sinal.</p>'
+        + '<p>Na latitude atual, ' + Math.abs(est.lat) + '°, a taxa é '
+        + F.fmt(Math.abs(D.taxa), 2) + ' graus por hora'
+        + (D.per === Infinity ? ' e o plano nunca completa uma volta.'
+            : ' e uma volta leva ' + F.fmt(D.per, 1) + ' horas.') + '</p>';
+      tipografar(corpo);
+    }
+
+    var chaveAnt = '';
+    function quadro() {
+      if (est.rodando) est.t += 0.016 * est.vel;
+      desenhar();
+      var chave = String(est.lat);
+      if (chave !== chaveAnt) { chaveAnt = chave; texto(); }
+      requestAnimationFrame(quadro);
+    }
+
+    texto();
+    requestAnimationFrame(quadro);
+    registrarRedesenho(desenhar);
+  };
+
+
+  /* =================================================================
+     19. A força de maré
+     Esta é a figura que o professor plota em Python nas suas aulas: o
+     campo de maré ao redor da Terra, com as duas protuberâncias. O
+     ponto que a figura resolve sozinha é por que existem DUAS marés
+     por dia e não uma: o campo é quadrupolar, não dipolar, porque é o
+     que sobra depois de subtrair a aceleração do centro da Terra.
+     ================================================================= */
+  REGISTRO.mare = function (raiz) {
+    var GN = 6.67430e-11, RT = 6.371e6, MT = 5.972e24, g0 = 9.81;
+    var ASTROS = {
+      lua: { n: 'Lua', M: 7.342e22, D: 3.844e8 },
+      sol: { n: 'Sol', M: 1.989e30, D: 1.496e11 }
+    };
+    var est = { vista: 'campo', caso: 'lua' };
+
+    var corpo = moldura(raiz, 'A força de maré: por que são duas por dia');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, [
+      { rot: 'O campo em volta da Terra', v: 'campo' },
+      { rot: 'Radial e tangencial', v: 'comp' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    var c1 = el('div', { class: 'controles' });
+    corpo.appendChild(c1);
+    c1.appendChild(el('span', { class: 'etiqueta', texto: 'causa' }));
+    opcoes(c1, [
+      { rot: 'só a Lua', v: 'lua' },
+      { rot: 'só o Sol', v: 'sol' },
+      { rot: 'sizígia (alinhados)', v: 'siz' },
+      { rot: 'quadratura (90°)', v: 'qua' }
+    ], 0, function (v) { est.caso = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'maré da Lua (m/s²)', k: 'al' },
+      { rot: 'maré do Sol (m/s²)', k: 'as' },
+      { rot: 'razão Lua / Sol', k: 'raz' },
+      { rot: 'fração de g', k: 'fr' },
+      { rot: 'altura da maré de equilíbrio', k: 'h' },
+      { rot: 'situação', k: 'sit' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* amplitude do campo de maré: a = (GM R / D³)(2cosθ, −senθ) */
+    function amp(a) { return GN * a.M * RT / Math.pow(a.D, 3); }
+    /* altura da maré de equilíbrio, de Δh = (3/2) G M R² / (g D³) */
+    function altura(a) {
+      return 1.5 * GN * a.M * RT * RT / (g0 * Math.pow(a.D, 3));
+    }
+
+    /* o campo total, em unidades da amplitude lunar, no ponto de
+       ângulo θ. A Lua fica em 0°; o Sol, no caso de quadratura, em 90° */
+    function campo(th) {
+      var AL = amp(ASTROS.lua), AS = amp(ASTROS.sol);
+      function par(A, off) {
+        var t = th - off;
+        /* em coordenadas do eixo do astro, e depois de volta */
+        var vx = A * 2 * Math.cos(t), vy = -A * Math.sin(t);
+        var c = Math.cos(off), s = Math.sin(off);
+        return [c * vx - s * vy, s * vx + c * vy];
+      }
+      if (est.caso === 'lua') return par(AL, 0);
+      if (est.caso === 'sol') return par(AS, 0);
+      if (est.caso === 'siz') {
+        var a1 = par(AL, 0), b1 = par(AS, 0);
+        return [a1[0] + b1[0], a1[1] + b1[1]];
+      }
+      var a2 = par(AL, 0), b2 = par(AS, Math.PI / 2);
+      return [a2[0] + b2[0], a2[1] + b2[1]];
+    }
+
+    function desenhaCampo() {
+      var alt = 330;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var R = Math.min((alt - 56) / 2.6, Lp * 0.2);
+      var cx = Lp * 0.42, cy = alt / 2 + 6;
+
+      /* a Terra */
+      ct.beginPath(); ct.arc(cx, cy, R, 0, 2 * Math.PI);
+      ct.fillStyle = 'rgba(23,107,93,.10)'; ct.fill();
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2; ct.stroke();
+
+      /* a direção dos astros */
+      function astro(off, cor, nome) {
+        var dx = Math.cos(off), dy = Math.sin(off);
+        ct.beginPath();
+        ct.moveTo(cx + dx * R * 1.1, cy - dy * R * 1.1);
+        ct.lineTo(cx + dx * (Lp * 0.42), cy - dy * (Lp * 0.42));
+        ct.strokeStyle = cor; ct.lineWidth = 1.4;
+        ct.setLineDash([6, 4]); ct.stroke(); ct.setLineDash([]);
+        var bx = cx + dx * R * 1.95, by = cy - dy * R * 1.95;
+        if (bx < Lp - 18 && by > 14) {
+          ct.beginPath(); ct.arc(bx, by, 9, 0, 2 * Math.PI);
+          ct.fillStyle = cor; ct.fill();
+          rotulo(ct, nome, bx, by - 18, cor);
+        }
+      }
+      if (est.caso !== 'sol') astro(0, G.COR.suave, 'Lua');
+      if (est.caso === 'sol') astro(0, G.COR.ambar, 'Sol');
+      if (est.caso === 'siz') astro(0, G.COR.ambar, '');
+      if (est.caso === 'qua') astro(Math.PI / 2, G.COR.ambar, 'Sol');
+
+      /* o campo de maré na superfície */
+      var AL = amp(ASTROS.lua);
+      /* a maior seta ocupa 0,42 raio: mais que isso e o campo engole a
+         Terra e sai do quadro */
+      var esc = R * 0.21 / (est.caso === 'siz' ? 1.5 : 1) / AL;
+      for (var k = 0; k < 36; k++) {
+        var th = k * Math.PI / 18;
+        var px = cx + R * Math.cos(th), py = cy - R * Math.sin(th);
+        var v = campo(th);
+        seta(ct, px, py, px + v[0] * esc, py - v[1] * esc, G.COR.vinho, 1.8);
+      }
+
+      /* o contorno deformado, bem exagerado */
+      ct.beginPath();
+      for (var j = 0; j <= 180; j++) {
+        var t2 = j * Math.PI / 90, w = campo(t2);
+        var ar = w[0] * Math.cos(t2) + w[1] * Math.sin(t2);
+        var rr = R * (1 + 0.16 * ar / AL / 2);
+        var qx = cx + rr * Math.cos(t2), qy = cy - rr * Math.sin(t2);
+        (j ? ct.lineTo : ct.moveTo).call(ct, qx, qy);
+      }
+      ct.closePath();
+      ct.strokeStyle = G.COR.azul; ct.lineWidth = 2;
+      ct.setLineDash([4, 3]); ct.stroke(); ct.setLineDash([]);
+
+      rotulo(ct, 'a água (deformação muito exagerada)', 10, 16, G.COR.azul, 'left');
+      rotulo(ct, 'força de maré', 10, 32, G.COR.vinho, 'left');
+    }
+
+    function desenhaComp() {
+      var AL = amp(ASTROS.lua);
+      var gr = G.eixos(cv, {
+        altura: 320, xmin: 0, xmax: 360,
+        ymin: -2.2 * AL * 1e6, ymax: 2.6 * AL * 1e6,
+        rotX: 'ângulo a partir da direção do astro (graus)',
+        rotY: 'aceleração de maré (μm/s²)',
+        marcasX: G.marcasLineares(0, 360, 6, 0),
+        formataY: function (v) { return F.fmt(v, 1); }
+      });
+      var rad = function (d) {
+        var t = d * Math.PI / 180, v = campo(t);
+        return (v[0] * Math.cos(t) + v[1] * Math.sin(t)) * 1e6;
+      };
+      var tan = function (d) {
+        var t = d * Math.PI / 180, v = campo(t);
+        return (-v[0] * Math.sin(t) + v[1] * Math.cos(t)) * 1e6;
+      };
+      var ct = gr.ct;
+      ct.strokeStyle = G.COR.grade; ct.lineWidth = 1.4;
+      ct.beginPath(); ct.moveTo(gr.x0, gr.Y(0)); ct.lineTo(gr.x1, gr.Y(0)); ct.stroke();
+      G.curva(gr, tan, G.COR.bronze, 2.4);
+      G.curva(gr, rad, G.COR.vinho, 2.6);
+      rotulo(ct, 'radial: puxa para fora em 0° e em 180°', gr.X(180),
+        gr.Y(rad(180)) - 16, G.COR.vinho);
+      rotulo(ct, 'tangencial: máxima em 45°, e é ela que move a água',
+        gr.X(120), gr.Y(tan(120)) + 16, G.COR.bronze);
+    }
+
+    function desenhar() {
+      if (est.vista === 'campo') desenhaCampo();
+      else desenhaComp();
+
+      var AL = amp(ASTROS.lua), AS = amp(ASTROS.sol);
+      var hL = altura(ASTROS.lua), hS = altura(ASTROS.sol);
+      var h = est.caso === 'lua' ? hL : est.caso === 'sol' ? hS
+        : est.caso === 'siz' ? hL + hS : hL - hS;
+      mostrar({
+        al: F.fmt(AL * 2e6, 3) + ' μm/s²',
+        as: F.fmt(AS * 2e6, 3) + ' μm/s²',
+        raz: F.fmt(AL / AS, 2),
+        fr: F.pct(2 * AL / g0, 6),
+        h: F.fmt(h * 100, 1) + ' cm',
+        sit: est.caso === 'siz' ? 'maré de sizígia: a maior'
+          : est.caso === 'qua' ? 'maré de quadratura: a menor'
+          : est.caso === 'lua' ? 'só a Lua' : 'só o Sol'
+      });
+
+      nota.innerHTML =
+        '<p>A maré não é a atração da Lua: é o que <strong>sobra</strong> dessa atração '
+        + 'depois de descontar a aceleração do centro da Terra, que também está caindo em '
+        + 'direção à Lua. Esse desconto é precisamente a força de inércia de translação da '
+        + 'seção 1, e é por isso que marés são assunto de referencial não inercial.</p>'
+        + '\\[\\vet{F}_{\\rm maré}=-\\frac{GM_Lm}{d^2}\\vers{d}'
+        + '+\\frac{GM_Lm}{D^2}\\vers{D}.\\]'
+        + '<p>Expandindo em potências de \\(R/D\\), que vale 0,0166 para a Lua, os '
+        + 'coeficientes que aparecem são os polinômios de Legendre, e o primeiro termo que '
+        + 'sobrevive é o de \\(P_2\\). Em componentes, com \\(\\theta\\) medido a partir da '
+        + 'direção do astro,</p>'
+        + '\\[a_r=\\frac{GM_LR}{D^3}\\left(3\\cos^2\\theta-1\\right),\\qquad '
+        + 'a_\\theta=-\\frac{3}{2}\\frac{GM_LR}{D^3}\\sen2\\theta.\\]'
+        + '<p>A figura mostra o resultado, e ele explica de uma vez o fato que mais intriga '
+        + 'quem estuda marés: <strong>há duas marés altas por dia, não uma</strong>. O campo '
+        + 'é quadrupolar, com protuberâncias dos <em>dois</em> lados, porque a água do lado '
+        + 'próximo é puxada mais que o centro e a do lado distante é puxada menos. Em ambos '
+        + 'os casos ela se afasta do centro.</p>'
+        + '<p>Repare também em qual componente faz o trabalho. A radial, de '
+        + F.fmt(2 * AL * 1e6, 2) + ' μm/s², é ' + F.pct(2 * AL / g0, 6) + ' de \\(g\\): '
+        + 'levantar o oceano contra a gravidade com isso seria impossível. Quem move a água é '
+        + 'a componente <strong>tangencial</strong>, que não tem nada contra o que lutar e '
+        + 'empurra a água horizontalmente rumo aos dois pontos de maré alta, ao longo de '
+        + 'milhares de quilômetros.</p>'
+        + '<p>A maré do Sol existe e não é desprezível. Como a amplitude vai com '
+        + '\\(M/D^3\\), e não com \\(M/D^2\\), o Sol perde apesar de ter 27 milhões de vezes '
+        + 'a massa da Lua: a razão é \\(\\left(M_L/M_S\\right)\\left(D_S/D_L\\right)^3='
+        + F.fmt(AL / AS, 2) + '\\). Alinhados, os dois se somam e dão a maré de '
+        + '<strong>sizígia</strong>; a 90°, se subtraem e dão a de '
+        + '<strong>quadratura</strong>. Compare as duas nos botões.</p>'
+        + '<p>A altura prevista aqui, de algumas dezenas de centímetros, é a da '
+        + '<em>maré de equilíbrio</em>, que supõe um oceano global sem continentes. Marés '
+        + 'reais de vários metros, como as da baía de Fundy, vêm de ressonância das bacias '
+        + 'oceânicas e de estrangulamento em estreitos, efeitos de hidrodinâmica que esta '
+        + 'conta não captura.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {
