@@ -5718,7 +5718,7 @@
        jamais ter andado de lado.
          fase 1:  dθ = +ds/R,  fase 2:  dθ = −ds/R, ambas em marcha a ré
        Integrando, x = −2R sen Δ e y = −2R(1 − cos Δ), com θ final nulo. */
-    var RG = 1.25, DG = 0.65;          // raio de giro e guinada máxima (rad)
+    var RG = 1.25, DG = 0.78;          // raio de giro e guinada máxima (rad)
     function pose(s) {
       var x = 0, y = 0, th = 0;
       var N = 600, passos = Math.max(0, Math.round(s * N));
@@ -5738,23 +5738,48 @@
       ct.clearRect(0, 0, Lp, alt);
 
       var pf = pose(1), p0 = pose(0);
-      var esc = Math.min(Lp / 5.2, alt / 2.2);
+      var esc = Math.min(Lp / 5.6, alt / 2.4);
       var ox = Lp * 0.5 - (p0[0] + pf[0]) / 2 * esc;
-      var oy = alt * 0.52 + (p0[1] + pf[1]) / 2 * esc;
+      var oy = alt * 0.46 + (p0[1] + pf[1]) / 2 * esc;
       function X(u) { return ox + u * esc; }
       function Y(u) { return oy - u * esc; }
 
       var compr = 0.80, larg = 0.40;      // o carro, em unidades de mundo
 
+      /* Onde pôr os carros parados: não basta medir a partir do destino,
+         porque durante a manobra o carro gira e varre bem mais espaço do
+         que ocupa parado. Percorremos a manobra inteira, tomamos os cantos
+         do carro em cada instante e deixamos os vizinhos fora desse
+         envelope, com uma folga. */
+      function cantos(qq) {
+        var c = Math.cos(qq[2]), sn = Math.sin(qq[2]);
+        var lista = [];
+        [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(function (sg) {
+          var dx = sg[0] * compr / 2, dy = sg[1] * larg / 2;
+          lista.push([qq[0] + dx * c - dy * sn, qq[1] + dx * sn + dy * c]);
+        });
+        return lista;
+      }
+      var xmin = Infinity, xmax = -Infinity;
+      for (var kv = 0; kv <= 60; kv++) {
+        cantos(pose(kv / 60)).forEach(function (c) {
+          if (c[0] < xmin) xmin = c[0];
+          if (c[0] > xmax) xmax = c[0];
+        });
+      }
+      var folga = 0.10;
+      var xTras = xmax + compr / 2 + folga;     // o que fica atrás da vaga
+      var xFrente = xmin - compr / 2 - folga;   // o que fica à frente
+
       /* o meio-fio e os dois carros estacionados, posicionados em torno
          da vaga para onde a manobra leva */
-      var ymf = pf[1] - larg * 0.80;
+      var ymf = pf[1] - larg * 0.72;
       ct.beginPath();
-      ct.moveTo(X(pf[0] - 2.6), Y(ymf)); ct.lineTo(X(pf[0] + 2.6), Y(ymf));
+      ct.moveTo(0, Y(ymf)); ct.lineTo(Lp, Y(ymf));
       ct.strokeStyle = G.COR.tinta; ct.lineWidth = 2.4; ct.stroke();
       ct.fillStyle = 'rgba(27,31,36,.06)';
-      ct.fillRect(X(pf[0] - 2.6), Y(ymf), 5.2 * esc, alt);
-      rotulo(ct, 'meio-fio', X(pf[0] + 2.5), Y(ymf) + 16, G.COR.suave, 'right');
+      ct.fillRect(0, Y(ymf), Lp, alt);
+      rotulo(ct, 'meio-fio', Lp - 12, Y(ymf) + 16, G.COR.suave, 'right');
 
       function carro(q, cor, contorno) {
         ct.save();
@@ -5775,14 +5800,14 @@
         ct.restore();
       }
 
-      carro([pf[0] - 1.18, pf[1], 0], 'rgba(27,31,36,.17)');
-      carro([pf[0] + 1.18, pf[1], 0], 'rgba(27,31,36,.17)');
+      carro([xFrente, pf[1], 0], 'rgba(27,31,36,.17)');
+      carro([xTras, pf[1], 0], 'rgba(27,31,36,.17)');
 
       /* a vaga, entre os dois */
       ct.strokeStyle = G.COR.clara; ct.lineWidth = 1.6;
       ct.setLineDash([6, 5]);
-      ct.strokeRect(X(pf[0] - 0.62), Y(pf[1] + larg * 0.62),
-        1.24 * esc, larg * 1.24 * esc);
+      ct.strokeRect(X(xFrente + compr / 2), Y(pf[1] + larg * 0.70),
+        (xTras - xFrente - compr) * esc, larg * 1.40 * esc);
       ct.setLineDash([]);
 
       /* o rastro já percorrido */
@@ -6360,6 +6385,674 @@
         + 'cinco vezes mais rígida que a biapoiada, e a viga em balanço é a mais flexível de '
         + 'todas por uma margem larga. É o mesmo material e a mesma carga: o que muda é '
         + 'apenas a condição de contorno de um problema variacional.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     37. O pêndulo duplo e a sensibilidade às condições iniciais
+     Duas cópias com diferença inicial de um milésimo de grau. As
+     equações saem de uma lagrangiana de duas linhas e o resultado é
+     caos determinístico.
+     ================================================================= */
+  REGISTRO.duplo = function (raiz) {
+    var g0 = 9.80665;
+    var est = { th1: 120, th2: 60, delta: 1e-3, rodando: true, t: 0 };
+    var m1 = 1, m2 = 1, L1 = 1, L2 = 1;
+    var A = null, B = null, rastro = [];
+
+    var corpo = moldura(raiz, 'O pêndulo duplo: duas linhas de lagrangiana, caos de sobra');
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'ângulo inicial de cima', 10, 175, 1, 120,
+      function (v) { est.th1 = v; reiniciar(); }, function (v) { return v + '°'; });
+    deslizante(ctr, 'ângulo inicial de baixo', 10, 175, 1, 60,
+      function (v) { est.th2 = v; reiniciar(); }, function (v) { return v + '°'; });
+    var bt = el('button', { type: 'button', texto: 'recomeçar' });
+    bt.addEventListener('click', reiniciar);
+    ctr.appendChild(bt);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'diferença inicial', k: 'd0' },
+      { rot: 'diferença agora', k: 'd' },
+      { rot: 'fator de ampliação', k: 'amp' },
+      { rot: 'tempo decorrido', k: 't' },
+      { rot: 'energia da cópia A', k: 'E' },
+      { rot: 'desvio relativo da energia', k: 'dE' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function energia(y) {
+      var t1 = y[0], t2 = y[1], w1 = y[2], w2 = y[3];
+      var T = 0.5 * (m1 + m2) * L1 * L1 * w1 * w1
+        + 0.5 * m2 * L2 * L2 * w2 * w2
+        + m2 * L1 * L2 * w1 * w2 * Math.cos(t1 - t2);
+      var V = -(m1 + m2) * g0 * L1 * Math.cos(t1) - m2 * g0 * L2 * Math.cos(t2);
+      return T + V;
+    }
+    /* as equações que saem das duas equações de Lagrange, já resolvidas
+       para as acelerações angulares */
+    function deriv(y) {
+      var t1 = y[0], t2 = y[1], w1 = y[2], w2 = y[3];
+      var d = t1 - t2, s = Math.sin(d), c = Math.cos(d);
+      var den = m1 + m2 * s * s;
+      var a1 = (-m2 * L1 * w1 * w1 * s * c
+        - m2 * g0 * Math.sin(t2) * c
+        - m2 * L2 * w2 * w2 * s
+        - (m1 + m2) * g0 * Math.sin(t1)) / (L1 * den);
+      var a2 = ((m1 + m2) * (L1 * w1 * w1 * s
+        - g0 * Math.sin(t2) + g0 * Math.sin(t1) * c)
+        + m2 * L2 * w2 * w2 * s * c) / (L2 * den);
+      return [w1, w2, a1, a2];
+    }
+    function passo(y, h) {
+      function soma(a, b, f) { return a.map(function (v, i) { return v + f * b[i]; }); }
+      var k1 = deriv(y);
+      var k2 = deriv(soma(y, k1, h / 2));
+      var k3 = deriv(soma(y, k2, h / 2));
+      var k4 = deriv(soma(y, k3, h));
+      return y.map(function (v, i) {
+        return v + h / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]);
+      });
+    }
+    function reiniciar() {
+      var r = Math.PI / 180;
+      A = [est.th1 * r, est.th2 * r, 0, 0];
+      B = [est.th1 * r + est.delta * r, est.th2 * r, 0, 0];
+      est.t = 0; rastro = [];
+      est.E0 = energia(A);
+    }
+    reiniciar();
+
+    function pos(y) {
+      var x1 = L1 * Math.sin(y[0]), y1 = L1 * Math.cos(y[0]);
+      return [x1, y1, x1 + L2 * Math.sin(y[1]), y1 + L2 * Math.cos(y[1])];
+    }
+
+    function desenhar() {
+      var alt = 340;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+      var meia = Lp * 0.46;
+
+      var esc = Math.min(meia * 0.38, (alt - 70) / 2.6);
+      var ox = meia * 0.5, oy = alt * 0.34;
+      function X(u) { return ox + u * esc; }
+      function Y(u) { return oy + u * esc; }
+
+      /* o rastro da ponta da cópia A */
+      ct.beginPath();
+      rastro.forEach(function (q, i) {
+        (i ? ct.lineTo : ct.moveTo).call(ct, X(q[0]), Y(q[1]));
+      });
+      ct.strokeStyle = 'rgba(123,184,171,.75)'; ct.lineWidth = 1.4; ct.stroke();
+
+      [[B, G.COR.bronze, 0.55], [A, G.COR.mestra, 1]].forEach(function (par) {
+        var q = pos(par[0]);
+        ct.save();
+        ct.globalAlpha = par[2];
+        ct.beginPath();
+        ct.moveTo(X(0), Y(0)); ct.lineTo(X(q[0]), Y(q[1])); ct.lineTo(X(q[2]), Y(q[3]));
+        ct.strokeStyle = par[1]; ct.lineWidth = 2.6; ct.stroke();
+        [[q[0], q[1], 7], [q[2], q[3], 9]].forEach(function (b) {
+          ct.beginPath(); ct.arc(X(b[0]), Y(b[1]), b[2], 0, 2 * Math.PI);
+          ct.fillStyle = par[1]; ct.fill();
+        });
+        ct.restore();
+      });
+      ct.beginPath(); ct.arc(X(0), Y(0), 4, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.tinta; ct.fill();
+      rotulo(ct, 'cópia A', 12, 16, G.COR.mestra, 'left');
+      rotulo(ct, 'cópia B, deslocada de 0,001°', 12, 32, G.COR.bronze, 'left');
+
+      /* painel 2: a separação entre as duas cópias, em escala log */
+      var sep = Math.abs(A[0] - B[0]) + Math.abs(A[1] - B[1]) + 1e-16;
+      hist.push([est.t, sep]);
+      if (hist.length > 1500) hist.shift();
+      var g2 = G.eixos(cv, {
+        altura: alt, xmin: 0, xmax: Math.max(20, est.t),
+        ymin: -8, ymax: 1,
+        rotX: 't (s)', rotY: 'log₁₀ da separação (rad)',
+        marcasX: G.marcasLineares(0, Math.max(20, est.t), 5, 0),
+        formataY: function (v) { return F.fmt(v, 0); },
+        limpar: false, margem: { e: meia + 62, d: 16, c: 16, b: 40 }
+      });
+      var c2 = g2.ct;
+      c2.beginPath();
+      hist.forEach(function (q, i) {
+        var yy = Math.log(q[1]) / Math.LN10;
+        (i ? c2.lineTo : c2.moveTo).call(c2,
+          g2.X(q[0]), g2.Y(Math.max(-8, Math.min(1, yy))));
+      });
+      c2.strokeStyle = G.COR.vinho; c2.lineWidth = 2.2; c2.stroke();
+      G.curva(g2, function () { return 0; }, G.COR.grade, 1.4);
+      rotulo(c2, 'separação da ordem do próprio ângulo',
+        g2.x1 - 6, g2.Y(0) - 12, G.COR.suave, 'right');
+
+      var amp = sep / (est.delta * Math.PI / 180);
+      mostrar({
+        d0: '0,001° = 1,75×10⁻⁵ rad',
+        d: F.fmt(sep, 6) + ' rad',
+        amp: F.fmt(amp, 1) + ' vezes',
+        t: F.fmt(est.t, 1) + ' s',
+        E: F.fmt(energia(A), 4) + ' J por kg',
+        dE: F.pct(Math.abs(energia(A) - est.E0) / Math.abs(est.E0), 4)
+      });
+
+      nota.innerHTML =
+        '<p>Duas coordenadas bastam, \\(\\theta_1\\) e \\(\\theta_2\\), medidas a partir da '
+        + 'vertical. As posições são \\(x_1=\\ell_1\\sen\\theta_1\\), '
+        + '\\(y_1=-\\ell_1\\cos\\theta_1\\), e a segunda massa acompanha a primeira. '
+        + 'Derivando e somando os quadrados, o termo cruzado sobrevive, e é dele que vem '
+        + 'todo o acoplamento:</p>'
+        + '\\[T=\\tfrac12\\left(m_1+m_2\\right)\\ell_1^2\\dot\\theta_1^2'
+        + '+\\tfrac12m_2\\ell_2^2\\dot\\theta_2^2'
+        + '+m_2\\ell_1\\ell_2\\dot\\theta_1\\dot\\theta_2'
+        + '\\cos\\left(\\theta_1-\\theta_2\\right),\\]'
+        + '\\[V=-\\left(m_1+m_2\\right)g\\ell_1\\cos\\theta_1-m_2g\\ell_2\\cos\\theta_2.\\]'
+        + '<p>Duas equações de Lagrange saem daí por derivação direta. Pela via de Newton '
+        + 'seriam necessárias as duas trações, com quatro equações e duas incógnitas a '
+        + 'eliminar.</p>'
+        + '<p>As duas cópias desenhadas começam separadas por um milésimo de grau, uma '
+        + 'diferença de \\(1{,}75\\cruz10^{-5}\\) rad, abaixo do que qualquer experimento '
+        + 'controla. O segundo painel acompanha a separação em escala logarítmica, e o '
+        + 'trecho retilíneo que aparece no começo é o crescimento <strong>exponencial</strong> '
+        + 'característico: a inclinação dessa reta é o expoente de Lyapunov. Quando a '
+        + 'separação chega à ordem do próprio ângulo, as duas trajetórias não têm mais '
+        + 'relação entre si.</p>'
+        + '<p>Nada disso é aleatório. As equações são determinísticas, a integração é a mesma '
+        + 'para as duas cópias, e o cartão do desvio de energia mostra que o método numérico '
+        + 'está sob controle. O que há é sensibilidade às condições iniciais, e é essa a '
+        + 'definição de <strong>caos determinístico</strong>. A consequência prática é que '
+        + 'prever o estado do sistema daqui a um minuto exigiria conhecer o estado inicial com '
+        + 'uma precisão que cresce exponencialmente com o horizonte de previsão.</p>';
+      tipografar(corpo);
+    }
+    var hist = [];
+
+    registrarRedesenho(desenhar);
+    (function animar() {
+      if (est.rodando) {
+        for (var i = 0; i < 8; i++) {
+          A = passo(A, 0.002); B = passo(B, 0.002); est.t += 0.002;
+        }
+        var q = pos(A);
+        rastro.push([q[2], q[3]]);
+        if (rastro.length > 900) rastro.shift();
+        desenhar();
+      }
+      requestAnimationFrame(animar);
+    })();
+  };
+
+  /* =================================================================
+     38. O potencial efetivo do problema de Kepler
+     O problema de duas coordenadas vira um de uma só, e o tipo de
+     órbita se lê no gráfico antes de resolver equação nenhuma.
+     ================================================================= */
+  REGISTRO.potefetivo = function (raiz) {
+    var est = { l: 1, E: -0.35 };
+
+    var corpo = moldura(raiz, 'O potencial efetivo decide o tipo de órbita');
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'momento angular ℓ', 0.4, 1.8, 0.02, 1,
+      function (v) { est.l = v; desenhar(); },
+      function (v) { return F.fmt(v, 2); });
+    deslizante(ctr, 'energia E', -1.2, 0.5, 0.01, -0.35,
+      function (v) { est.E = v; desenhar(); },
+      function (v) { return F.fmt(v, 2); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'tipo de órbita', k: 'tipo' },
+      { rot: 'excentricidade e', k: 'e' },
+      { rot: 'periélio r₁', k: 'r1' },
+      { rot: 'afélio r₂', k: 'r2' },
+      { rot: 'raio da órbita circular', k: 'rc' },
+      { rot: 'energia mínima possível', k: 'Em' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* m = k = 1, de modo que U_ef = l²/2r² − 1/r */
+    function Uef(r) { return est.l * est.l / (2 * r * r) - 1 / r; }
+
+    function desenhar() {
+      var alt = 330;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+      var meia = Lp * 0.52;
+
+      var rc = est.l * est.l;                 // mínimo de U_ef
+      var Emin = -1 / (2 * est.l * est.l);
+      var E = Math.max(est.E, Emin + 1e-6);
+      var ecc = Math.sqrt(Math.max(0, 1 + 2 * E * est.l * est.l));
+      /* pontos de retorno: raízes de E = U_ef */
+      var r1 = null, r2 = null;
+      if (E < 0) {
+        var a = -1 / (2 * E);
+        r1 = a * (1 - ecc); r2 = a * (1 + ecc);
+      } else {
+        r1 = est.l * est.l / (1 + ecc);
+      }
+
+      var rmax = 6;
+      var g1 = G.eixos(cv, {
+        altura: alt, xmin: 0.05, xmax: rmax, ymin: -1.3, ymax: 0.7,
+        rotX: 'r', rotY: 'energia',
+        marcasX: G.marcasLineares(0, rmax, 6, 0),
+        formataY: function (v) { return F.fmt(v, 1); },
+        margem: { e: 54, d: Lp - meia + 10, c: 16, b: 40 }
+      });
+      G.curva(g1, function (r) { return est.l * est.l / (2 * r * r); },
+        G.COR.azul, 1.8, [5, 4]);
+      G.curva(g1, function (r) { return -1 / r; }, G.COR.bronze, 1.8, [5, 4]);
+      G.curva(g1, Uef, G.COR.mestra, 2.8);
+      G.curva(g1, function () { return E; }, G.COR.vinho, 2.2);
+      G.curva(g1, function () { return 0; }, G.COR.grade, 1.4);
+      var c1 = g1.ct;
+      [[r1, 'r₁'], [r2, 'r₂']].forEach(function (q) {
+        if (q[0] === null || q[0] > rmax) return;
+        c1.beginPath(); c1.arc(g1.X(q[0]), g1.Y(E), 5, 0, 2 * Math.PI);
+        c1.fillStyle = G.COR.vinho; c1.fill();
+        rotulo(c1, q[1], g1.X(q[0]), g1.Y(E) - 16, G.COR.vinho);
+      });
+      c1.beginPath(); c1.arc(g1.X(rc), g1.Y(Uef(rc)), 5, 0, 2 * Math.PI);
+      c1.fillStyle = G.COR.tinta; c1.fill();
+      G.legenda(g1, [
+        { texto: 'U_ef', cor: G.COR.mestra },
+        { texto: 'centrífugo', cor: G.COR.azul },
+        { texto: '−1/r', cor: G.COR.bronze },
+        { texto: 'E', cor: G.COR.vinho }
+      ]);
+
+      /* painel 2: a órbita correspondente */
+      var esc = Math.min((Lp - meia) * 0.16, alt * 0.19);
+      var ox = meia + (Lp - meia) * 0.52, oy = alt * 0.52;
+      function X(u) { return ox + u * esc; }
+      function Y(u) { return oy - u * esc; }
+      var sl = est.l * est.l;                 // semi-latus rectum
+      ct.beginPath();
+      var ini = true;
+      for (var i = 0; i <= 600; i++) {
+        var fi = -Math.PI + 2 * Math.PI * i / 600;
+        var den = 1 + ecc * Math.cos(fi);
+        if (den <= 0.02) { ini = true; continue; }
+        var r = sl / den;
+        if (r > 40) { ini = true; continue; }
+        var xx = X(r * Math.cos(fi)), yy = Y(r * Math.sin(fi));
+        if (ini) { ct.moveTo(xx, yy); ini = false; } else ct.lineTo(xx, yy);
+      }
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2.6; ct.stroke();
+      ct.beginPath(); ct.arc(X(0), Y(0), 7, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.bronze; ct.fill();
+      rotulo(ct, 'foco', X(0), Y(0) - 18, G.COR.bronze);
+      rotulo(ct, ecc < 1e-3 ? 'circunferência'
+        : (ecc < 1 ? 'elipse' : (ecc > 1.001 ? 'hipérbole' : 'parábola')),
+        ox, 20, G.COR.suave);
+
+      mostrar({
+        tipo: ecc < 1e-3 ? 'circular' : (ecc < 1 ? 'elíptica'
+          : (ecc > 1.001 ? 'hiperbólica' : 'parabólica')),
+        e: F.fmt(ecc, 4),
+        r1: F.fmt(r1, 4),
+        r2: r2 === null ? 'não há (órbita aberta)' : F.fmt(r2, 4),
+        rc: F.fmt(rc, 4),
+        Em: F.fmt(Emin, 4)
+      });
+
+      nota.innerHTML =
+        '<p>Para uma força central a lagrangiana no plano é '
+        + '\\(\\Lag=\\tfrac12m\\left(\\dot r^2+r^2\\dot\\varphi^2\\right)-V(r)\\), e '
+        + '\\(\\varphi\\) é cíclica, de modo que \\(\\ell=mr^2\\dot\\varphi\\) é constante. '
+        + 'Levando isso à energia,</p>'
+        + '\\[E=\\tfrac12m\\dot r^2+\\frac{\\ell^2}{2mr^2}+V(r)'
+        + '=\\tfrac12m\\dot r^2+U_{\\rm ef}(r).\\]'
+        + '<p>O problema de duas coordenadas virou um problema de <strong>uma só</strong>: uma '
+        + 'partícula de massa \\(m\\) movendo-se em \\(r\\) sob o potencial efetivo</p>'
+        + '\\[U_{\\rm ef}(r)=\\frac{\\ell^2}{2mr^2}-\\frac{k}{r}.\\]'
+        + '<p>O primeiro termo é repulsivo e domina perto da origem: é a barreira '
+        + 'centrífuga, e é ela que impede uma partícula com \\(\\ell\\neq0\\) de cair no '
+        + 'centro. O segundo é a atração de sempre, e domina longe.</p>'
+        + '<p>A partir daí o gráfico responde tudo sem resolver equação nenhuma. A reta '
+        + 'horizontal é \\(E\\), e o movimento radial só acontece onde \\(E>U_{\\rm ef}\\), '
+        + 'porque \\(\\tfrac12m\\dot r^2\\) não pode ser negativo. Os cruzamentos são os '
+        + 'pontos de retorno, periélio e afélio.</p>'
+        + '<ul><li>\\(E=U_{\\rm ef,min}\\): um único raio possível, órbita '
+        + '<strong>circular</strong>;</li>'
+        + '<li>\\(U_{\\rm ef,min}<E<0\\): dois pontos de retorno, órbita '
+        + '<strong>elíptica</strong>;</li>'
+        + '<li>\\(E=0\\): <strong>parabólica</strong>, no limiar do escape;</li>'
+        + '<li>\\(E>0\\): um só ponto de retorno, órbita '
+        + '<strong>hiperbólica</strong>.</li></ul>'
+        + '<p>A excentricidade sai da mesma conta, '
+        + '\\(e=\\sqrt{1+2E\\ell^2/mk^2}\\), e o segundo painel desenha a cônica '
+        + 'correspondente. Mexa no momento angular e veja a barreira centrífuga subir: com '
+        + '\\(\\ell\\) grande, a partícula não consegue chegar perto do centro por mais '
+        + 'energia que tenha disponível na direção radial.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     39. Potencial generalizado: a força de Lorentz
+     A força magnética depende da velocidade e ainda assim cabe no
+     formalismo. O widget integra o movimento e separa o momento
+     canônico do mecânico.
+     ================================================================= */
+  REGISTRO.lorentz = function (raiz) {
+    var est = { B: 1, E: 0.35, v0: 1, t: 0, rodando: true };
+    var q = 1, m = 1, s = null, rastro = [];
+
+    var corpo = moldura(raiz, 'A força de Lorentz a partir de um potencial que depende da velocidade');
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'campo magnético B (para fora da tela)', 0.4, 2.5, 0.05, 1,
+      function (v) { est.B = v; reiniciar(); },
+      function (v) { return F.fmt(v, 2) + ' T'; });
+    deslizante(ctr, 'campo elétrico E (para cima)', 0, 1.2, 0.05, 0.35,
+      function (v) { est.E = v; reiniciar(); },
+      function (v) { return F.fmt(v, 2) + ' V/m'; });
+    deslizante(ctr, 'rapidez inicial', 0.2, 2.5, 0.05, 1,
+      function (v) { est.v0 = v; reiniciar(); },
+      function (v) { return F.fmt(v, 2) + ' m/s'; });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'raio de Larmor mv/qB', k: 'rl' },
+      { rot: 'frequência de cíclotron qB/m', k: 'wc' },
+      { rot: 'velocidade de deriva E/B', k: 'vd' },
+      { rot: 'rapidez atual', k: 'v' },
+      { rot: 'momento mecânico mv_x', k: 'pm' },
+      { rot: 'momento canônico mv_x + qA_x', k: 'pc' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function reiniciar() {
+      s = [0, 0, est.v0, 0];
+      rastro = []; est.t = 0;
+    }
+    reiniciar();
+
+    function deriv(y) {
+      /* B = B ẑ, E = E ŷ, de modo que v × B = (v_y B, −v_x B, 0) */
+      return [y[2], y[3],
+        q / m * (0 + y[3] * est.B),
+        q / m * (est.E - y[2] * est.B)];
+    }
+    function passo(y, h) {
+      function soma(a, b, f) { return a.map(function (v, i) { return v + f * b[i]; }); }
+      var k1 = deriv(y), k2 = deriv(soma(y, k1, h / 2));
+      var k3 = deriv(soma(y, k2, h / 2)), k4 = deriv(soma(y, k3, h));
+      return y.map(function (v, i) {
+        return v + h / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]);
+      });
+    }
+
+    function desenhar() {
+      var alt = 320;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var rl = m * est.v0 / (q * est.B), vd = est.E / est.B;
+      var alcance = Math.max(4 * rl, Math.abs(s[0]) + 2 * rl, 3);
+      var esc = Math.min(Lp * 0.42 / alcance, (alt - 70) / (4.2 * rl + 1));
+      var ox = Lp * 0.12, oy = alt * 0.52;
+      function X(u) { return ox + u * esc; }
+      function Y(u) { return oy - u * esc; }
+
+      /* a malha de pontos que marca B saindo da tela */
+      ct.fillStyle = 'rgba(44,95,141,.35)';
+      for (var i = 0; i < 90; i++) {
+        var gx = 18 + (i % 15) * (Lp - 36) / 14;
+        var gy = 24 + Math.floor(i / 15) * (alt - 60) / 5;
+        ct.beginPath(); ct.arc(gx, gy, 1.8, 0, 2 * Math.PI); ct.fill();
+      }
+      rotulo(ct, 'B sai da tela', Lp - 12, 16, G.COR.azul, 'right');
+      seta(ct, 20, alt - 20, 20, alt - 56, G.COR.bronze, 2);
+      rotulo(ct, 'E', 30, alt - 40, G.COR.bronze, 'left');
+
+      ct.beginPath();
+      rastro.forEach(function (r, k) {
+        (k ? ct.lineTo : ct.moveTo).call(ct, X(r[0]), Y(r[1]));
+      });
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2; ct.stroke();
+
+      /* a deriva, em tracejado: o centro de giro caminha com E/B */
+      if (est.E > 0) {
+        ct.beginPath();
+        ct.moveTo(X(0), Y(rl));
+        ct.lineTo(X(vd * est.t), Y(rl));
+        ct.strokeStyle = G.COR.bronze; ct.lineWidth = 1.8;
+        ct.setLineDash([6, 5]); ct.stroke(); ct.setLineDash([]);
+        rotulo(ct, 'deriva E×B', X(vd * est.t * 0.5), Y(rl) - 14, G.COR.bronze);
+      }
+
+      ct.beginPath(); ct.arc(X(s[0]), Y(s[1]), 8, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.vinho; ct.fill();
+      seta(ct, X(s[0]), Y(s[1]), X(s[0]) + s[2] * esc * 0.5,
+        Y(s[1]) + s[3] * esc * 0.5, G.COR.tinta, 2);
+
+      var v = Math.hypot(s[2], s[3]);
+      /* no calibre simétrico A = (−By/2, Bx/2, 0) */
+      var Ax = -est.B * s[1] / 2;
+      mostrar({
+        rl: F.fmt(rl, 4) + ' m',
+        wc: F.fmt(q * est.B / m, 4) + ' rad/s',
+        vd: F.fmt(vd, 4) + ' m/s',
+        v: F.fmt(v, 4) + ' m/s',
+        pm: F.fmt(m * s[2], 4),
+        pc: F.fmt(m * s[2] + q * Ax, 4)
+      });
+
+      nota.innerHTML =
+        '<p>A força magnética \\(q\\vet{v}\\cruz\\vet{B}\\) depende da velocidade, e por isso '
+        + 'não vem de nenhum potencial \\(V(\\vet{r})\\). Ela também não realiza trabalho, '
+        + 'porque é perpendicular a \\(\\vet{v}\\): muda a direção do movimento sem mudar a '
+        + 'rapidez, como o cartão confirma a cada instante quando \\(E=0\\).</p>'
+        + '<p>Mesmo assim ela cabe no formalismo, através de um <strong>potencial '
+        + 'generalizado</strong>, isto é, um \\(U\\) que pode depender da velocidade. A '
+        + 'definição é</p>'
+        + '\\[F_i=-\\pder{U}{x_i}+\\der{}{t}\\left(\\pder{U}{\\dot x_i}\\right),\\]'
+        + '<p>e para o eletromagnetismo a escolha que funciona é</p>'
+        + '\\[U=q\\phi-q\\,\\vet{v}\\cdot\\vet{A}'
+        + '\\qquad\\Longrightarrow\\qquad'
+        + '\\Lag=\\tfrac12m v^2-q\\phi+q\\,\\vet{v}\\cdot\\vet{A}.\\]'
+        + '<p>Aplicando Euler-Lagrange a essa lagrangiana e usando '
+        + '\\(\\vet{E}=-\\nabla\\phi-\\partial\\vet{A}/\\partial t\\) e '
+        + '\\(\\vet{B}=\\nabla\\cruz\\vet{A}\\), sai exatamente '
+        + '\\(m\\ddot{\\vet{r}}=q\\left(\\vet{E}+\\vet{v}\\cruz\\vet{B}\\right)\\).</p>'
+        + '<p>A consequência mais importante está no momento conjugado. Derivando a '
+        + 'lagrangiana em \\(\\dot x\\),</p>'
+        + '\\[p_x=\\pder{\\Lag}{\\dot x}=m\\dot x+qA_x,\\]'
+        + '<p>que <em>não</em> é o momento mecânico. Os dois cartões do fim mostram a '
+        + 'diferença. O momento canônico depende do calibre escolhido para \\(\\vet{A}\\), e '
+        + 'portanto não é observável sozinho; o mecânico é. Essa distinção reaparece em '
+        + 'mecânica quântica, na substituição mínima '
+        + '\\(\\vet{p}\\to\\vet{p}-q\\vet{A}\\), e está por trás do efeito Aharonov-Bohm.</p>'
+        + '<p>O movimento desenhado é a soma de duas coisas: o giro de cíclotron, de raio '
+        + '\\(mv/qB\\) e frequência \\(qB/m\\), e a <strong>deriva</strong> do centro de giro, '
+        + 'com velocidade \\(\\vet{E}\\cruz\\vet{B}/B^2\\). Repare que a deriva é '
+        + 'perpendicular aos dois campos e independe da carga e da massa: íons e elétrons '
+        + 'derivam juntos, no mesmo sentido, e é por isso que o processo não gera corrente. '
+        + 'É o mecanismo que confina plasma em tokamaks e o que organiza os cinturões de Van '
+        + 'Allen.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+    (function animar() {
+      if (est.rodando) {
+        for (var i = 0; i < 6; i++) { s = passo(s, 0.006); est.t += 0.006; }
+        rastro.push([s[0], s[1]]);
+        if (rastro.length > 1400) rastro.shift();
+        if (s[0] * 1 > 60) reiniciar();
+        desenhar();
+      }
+      requestAnimationFrame(animar);
+    })();
+  };
+
+  /* =================================================================
+     40. A função de dissipação de Rayleigh
+     Atrito viscoso dentro do formalismo, e a verificação numérica de
+     que dE/dt = −2F.
+     ================================================================= */
+  REGISTRO.rayleigh = function (raiz) {
+    var est = { b: 0.6, vista: 'x' };
+    var m = 1, k = 4;                  // ω₀ = 2 rad/s
+
+    var corpo = moldura(raiz, 'A função de Rayleigh: atrito dentro do formalismo');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, [
+      { rot: 'posição x(t)', v: 'x' },
+      { rot: 'energia e dissipação', v: 'E' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'coeficiente de amortecimento b', 0, 8, 0.05, 0.6,
+      function (v) { est.b = v; desenhar(); },
+      function (v) { return F.fmt(v, 2) + ' kg/s'; });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'regime', k: 'reg' },
+      { rot: 'ω₀ = √(k/m)', k: 'w0' },
+      { rot: 'γ = b/2m', k: 'gam' },
+      { rot: 'ω′ = √(ω₀² − γ²)', k: 'wl' },
+      { rot: 'tempo para cair a 1/e', k: 'tau' },
+      { rot: 'fator de qualidade Q', k: 'Q' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    var T = 10;
+    function solucao() {
+      var g = est.b / (2 * m), w0 = Math.sqrt(k / m);
+      if (Math.abs(g - w0) < 1e-6) {
+        return function (t) { return (1 + w0 * t) * Math.exp(-g * t); };
+      }
+      if (g < w0) {
+        var wl = Math.sqrt(w0 * w0 - g * g);
+        return function (t) {
+          return Math.exp(-g * t) * (Math.cos(wl * t) + g / wl * Math.sin(wl * t));
+        };
+      }
+      var s = Math.sqrt(g * g - w0 * w0);
+      var l1 = -g + s, l2 = -g - s;
+      var A = -l2 / (l1 - l2), B = l1 / (l1 - l2);
+      return function (t) { return A * Math.exp(l1 * t) + B * Math.exp(l2 * t); };
+    }
+
+    function desenhar() {
+      var x = solucao();
+      function vel(t) { return (x(t + 1e-5) - x(t - 1e-5)) / 2e-5; }
+      function ener(t) { var v = vel(t); return 0.5 * m * v * v + 0.5 * k * x(t) * x(t); }
+      function rayl(t) { var v = vel(t); return 0.5 * est.b * v * v; }
+
+      var gr;
+      if (est.vista === 'x') {
+        gr = G.eixos(cv, {
+          altura: 300, xmin: 0, xmax: T, ymin: -1.15, ymax: 1.15,
+          rotX: 't (s)', rotY: 'x (m)',
+          marcasX: G.marcasLineares(0, T, 5, 0),
+          formataY: function (v) { return F.fmt(v, 1); }
+        });
+        var g = est.b / (2 * m);
+        G.curva(gr, function (t) { return Math.exp(-g * t); }, G.COR.bronze, 1.8, [6, 4]);
+        G.curva(gr, function (t) { return -Math.exp(-g * t); }, G.COR.bronze, 1.8, [6, 4]);
+        G.curva(gr, function () { return 0; }, G.COR.grade, 1.4);
+        G.curva(gr, x, G.COR.mestra, 2.8);
+        G.legenda(gr, [
+          { texto: 'x(t)', cor: G.COR.mestra },
+          { texto: 'envoltória e^{−γt}', cor: G.COR.bronze }
+        ]);
+      } else {
+        var emax = ener(0) * 1.1 + 1e-6;
+        gr = G.eixos(cv, {
+          altura: 300, xmin: 0, xmax: T, ymin: 0, ymax: emax,
+          rotX: 't (s)', rotY: 'energia (J) e dissipação (W)',
+          marcasX: G.marcasLineares(0, T, 5, 0),
+          formataY: function (v) { return F.fmt(v, 1); }
+        });
+        G.curva(gr, ener, G.COR.mestra, 2.8);
+        G.curva(gr, function (t) { return 2 * rayl(t); }, G.COR.vinho, 2.2);
+        G.curva(gr, function (t) {
+          return -(ener(t + 1e-3) - ener(t - 1e-3)) / 2e-3;
+        }, G.COR.bronze, 2.6, [7, 5]);
+        G.legenda(gr, [
+          { texto: 'E(t)', cor: G.COR.mestra },
+          { texto: '2ℱ', cor: G.COR.vinho },
+          { texto: '−dE/dt', cor: G.COR.bronze }
+        ]);
+      }
+
+      var g2 = est.b / (2 * m), w0 = Math.sqrt(k / m);
+      var reg = Math.abs(g2 - w0) < 0.02 ? 'crítico'
+        : (g2 < w0 ? 'subamortecido' : 'superamortecido');
+      mostrar({
+        reg: reg,
+        w0: F.fmt(w0, 3) + ' rad/s',
+        gam: F.fmt(g2, 3) + ' s⁻¹',
+        wl: g2 < w0 ? F.fmt(Math.sqrt(w0 * w0 - g2 * g2), 3) + ' rad/s' : 'não há oscilação',
+        tau: est.b > 0 ? F.fmt(1 / g2, 3) + ' s' : 'não decai',
+        Q: est.b > 0 ? F.fmt(w0 / (2 * g2), 3) : 'infinito'
+      });
+
+      nota.innerHTML =
+        '<p>Atrito viscoso não vem de potencial nenhum, e mesmo assim entra no formalismo sem '
+        + 'estragá-lo. Para forças da forma \\(\\vet{F}_i=-b_i\\vet{v}_i\\), define-se a '
+        + '<strong>função de dissipação de Rayleigh</strong></p>'
+        + '\\[\\mathcal{F}=\\tfrac12\\sum_ib_iv_i^2,\\]'
+        + '<p>com a propriedade de que a força generalizada dissipativa é '
+        + '\\(Q_j=-\\partial\\mathcal{F}/\\partial\\dot q_j\\). As equações de Lagrange '
+        + 'ganham então um lado direito:</p>'
+        + '\\[\\der{}{t}\\left(\\pder{\\Lag}{\\dot q_j}\\right)-\\pder{\\Lag}{q_j}'
+        + '=-\\pder{\\mathcal{F}}{\\dot q_j}.\\]'
+        + '<p>Para a massa presa à mola, \\(\\Lag=\\tfrac12m\\dot x^2-\\tfrac12kx^2\\) e '
+        + '\\(\\mathcal{F}=\\tfrac12b\\dot x^2\\), de modo que</p>'
+        + '\\[m\\ddot x+b\\dot x+kx=0,\\]'
+        + '<p>a equação do oscilador amortecido. Com \\(\\gamma=b/2m\\) e '
+        + '\\(\\omega_0=\\sqrt{k/m}\\) há três regimes: subamortecido '
+        + '(\\(\\gamma<\\omega_0\\)), com oscilação de frequência '
+        + '\\(\\omega\'=\\sqrt{\\omega_0^2-\\gamma^2}\\) dentro de uma envoltória '
+        + '\\(e^{-\\gamma t}\\); crítico (\\(\\gamma=\\omega_0\\)), que volta ao equilíbrio no '
+        + 'menor tempo possível sem ultrapassá-lo, e é o que se projeta num amortecedor de '
+        + 'automóvel; e superamortecido (\\(\\gamma>\\omega_0\\)), lento e sem oscilar.</p>'
+        + '<p>O nome da função fica claro na segunda vista. A taxa com que o sistema perde '
+        + 'energia é</p>'
+        + '\\[\\der{E}{t}=-2\\mathcal{F},\\]'
+        + '<p>e as duas curvas desenhadas, \\(-dE/dt\\) calculado numericamente e '
+        + '\\(2\\mathcal{F}\\) calculado pela fórmula, coincidem ponto a ponto. O fator dois é '
+        + 'convenção, pelo mesmo motivo do meio em \\(T=\\tfrac12mv^2\\): ele torna a '
+        + 'derivada limpa.</p>'
+        + '<p>A mesma estrutura descreve um circuito RLC, com \\(Q\\) no lugar de \\(x\\), '
+        + '\\(L\\) no lugar de \\(m\\), \\(1/C\\) no lugar de \\(k\\) e \\(R\\) no lugar de '
+        + '\\(b\\). A lagrangiana é \\(\\tfrac12L\\dot Q^2-Q^2/2C\\) e a função de Rayleigh é '
+        + '\\(\\tfrac12R\\dot Q^2\\), com \\(2\\mathcal{F}=RI^2\\), que é a potência '
+        + 'dissipada por efeito Joule. A analogia não é metáfora: são as mesmas equações.</p>';
       tipografar(corpo);
     }
 
