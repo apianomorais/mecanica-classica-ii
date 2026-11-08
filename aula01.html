@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 1: Cinemática dos corpos rígidos | Mecânica Clássica II</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611081818">
+<script src="assets/js/comum.js?v=202611081818"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Mecânica Clássica II <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html">Início</a>
+      <span class="grupo">Corpos rígidos</span>
+      <a href="aula01.html" class="num ativo" title="Módulo 1: Cinemática dos corpos rígidos">1</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+<aside class="lateral">
+  <h4>Neste módulo</h4>
+  <ol>
+    <li><a href="#s1">1. O que é um corpo rígido</a></li>
+    <li><a href="#s2">2. Seis graus de liberdade</a></li>
+    <li><a href="#s3">3. Translação mais rotação</a></li>
+    <li><a href="#s4">4. De onde vem a velocidade angular</a></li>
+    <li><a href="#s5">5. Por que ω não depende do ponto</a></li>
+    <li><a href="#s6">6. Composição de rotações</a></li>
+    <li><a href="#s7">7. A aceleração de um ponto</a></li>
+    <li><a href="#s8">8. O eixo instantâneo de rotação</a></li>
+    <li><a href="#s9">9. Rolamento sem deslizamento</a></li>
+    <li><a href="#s10">10. Exercícios resolvidos</a></li>
+    <li><a href="#s11">11. Exercícios propostos</a></li>
+  </ol>
+</aside>
+
+<main class="conteudo">
+
+  <p class="chapeu">Módulo 1 · Corpos rígidos</p>
+  <h1>Cinemática dos corpos rígidos</h1>
+  <p class="subtitulo">Um corpo rígido tem um número astronômico de coordenadas e apenas seis
+  graus de liberdade. Toda a cinemática cabe numa única equação, \(\vet{v}=\vet{v}_O+
+  \vet{\omega}\cruz\vet{s}\), e o trabalho deste módulo é mostrar de onde ela vem, por que
+  \(\vet{\omega}\) é a mesma para o corpo inteiro e por que um ângulo de rotação finito não
+  é um vetor, apesar de todas as aparências.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Objetivos</span>
+    <ul>
+      <li>Contar os seis graus de liberdade de um corpo rígido e identificá-los;</li>
+      <li>Deduzir \(\dot{\vers{e}}_i=\vet{\omega}\cruz\vers{e}_i\) a partir do vínculo de rigidez;</li>
+      <li>Mostrar que \(\vet{\omega}\) independe do ponto de referência escolhido;</li>
+      <li>Explicar por que rotações finitas não comutam e velocidades angulares somam;</li>
+      <li>Separar a aceleração de um ponto em parcela tangencial e centrípeta;</li>
+      <li>Localizar o eixo instantâneo de rotação e aplicá-lo ao rolamento.</li>
+    </ul>
+  </div>
+
+  <hr class="linha">
+
+  <!-- ================================================== -->
+  <h2 id="s1">1. O que é um corpo rígido</h2>
+
+  <p>Um <strong>corpo rígido</strong> é um sistema de partículas em que todas as distâncias
+  mútuas são constantes no tempo:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Vínculo de rigidez</span>
+    \[\left|\vet{r}_i-\vet{r}_j\right|=c_{ij}=\text{constante},\qquad
+    \text{para todo par }(i,j).\]
+  </div>
+
+  <p>É uma idealização, e convém saber exatamente em que sentido. Um corpo perfeitamente
+  rígido transmitiria um empurrão de uma ponta à outra instantaneamente, o que a relatividade
+  proíbe. Num corpo real o empurrão viaja com a velocidade do som no material, uns 5 000 m/s
+  no aço. A rigidez é uma boa aproximação quando o tempo que o som leva para atravessar o
+  corpo é desprezível diante dos tempos do movimento que estamos estudando, e quando as
+  deformações são pequenas comparadas às dimensões envolvidas.</p>
+
+  <p>Para uma barra de aço de meio metro, o som a atravessa em \(10^{-4}\) s. Num problema
+  de rotação com período de um segundo, isso é irrelevante. Num problema de impacto
+  balístico, não é, e o modelo de corpo rígido deixa de valer.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que começar por aqui</span>
+    <p>O corpo rígido é o <strong>sistema vinculado mais simples que existe</strong>, e por
+    isso é o lugar certo para sentir o problema que o formalismo lagrangiano vai resolver.
+    As forças internas que mantêm as distâncias fixas são desconhecidas, incontáveis, e no
+    fim não realizam trabalho nenhum. Carregá-las até o fim da conta para então descartá-las
+    é um desperdício, e os módulos 7 a 12 existem para eliminar esse desperdício.</p>
+    <p>Mas antes disso é preciso ver o que o método newtoniano consegue, e consegue muito:
+    toda a cinemática deste módulo sai de álgebra vetorial elementar aplicada ao vínculo
+    acima.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s2">2. Seis graus de liberdade</h2>
+
+  <p>Um corpo com \(N\) partículas tem \(3N\) coordenadas. O vínculo de rigidez impõe
+  \(N(N-1)/2\) equações, que para \(N\) grande é muito mais que \(3N\). Se as equações fossem
+  independentes, o número de graus de liberdade seria negativo, o que é absurdo. Elas não são
+  independentes, e a contagem correta é a seguinte.</p>
+
+  <p>Escolha três pontos do corpo que não sejam colineares. Eles determinam o corpo inteiro,
+  porque a posição de qualquer outra partícula fica fixada pelas três distâncias até eles.
+  Então:</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Ponto</th><th>Liberdade que resta</th><th>Coordenadas</th></tr></thead>
+    <tbody>
+      <tr><td>1.º</td><td>nenhuma restrição: qualquer lugar do espaço</td><td>3</td></tr>
+      <tr><td>2.º</td><td>a distância ao 1.º é fixa: uma esfera</td><td>2</td></tr>
+      <tr><td>3.º</td><td>as distâncias aos dois primeiros são fixas: uma circunferência</td><td>1</td></tr>
+      <tr><td>demais</td><td>totalmente determinados</td><td>0</td></tr>
+      <tr><td><strong>total</strong></td><td></td><td><strong>6</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Seis, independentemente de o corpo ter mil átomos ou \(10^{23}\). A leitura física dos
+  seis é imediata: <strong>três</strong> dizem onde o corpo está, por exemplo as coordenadas
+  do centro de massa, e <strong>três</strong> dizem como ele está orientado. O espaço de
+  configurações de um corpo rígido livre é, portanto, \(\R^3\) para a posição e, para a
+  orientação, o conjunto das rotações do espaço, que se chama \(SO(3)\).</p>
+
+  <p>Os três ângulos de orientação podem ser escolhidos de várias maneiras. A escolha
+  clássica, que será vista em Mecânica Clássica III, são os <strong>ângulos de Euler</strong>.
+  Neste módulo eles não são necessários: tudo o que vem a seguir é independente dessa
+  escolha.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Contagem em casos vinculados</span>
+    <ul>
+      <li>Corpo livre no espaço: <strong>6</strong> (3 de translação, 3 de rotação).</li>
+      <li>Corpo com um ponto fixo, como um pião apoiado: <strong>3</strong> (só rotação).</li>
+      <li>Corpo com um eixo fixo, como uma porta: <strong>1</strong>.</li>
+      <li>Corpo que se move num plano, como um disco rolando numa mesa: <strong>3</strong>
+        (duas coordenadas no plano e um ângulo).</li>
+      <li>Disco rolando sem deslizar numa reta: <strong>1</strong>, porque \(x\) e \(\theta\)
+        ficam amarrados por \(x=R\theta\).</li>
+    </ul>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. Translação mais rotação</h2>
+
+  <p>Escolha um ponto \(O\) qualquer <em>do corpo</em> e acompanhe o movimento em duas etapas:
+  primeiro transporte o corpo inteiro, sem girar, até que \(O\) chegue à sua nova posição;
+  depois gire o corpo em torno de \(O\) até a orientação correta. Esse é o
+  <strong>teorema de Chasles</strong>: qualquer deslocamento de um corpo rígido pode ser
+  escrito como uma translação seguida de uma rotação em torno de um eixo que passa por um
+  ponto escolhido à vontade.</p>
+
+  <p>O ponto delicado, e que a próxima seção vai demonstrar, é este:</p>
+
+  <div class="destaque">
+    <span class="anuncio">O que depende da escolha e o que não depende</span>
+    <p>A <strong>parcela de translação</strong> depende inteiramente de qual ponto \(O\) foi
+    escolhido. Escolhendo outro ponto, ela muda.</p>
+    <p>A <strong>rotação</strong> não. O eixo e o ângulo de giro são os mesmos para qualquer
+    escolha de \(O\). Por isso faz sentido falar da velocidade angular <em>do corpo</em>,
+    enquanto nunca faz sentido falar da velocidade <em>do corpo</em>.</p>
+  </div>
+
+  <p>Chasles provou ainda um resultado mais forte: existe sempre uma escolha de eixo para a
+  qual a translação restante é <em>paralela</em> ao eixo de rotação, de modo que o movimento
+  mais geral de um corpo rígido é um <strong>movimento helicoidal</strong>, como o de um
+  parafuso entrando na madeira. Voltaremos a isso na seção 8.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. De onde vem a velocidade angular</h2>
+
+  <p>A velocidade angular costuma ser apresentada como uma definição, o que é uma pena,
+  porque ela na verdade é um <em>teorema</em>: ela existe, e é um vetor, como consequência
+  direta do vínculo de rigidez. A demonstração é curta.</p>
+
+  <p>Prenda ao corpo um sistema de eixos \(\vers{e}_1,\vers{e}_2,\vers{e}_3\), que giram com
+  ele. Como o corpo é rígido, esses três vetores permanecem ortonormais em todo instante:</p>
+
+  <p>\[\vers{e}_i\cdot\vers{e}_j=\delta_{ij}.\]</p>
+
+  <p>Derive essa identidade em relação ao tempo:</p>
+
+  <p>\[\dot{\vers{e}}_i\cdot\vers{e}_j+\vers{e}_i\cdot\dot{\vers{e}}_j=0.\]</p>
+
+  <p>Chamando \(A_{ij}\equiv\dot{\vers{e}}_i\cdot\vers{e}_j\), o que a equação diz é</p>
+
+  <p>\[A_{ij}=-A_{ji}:\qquad\text{a matriz }\Ten{A}\text{ é antissimétrica.}\]</p>
+
+  <p>Aqui está o passo decisivo. Uma matriz antissimétrica \(3\cruz3\) tem a diagonal nula e
+  apenas <strong>três</strong> componentes independentes, que podemos batizar como quisermos.
+  Batizemos assim:</p>
+
+  <p>\[\omega_1\equiv A_{23},\qquad \omega_2\equiv A_{31},\qquad \omega_3\equiv A_{12},
+  \qquad\text{ou seja}\qquad A_{ij}=\varepsilon_{ijk}\,\omega_k.\]</p>
+
+  <p>Com isso, \(\dot{\vers{e}}_i=\sum_j A_{ij}\vers{e}_j\) vira exatamente um produto
+  vetorial. Conferindo em \(i=1\):</p>
+
+  <p>\[\dot{\vers{e}}_1=A_{12}\vers{e}_2+A_{13}\vers{e}_3=\omega_3\vers{e}_2-\omega_2\vers{e}_3,\]</p>
+
+  <p>e, por outro lado,</p>
+
+  <p>\[\vet{\omega}\cruz\vers{e}_1=
+  \left(\omega_1\vers{e}_1+\omega_2\vers{e}_2+\omega_3\vers{e}_3\right)\cruz\vers{e}_1
+  =\omega_3\vers{e}_2-\omega_2\vers{e}_3.\]</p>
+
+  <p>São a mesma coisa. Logo</p>
+
+  <div class="destaque">
+    <span class="anuncio">O teorema da velocidade angular</span>
+    \[\dot{\vers{e}}_i=\vet{\omega}\cruz\vers{e}_i,\qquad i=1,2,3.\]
+    Existe um e um só vetor \(\vet{\omega}\) que descreve como o sistema de eixos preso ao
+    corpo gira. Ele não foi postulado: foi extraído da antissimetria que a ortonormalidade
+    impôs.
+  </div>
+
+  <p>O resto é consequência. Seja \(P\) um ponto qualquer do corpo e \(\vet{s}\) o vetor que
+  vai de \(O\) até \(P\). Como ambos pertencem ao corpo, as componentes de \(\vet{s}\) na base
+  presa ao corpo são <em>constantes</em>: é exatamente isso que a rigidez significa. Então</p>
+
+  <p>\[\dot{\vet{s}}=\frac{d}{dt}\sum_i s_i\vers{e}_i=\sum_i s_i\dot{\vers{e}}_i
+  =\vet{\omega}\cruz\sum_i s_i\vers{e}_i=\vet{\omega}\cruz\vet{s},\]</p>
+
+  <p>e, como \(\vet{r}_P=\vet{r}_O+\vet{s}\),</p>
+
+  <div class="destaque">
+    <span class="anuncio">A equação fundamental da cinemática do corpo rígido</span>
+    \[\boxed{\;\vet{v}_P=\vet{v}_O+\vet{\omega}\cruz\vet{s}\;}\]
+  </div>
+
+  <p>Toda a cinemática deste módulo está nessa linha. Note onde a rigidez entrou: no fato de
+  os \(s_i\) serem constantes. Se o corpo se deformasse, apareceria um termo
+  \(\sum_i\dot s_i\vers{e}_i\), que é precisamente a velocidade de deformação estudada em
+  meios contínuos.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O mesmo resultado, dito em matrizes</span>
+    <p>Se \(\Ten{R}(t)\) é a matriz de rotação que leva a base fixa à base do corpo, então
+    \(\Ten{R}\Ten{R}^{\sf T}=\Ten{1}\). Derivando,
+    \(\dot{\Ten{R}}\Ten{R}^{\sf T}+\Ten{R}\dot{\Ten{R}}^{\sf T}=\Ten{0}\), ou seja, a matriz
+    \(\Ten{\Omega}=\dot{\Ten{R}}\Ten{R}^{\sf T}\) é antissimétrica. É a mesma
+    \(\Ten{A}\) de cima, e \(\vet{\omega}\) é o chamado <strong>vetor axial</strong> de
+    \(\Ten{\Omega}\):</p>
+    \[\Ten{\Omega}=\begin{pmatrix}0&-\omega_3&\omega_2\\
+    \omega_3&0&-\omega_1\\-\omega_2&\omega_1&0\end{pmatrix}.\]
+    <p>Esse é o enunciado que reaparece em Mecânica Clássica III, quando as rotações forem
+    tratadas como grupo. O conteúdo físico é idêntico.</p>
+  </div>
+
+  <div data-widget="corporigido"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. Por que ω não depende do ponto</h2>
+
+  <p>A demonstração da seção anterior partiu de um ponto \(O\) escolhido. Será que outro
+  ponto daria outro \(\vet{\omega}\)? Suponha que sim e chame de \(\vet{\omega}'\) a
+  velocidade angular obtida com um segundo ponto \(O'\), também do corpo. Para um ponto
+  \(P\) qualquer teríamos as duas expressões</p>
+
+  <p>\[\vet{v}_P=\vet{v}_O+\vet{\omega}\cruz(\vet{r}_P-\vet{r}_O),\qquad
+  \vet{v}_P=\vet{v}_{O'}+\vet{\omega}\,'\cruz(\vet{r}_P-\vet{r}_{O'}).\]</p>
+
+  <p>Mas \(O'\) também é ponto do corpo, de modo que a primeira expressão aplicada a ele dá
+  \(\vet{v}_{O'}=\vet{v}_O+\vet{\omega}\cruz(\vet{r}_{O'}-\vet{r}_O)\). Substituindo na
+  segunda e subtraindo da primeira, todos os termos se cancelam e sobra</p>
+
+  <p>\[\left(\vet{\omega}-\vet{\omega}\,'\right)\cruz\left(\vet{r}_P-\vet{r}_{O'}\right)=\vet 0.\]</p>
+
+  <p>Isso vale para <em>todo</em> ponto \(P\) do corpo, e um corpo rígido tem pontos em
+  direções não colineares. Um vetor que dá produto vetorial nulo com vetores de direções
+  diferentes só pode ser o vetor nulo. Logo \(\vet{\omega}=\vet{\omega}\,'\).</p>
+
+  <div class="bloco def">
+    <span class="rotulo">A assimetria que vale memorizar</span>
+    <p><strong>A velocidade é propriedade do ponto.</strong> Pontos diferentes do mesmo corpo
+    têm velocidades diferentes, e a pergunta "qual é a velocidade daquele pião?" não tem
+    resposta sem dizer de que ponto se fala.</p>
+    <p><strong>A velocidade angular é propriedade do movimento.</strong> Ela é a mesma em todo
+    ponto, em todo instante, para qualquer escolha de origem. É por isso que \(\vet{\omega}\)
+    merece o artigo definido e aparece sozinha nas equações de dinâmica dos próximos
+    módulos.</p>
+  </div>
+
+  <p>No simulador acima, a segunda vista mostra isso diretamente: trocando o ponto de apoio,
+  as duas parcelas da decomposição mudam completamente, mas a soma, que é a velocidade real
+  de cada ponto, não se mexe. A translação é uma convenção; a rotação é um fato.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. Composição de rotações</h2>
+
+  <p>Suponha três referenciais: o laboratório, um carrossel que gira em relação a ele, e um
+  cavalinho que gira em relação ao carrossel. Como se combinam as velocidades angulares?</p>
+
+  <p>Seja \(\vet{u}\) um vetor fixo no cavalinho. Visto do carrossel, ele gira com
+  \(\vet{\omega}_{32}\), de modo que \((d\vet{u}/dt)_2=\vet{\omega}_{32}\cruz\vet{u}\). Mas o
+  carrossel gira com \(\vet{\omega}_{21}\) em relação ao laboratório, e a regra de derivação
+  entre referenciais girantes, que decorre diretamente da seção 4, é</p>
+
+  <div class="destaque">
+    <span class="anuncio">Teorema do transporte</span>
+    \[\left(\der{\vet{Q}}{t}\right)_{\!\text{fixo}}=
+    \left(\der{\vet{Q}}{t}\right)_{\!\text{girante}}+\vet{\omega}\cruz\vet{Q},\]
+    válido para qualquer vetor \(\vet{Q}\). É o motor do módulo 6, onde darão as forças
+    centrífuga e de Coriolis.
+  </div>
+
+  <p>Aplicando, \((d\vet{u}/dt)_1=\vet{\omega}_{32}\cruz\vet{u}+\vet{\omega}_{21}\cruz\vet{u}
+  =(\vet{\omega}_{32}+\vet{\omega}_{21})\cruz\vet{u}\), e portanto</p>
+
+  <p>\[\vet{\omega}_{31}=\vet{\omega}_{21}+\vet{\omega}_{32}.\]</p>
+
+  <p>Velocidades angulares <strong>somam como vetores</strong>, e somam na ordem que se
+  queira. Isso parece banal até percebermos que o mesmo é falso para as rotações finitas.</p>
+
+  <h3>Rotações finitas não são vetores</h3>
+
+  <p>Pegue um livro e gire-o 90° em torno de um eixo horizontal, depois 90° em torno de um
+  eixo vertical. Agora recomece e faça na ordem inversa. O livro termina em posições
+  diferentes. Em símbolos,</p>
+
+  <p>\[\Ten{R}_z\Ten{R}_x\neq\Ten{R}_x\Ten{R}_z.\]</p>
+
+  <p>Um ângulo de rotação finito tem módulo, direção e sentido, e ainda assim
+  <strong>não é um vetor</strong>, porque lhe falta a propriedade mais básica de todas: a
+  soma comutativa. O conjunto das rotações é um grupo, e um grupo não comutativo.</p>
+
+  <div data-widget="comutam"></div>
+
+  <p>A reconciliação está na ordem do infinitésimo. Escreva uma rotação pequena como um
+  desvio da identidade, \(\Ten{R}=\Ten{1}+\Ten{A}\), com \(\Ten{A}\) antissimétrica e da
+  ordem do ângulo \(\varphi\). Então</p>
+
+  <p>\[\Ten{R}_1\Ten{R}_2=\Ten{1}+\Ten{A}_1+\Ten{A}_2+\Ten{A}_1\Ten{A}_2,\qquad
+  \Ten{R}_2\Ten{R}_1=\Ten{1}+\Ten{A}_1+\Ten{A}_2+\Ten{A}_2\Ten{A}_1,\]</p>
+
+  <p>e a diferença entre as duas ordens é \(\Ten{A}_1\Ten{A}_2-\Ten{A}_2\Ten{A}_1\), que é de
+  <strong>segunda ordem</strong> em \(\varphi\). Em primeira ordem as duas são iguais:
+  rotações infinitesimais comutam. E como \(\vet{\omega}=d\vet{\varphi}/dt\) é construída a
+  partir de rotações infinitesimais, ela herda a comutatividade e é legitimamente um vetor.
+  O simulador mede esse desencontro e mostra que ele acompanha a curva \(\varphi^2\) enquanto
+  os giros são pequenos.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. A aceleração de um ponto</h2>
+
+  <p>Derive a equação fundamental em relação ao tempo, lembrando que
+  \(\dot{\vet{s}}=\vet{\omega}\cruz\vet{s}\):</p>
+
+  <p>\[\vet{a}_P=\vet{a}_O+\dot{\vet{\omega}}\cruz\vet{s}+\vet{\omega}\cruz\dot{\vet{s}}
+  =\vet{a}_O+\vet{\alpha}\cruz\vet{s}+\vet{\omega}\cruz\left(\vet{\omega}\cruz\vet{s}\right),\]</p>
+
+  <p>onde \(\vet{\alpha}=\dot{\vet{\omega}}\) é a <strong>aceleração angular</strong>.
+  Usando a identidade do duplo produto vetorial,
+  \(\vet{a}\cruz(\vet{b}\cruz\vet{c})=\vet{b}(\vet{a}\cdot\vet{c})-\vet{c}(\vet{a}\cdot\vet{b})\),</p>
+
+  <p>\[\vet{\omega}\cruz\left(\vet{\omega}\cruz\vet{s}\right)
+  =\vet{\omega}\left(\vet{\omega}\cdot\vet{s}\right)-\omega^2\vet{s}
+  =-\omega^2\vet{s}_\perp,\]</p>
+
+  <p>em que \(\vet{s}_\perp\) é a componente de \(\vet{s}\) perpendicular ao eixo. Essa
+  parcela aponta sempre <em>para</em> o eixo: é a aceleração centrípeta.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Parcela</th><th>Expressão</th><th>Direção</th><th>Some quando</th></tr></thead>
+    <tbody>
+      <tr><td>do ponto de apoio</td><td>\(\vet{a}_O\)</td><td>qualquer</td>
+        <td>\(O\) não acelera</td></tr>
+      <tr><td>tangencial</td><td>\(\vet{\alpha}\cruz\vet{s}\)</td>
+        <td>perpendicular a \(\vet{s}_\perp\) e ao eixo</td><td>\(\vet{\alpha}=0\)</td></tr>
+      <tr><td>centrípeta</td><td>\(-\omega^2\vet{s}_\perp\)</td><td>aponta para o eixo</td>
+        <td>\(\omega=0\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>A terceira vista do simulador da seção 4 desenha essas duas parcelas separadamente.
+  Vale experimentar \(\alpha=0\) com \(\omega\) grande, para ver a centrípeta sozinha
+  crescendo com o quadrado, e depois \(\omega=0\) com \(\alpha\) grande, para ver a
+  tangencial sozinha crescendo com a distância ao eixo.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. O eixo instantâneo de rotação</h2>
+
+  <p>Volte à equação fundamental e pergunte: existe algum ponto do corpo, ou da sua extensão
+  rígida imaginária, cuja velocidade seja paralela a \(\vet{\omega}\)? Procuramos
+  \(\vet{r}^{*}\) tal que \(\vet{v}_O+\vet{\omega}\cruz(\vet{r}^{*}-\vet{r}_O)=\lambda
+  \vet{\omega}\). A resposta é</p>
+
+  <div class="destaque">
+    <span class="anuncio">Eixo instantâneo (eixo de Mozzi e Chasles)</span>
+    \[\vet{r}^{*}=\vet{r}_O+\frac{\vet{\omega}\cruz\vet{v}_O}{\omega^{2}}+t\,\vet{\omega},
+    \qquad t\in\R.\]
+  </div>
+
+  <p>Verificar é um exercício de duplo produto vetorial: levando \(\vet{r}^*\) à equação
+  fundamental sobra \(\vet{v}=\vet{\omega}(\vet{\omega}\cdot\vet{v}_O)/\omega^2\), que é de
+  fato paralelo a \(\vet{\omega}\). Todos os pontos dessa reta têm a <em>mesma</em>
+  velocidade, paralela ao eixo, e ela é a menor velocidade que existe no corpo naquele
+  instante.</p>
+
+  <p>O movimento geral é, portanto, um <strong>parafuso</strong>: rotação em torno do eixo
+  instantâneo mais deslizamento ao longo dele. O passo do parafuso, isto é, o avanço por
+  radianto de giro, é \(h=(\vet{\omega}\cdot\vet{v}_O)/\omega^2\).</p>
+
+  <p>Há um caso particular importante e comum. Quando \(\vet{v}_O\perp\vet{\omega}\), o
+  deslizamento é nulo e o eixo instantâneo é um eixo de pontos <strong>em
+  repouso</strong>. Todo movimento plano é desse tipo, e aí fala-se em <em>centro
+  instantâneo de rotação</em>: naquele instante o corpo gira em torno dele como se estivesse
+  espetado ali por um prego. O prego, porém, muda de lugar a cada instante.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. Rolamento sem deslizamento</h2>
+
+  <p>A aplicação mais útil do eixo instantâneo é o rolamento. Uma roda de raio \(R\) avança
+  com o centro a velocidade \(v\) girando com velocidade angular \(\omega\). A velocidade do
+  ponto do pneu que toca o chão é, pela equação fundamental,</p>
+
+  <p>\[v_{\text{contato}}=v-\omega R.\]</p>
+
+  <p><strong>Rolar sem deslizar é exigir que essa velocidade seja zero.</strong> O vínculo
+  \(v=\omega R\) não é uma hipótese adicional, é a tradução matemática de que o pneu não
+  escorrega sobre o asfalto. E uma vez imposto, o ponto de contato é o centro instantâneo de
+  rotação, de onde sai de graça a velocidade de qualquer outro ponto:</p>
+
+  <p>\[\left|\vet{v}\right|=\omega\,\overline{PC}=2R\omega\,\sen\frac{\theta}{2},\]</p>
+
+  <p>com \(\theta\) medido a partir do ponto de contato. No topo, \(\theta=\pi\) e
+  \(|\vet{v}|=2R\omega=2v\): o alto do pneu de um carro a 100 km/h move-se a 200 km/h em
+  relação ao chão.</p>
+
+  <div data-widget="rolamento"></div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Velocidade nula, aceleração não</span>
+    <p>O ponto de contato tem velocidade zero, mas sua aceleração não é zero. Com \(\omega\)
+    constante, a equação da seção 7 dá, para o ponto de contato, \(\vet{s}=-R\vers{y}\) e
+    \(\vet{a}_C=0\), de modo que</p>
+    \[\vet{a}_{\text{contato}}=-\omega^2\vet{s}=+\omega^2R\,\vers{y},\]
+    <p>apontando para cima, na direção do centro. Está certo e é necessário: a velocidade do
+    ponto de contato é nula <em>naquele instante</em>, mas um instante depois aquele pedaço
+    de pneu já subiu, e para isso precisa ser acelerado. É por isso que a trajetória de um
+    ponto da borda faz um <strong>bico</strong> ao tocar o chão, e não uma curva suave.</p>
+  </div>
+
+  <p>A trajetória de um ponto da borda é a <strong>cicloide</strong>, e seus bicos no chão
+  são a assinatura geométrica do vínculo: uma curva só faz bico onde a velocidade se anula.
+  Um arco completo tem comprimento \(8R\) e encerra área \(3\pi R^2\), resultados que foram
+  motivo de disputas ferozes no século XVII, quando a curva ganhou o apelido de "Helena dos
+  geômetras".</p>
+
+  <p>Uma observação para o módulo 9. Para uma roda que rola numa <em>reta</em>, o vínculo
+  \(x=R\theta\) pode ser integrado e elimina uma coordenada: é um vínculo
+  <strong>holônomo</strong>. Para uma esfera ou um disco que rola sobre um <em>plano</em>, a
+  condição de não deslizar envolve as velocidades e <em>não</em> pode ser integrada: é um
+  vínculo <strong>não holônomo</strong>, e a diferença terá consequências sérias quando
+  chegarmos aos multiplicadores de Lagrange.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. Exercícios resolvidos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 1.1 · O cone que rola</span>
+    <p>Um cone de semiângulo \(\alpha\) tem o vértice fixo na origem e rola sem deslizar sobre
+    um plano horizontal. Seu eixo precessa em torno da vertical com velocidade angular
+    \(\Omega\). Determine a velocidade angular total do cone.</p>
+    <p><strong>Solução.</strong> Rolar sem deslizar significa que todos os pontos da linha de
+    contato estão parados. Como o vértice também está parado, a linha de contato inteira tem
+    velocidade nula, e pela seção 8 ela <em>é</em> o eixo instantâneo. Portanto
+    \(\vet{\omega}\) está no plano, ao longo da linha de contato.</p>
+    <p>Por outro lado, compondo rotações segundo a seção 6, a velocidade angular total é a
+    precessão mais o giro próprio em torno do eixo do cone:</p>
+    \[\vet{\omega}=\Omega\vers{z}+\omega_s\vers{n},\qquad
+    \vers{n}=\sen\alpha\,\vers{z}+\cos\alpha\,\vers{c},\]
+    <p>com \(\vers{c}\) ao longo da linha de contato. Anulando a componente vertical,
+    \(\Omega+\omega_s\sen\alpha=0\), isto é \(\omega_s=-\Omega/\sen\alpha\). Substituindo,</p>
+    \[\vet{\omega}=-\Omega\,\frac{\cos\alpha}{\sen\alpha}\,\vers{c}
+    \qquad\Longrightarrow\qquad \left|\vet{\omega}\right|=\Omega\cotg\alpha.\]
+    <p>Um cone fino, de \(\alpha\) pequeno, gira muito rápido em torno do próprio eixo para
+    uma precessão lenta, como se percebe rolando um cone de papel sobre a mesa.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 1.2 · Pontos de uma roda que rola</span>
+    <p>Uma roda de raio \(R=0{,}35\) m rola sem deslizar com o centro a \(v=20\) m/s.
+    Determine \(\omega\), a velocidade do topo, a do ponto mais à frente da roda e a
+    aceleração do ponto de contato.</p>
+    <p><strong>Solução.</strong> Do vínculo, \(\omega=v/R=20/0{,}35=57{,}1\) rad/s.</p>
+    <p>Usando o contato como centro instantâneo, a velocidade de um ponto é \(\omega\) vezes
+    a distância até ele. O topo está a \(2R\), logo \(|\vet{v}|=2v=40\) m/s, horizontal. O
+    ponto mais à frente está a \(R\sqrt2\) do contato, logo
+    \(|\vet{v}|=\omega R\sqrt2=v\sqrt2=28{,}3\) m/s, inclinado 45° para cima e para a
+    frente.</p>
+    <p>O ponto de contato tem velocidade nula, mas aceleração
+    \(a=\omega^2R=v^2/R=20^2/0{,}35=1{,}14\cruz10^{3}\) m/s², dirigida verticalmente para
+    cima. São 116 vezes a gravidade, o que dá uma ideia de por que pneus de corrida se
+    desintegram.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 1.3 · Giroscópio sobre um carrossel</span>
+    <p>Um disco está montado sobre um carrossel que gira com \(\vet{\Omega}=\Omega\vers{z}\).
+    O eixo do disco é <em>horizontal</em>, apontando na direção \(\vers{x}\) do carrossel, e
+    o disco gira com \(\omega'\) em relação ao carrossel. Qual é a velocidade angular total e
+    o que acontece com ela ao longo do tempo?</p>
+    <p><strong>Solução.</strong> Pela composição da seção 6,</p>
+    \[\vet{\omega}=\Omega\vers{z}+\omega'\vers{x},\qquad
+    \left|\vet{\omega}\right|=\sqrt{\Omega^2+\omega'^2},\]
+    <p>que não é paralela a nenhum dos dois eixos. O detalhe importante é que \(\vers{x}\) é
+    solidário ao carrossel e portanto gira: aplicando o teorema do transporte a
+    \(\vet{\omega}\),</p>
+    \[\vet{\alpha}=\der{\vet{\omega}}{t}=\omega'\dot{\vers{x}}
+    =\omega'\,\Omega\vers{z}\cruz\vers{x}=\omega'\Omega\,\vers{y}.\]
+    <p>Existe aceleração angular mesmo com \(\Omega\) e \(\omega'\) constantes, e ela é
+    perpendicular às duas. Essa é a raiz cinemática da precessão giroscópica, que o módulo 3
+    retomará do lado da dinâmica.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 1.4 · Achando o eixo instantâneo</span>
+    <p>Um corpo tem \(\vet{\omega}=3\vers{z}\) rad/s e o seu ponto \(O\), na origem, tem
+    \(\vet{v}_O=(4,0,6)\) m/s. Localize o eixo instantâneo e calcule o passo do parafuso.</p>
+    <p><strong>Solução.</strong> Como \(\vet{\omega}\cdot\vet{v}_O=18\neq0\), o movimento é
+    helicoidal e não há ponto em repouso. Pela fórmula da seção 8,</p>
+    \[\frac{\vet{\omega}\cruz\vet{v}_O}{\omega^2}
+    =\frac{(0,0,3)\cruz(4,0,6)}{9}=\frac{(0,12,0)}{9}=\left(0,\tfrac43,0\right)\ {\rm m}.\]
+    <p>O eixo é a reta vertical que passa por \((0;1{,}33;0)\). Conferindo, a velocidade de um
+    ponto dessa reta é</p>
+    \[\vet{v}=(4,0,6)+(0,0,3)\cruz\left(0,\tfrac43,0\right)=(4,0,6)+(-4,0,0)=(0,0,6),\]
+    <p>paralela a \(\vet{\omega}\), como tinha de ser. O passo é
+    \(h=(\vet{\omega}\cdot\vet{v}_O)/\omega^2=18/9=2\) m por radiano, ou \(4\pi=12{,}6\) m por
+    volta completa.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. Exercícios propostos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Para resolver</span>
+    <ol>
+      <li><b>1.1</b> Quantos graus de liberdade tem (a) um sistema de dois corpos rígidos
+      ligados por uma dobradiça; (b) uma haste rígida com as duas pontas obrigadas a
+      permanecer em dois planos perpendiculares; (c) um corpo rígido com dois pontos fixos?
+      Justifique cada contagem.</li>
+
+      <li><b>1.2</b> Mostre explicitamente que a matriz \(\Ten{\Omega}=\dot{\Ten{R}}
+      \Ten{R}^{\sf T}\) é antissimétrica e que, para uma rotação em torno de \(z\) com
+      velocidade \(\omega\), ela tem como único elemento não nulo
+      \(\Omega_{12}=-\Omega_{21}=-\omega\).</li>
+
+      <li><b>1.3</b> Um corpo rígido tem \(\vet{\omega}=(1,2,2)\) rad/s. O ponto \(A\), em
+      \((1,0,0)\) m, tem velocidade \(\vet{v}_A=(0,1,-1)\) m/s. Determine a velocidade do
+      ponto \(B\), em \((0,2,1)\) m, e verifique que
+      \(\vet{v}_A\cdot\overline{AB}=\vet{v}_B\cdot\overline{AB}\). Por que isso tinha de
+      acontecer?</li>
+
+      <li><b>1.4</b> Demonstre a propriedade do exercício anterior em geral: num corpo
+      rígido, as projeções das velocidades de dois pontos sobre a reta que os une são sempre
+      iguais. (Sugestão: derive \(|\vet{r}_A-\vet{r}_B|^2=\) constante.)</li>
+
+      <li><b>1.5</b> Uma escada de 4 m escorrega com o pé afastando-se da parede a 0,5 m/s,
+      no instante em que o pé está a 2,4 m da parede. Localize o centro instantâneo de
+      rotação, calcule \(\omega\) da escada e a velocidade do ponto médio.</li>
+
+      <li><b>1.6</b> Mostre que, para a cicloide gerada por um ponto da borda de uma roda de
+      raio \(R\) que rola sem deslizar, o comprimento de um arco completo vale \(8R\).
+      (Sugestão: a rapidez do ponto é \(2R\omega\sen(\varphi/2)\); integre em \(dt\) ao longo
+      de uma volta.)</li>
+
+      <li><b>1.7</b> Uma moeda de raio \(r\) rola sem deslizar, mantendo-se vertical, ao longo
+      de uma circunferência de raio \(\rho\) traçada na mesa. Determine a velocidade angular
+      total da moeda e mostre que ela não é vertical nem horizontal. Quantas voltas a moeda dá
+      em torno do próprio eixo a cada volta no circuito?</li>
+
+      <li><b>1.8</b> Um livro é girado 90° em torno de \(x\) e depois 90° em torno de \(z\).
+      Escreva as duas matrizes, multiplique-as nas duas ordens e determine, pelo traço, o
+      ângulo da rotação que leva um resultado ao outro. Compare com o valor que o simulador da
+      seção 6 exibe para \(\varphi=90^\circ\).</li>
+
+      <li><b>1.9</b> Discuta em meia página: o vínculo de rolamento de um disco sobre uma
+      reta é holônomo, e o de uma esfera sobre um plano não é. Que diferença isso faz para a
+      contagem de graus de liberdade, e por que uma bola de bilhar pode voltar ao mesmo ponto
+      da mesa com outra orientação?</li>
+    </ol>
+  </div>
+
+  <nav class="nav-aulas">
+    <a href="index.html"><small>Voltar</small>← Início</a>
+    <span class="em-breve"><small>Em preparação</small>2. Centro de massa e inércia</span>
+  </nav>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+<script src="assets/js/widgets.js?v=202611081818"></script>
+</body>
+</html>

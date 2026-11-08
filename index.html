@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mecânica Clássica II | LFCA/URCA</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611081818">
+<script src="assets/js/comum.js?v=202611081818"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Mecânica Clássica II <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html" class="ativo">Início</a>
+      <span class="grupo">Corpos rígidos</span>
+      <a href="aula01.html" class="num" title="Módulo 1: Cinemática dos corpos rígidos">1</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+<main class="conteudo">
+
+  <div class="heroi">
+    <span class="placa-logo">
+      <img src="assets/img/logo-lfca.png" alt="LFCA | URCA (Laboratório de Física Computacional Aplicada)" style="width: 80%; height: auto;">
+    </span>
+    <h1>Mecânica Clássica II</h1>
+    <p>Material interativo da disciplina · DF006</p>
+    <p class="meta">
+      Prof. Apiano Morais · Laboratório de Física Computacional Aplicada (LFCA)<br>
+      Universidade Regional do Cariri (URCA) · apiano.morais@urca.br
+    </p>
+  </div>
+
+  <h2 id="apresentacao">Quando a mecânica deixa de falar de forças</h2>
+
+  <p>No verão de 1696, <strong><a href="https://pt.wikipedia.org/wiki/Johann_Bernoulli">Johann Bernoulli</a></strong>
+  publicou um desafio aos matemáticos da Europa. Dados dois pontos num plano vertical, qual
+  é a curva que leva uma conta a deslizar de um ao outro, sem atrito e só pela gravidade, no
+  menor tempo possível? O problema é estranho pelo tipo de resposta que pede. Não se procura
+  um número nem uma posição: procura-se uma <em>curva</em>, escolhida entre uma infinidade
+  de curvas, e o critério de escolha é um número associado a cada uma delas.</p>
+
+  <p>A história diz que <a href="https://pt.wikipedia.org/wiki/Isaac_Newton">Newton</a>
+  recebeu o problema no fim de uma jornada na Casa da Moeda, resolveu-o durante a noite e o
+  enviou sem assinatura. Bernoulli reconheceu o autor pelo estilo:
+  <em>tanquam ex ungue leonem</em>, o leão pela garra. Mas o que nasceu ali não foi apenas
+  uma solução engenhosa. Foi um ramo novo da matemática, o <strong>cálculo variacional</strong>,
+  e, cem anos depois, uma reformulação completa da mecânica.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O que esta disciplina faz</span>
+    <p>A mecânica newtoniana é um método de forças. Para resolver um problema, desenha-se o
+    diagrama de corpo livre, identificam-se todas as forças, inclusive as que não se conhece,
+    e escreve-se \(\vet{F}=m\vet{a}\) para cada componente. Funciona, e funciona muito bem,
+    enquanto as forças são conhecidas e o corpo é livre.</p>
+    <p>O problema aparece com os <strong>vínculos</strong>. Uma conta num arame, um pêndulo
+    duplo, um disco que rola sem deslizar, um corpo rígido com \(10^{23}\) átomos e apenas
+    seis graus de liberdade. Em todos esses casos existem forças que não se conhece de
+    antemão: as forças que o arame exerce sobre a conta, as que mantêm os átomos à distância
+    fixa. Elas precisam ser carregadas pela conta inteira para, no fim, serem descartadas,
+    porque não realizam trabalho algum.</p>
+    <p>Esta disciplina percorre o caminho que resolve esse incômodo. Começa levando o método
+    newtoniano ao seu limite natural, que são os corpos rígidos e os referenciais em
+    movimento. Depois troca o ponto de partida: em vez de forças e vetores, uma única função
+    escalar e uma condição de extremo. O resultado é que os vínculos deixam de ser um
+    problema e passam a ser a própria linguagem.</p>
+  </div>
+
+  <p>A troca é radical. Em 1788, <strong><a href="https://pt.wikipedia.org/wiki/Joseph-Louis_Lagrange">Joseph-Louis Lagrange</a></strong>
+  publicou a <em>Mécanique Analytique</em> com um aviso no prefácio que vale como manifesto:
+  não se encontrará nenhuma figura nesta obra. Nenhum diagrama de corpo livre, nenhuma seta.
+  Toda a mecânica reduzida a operações sobre funções.</p>
+
+  <div class="destaque">
+    <span class="anuncio">As três formulações</span>
+    <p><strong>Newton (1687).</strong> \(\vet{F}=\der{\vet{p}}{t}\). Vetorial, local, com
+    forças de vínculo explícitas. Uma equação por partícula, em cada direção.</p>
+    <p><strong>Lagrange (1788).</strong> Uma função escalar \(\Lag=T-V\) e tantas equações
+    quantos forem os graus de liberdade. As forças de vínculo somem sozinhas, e qualquer
+    conjunto de coordenadas serve.</p>
+    <p><strong>Hamilton (1834).</strong> As mesmas equações reescritas em primeira ordem,
+    num espaço de posições e momentos. É a forma que a Mecânica Quântica e a Física
+    Estatística herdaram inteira.</p>
+  </div>
+
+  <h3>Por que começar pelos corpos rígidos</h3>
+
+  <p>A ementa poderia ir direto ao cálculo variacional, e vários livros vão. O caminho
+  escolhido aqui é outro, e tem uma razão didática: <strong>um corpo rígido é o sistema
+  vinculado mais simples que existe</strong>. Ele tem um número gigantesco de coordenadas e
+  apenas seis graus de liberdade, porque todas as distâncias internas estão travadas. Quem
+  resolve o corpo rígido pelo método newtoniano sente na mão exatamente o desconforto que o
+  formalismo lagrangiano vai eliminar, e chega ao capítulo seguinte sabendo <em>de que</em> o
+  método novo o está livrando.</p>
+
+  <p>Pelo caminho aparecem coisas que não são apenas exercício. O momento angular que não
+  aponta na direção da velocidade angular. A roda que resiste a ser virada. A
+  <a href="https://pt.wikipedia.org/wiki/For%C3%A7a_de_Coriolis">força de Coriolis</a>, que
+  não existe e ainda assim desvia furacões. O pêndulo de Foucault, que foi a primeira prova
+  mecânica de que a Terra gira, exibida em Paris em 1851 diante de uma plateia que podia
+  simplesmente olhar.</p>
+
+  <h3>O fio que amarra tudo</h3>
+
+  <p>No fim da disciplina, uma única linha resume o que foi construído. A trajetória que um
+  sistema de fato percorre entre dois instantes é aquela que torna estacionária a
+  integral</p>
+
+  <p style="text-align:center">\(\Acao=\displaystyle\int_{t_1}^{t_2}\Lag\,dt\),</p>
+
+  <p>onde \(\Lag\) é a lagrangiana do sistema. É o <strong>princípio de Hamilton</strong>, e
+  dele saem as equações de movimento de qualquer sistema mecânico, com ou sem vínculos, em
+  qualquer sistema de coordenadas. Dele sai também, pelo
+  <a href="https://pt.wikipedia.org/wiki/Teorema_de_Noether">teorema de Noether</a>, a
+  explicação de por que existem leis de conservação: cada simetria contínua da ação
+  corresponde a uma quantidade conservada. A homogeneidade do tempo dá a energia, a do
+  espaço dá o momento, a isotropia dá o momento angular. Conservação deixa de ser um fato
+  experimental e vira uma consequência de simetria.</p>
+
+  <hr class="linha">
+
+  <h2>Os módulos</h2>
+
+  <h3 class="unidade">Corpos rígidos</h3>
+
+  <div class="cartoes">
+
+    <a class="cartao" href="aula01.html">
+      <span class="numero">Módulo 1</span>
+      <h3>Cinemática dos corpos rígidos</h3>
+      <p>O vínculo de rigidez e os seis graus de liberdade, o teorema de Chasles,
+      \(\vet{v}=\vet{\omega}\times\vet{r}\) deduzida do vínculo, a independência de
+      \(\vet{\omega}\) em relação à origem, rotações que não comutam, eixo instantâneo e
+      rolamento.</p>
+      <div class="etiquetas">
+        <span class="etiqueta">Campo de velocidades</span>
+        <span class="etiqueta">Rotações não comutam</span>
+        <span class="etiqueta">Rolamento e cicloide</span>
+      </div>
+    </a>
+
+    <span class="cartao em-preparo">
+      <span class="numero">Módulo 2</span>
+      <h3>Centro de massa e momentos de inércia</h3>
+      <p>Separação do movimento em translação do centro de massa e movimento relativo,
+      momento de inércia, teorema de Steiner, raio de giração e um primeiro contato com o
+      tensor de inércia.</p>
+      <div class="etiquetas"><span class="etiqueta">Em preparo</span></div>
+    </span>
+
+    <span class="cartao em-preparo">
+      <span class="numero">Módulo 3</span>
+      <h3>Momento angular, torque e equações de movimento</h3>
+      <p>Decomposição do momento angular, equações de movimento do corpo rígido, rotação em
+      torno de eixo fixo e o momento angular que não acompanha a velocidade angular.</p>
+      <div class="etiquetas"><span class="etiqueta">Em preparo</span></div>
+    </span>
+
+    <span class="cartao em-preparo">
+      <span class="numero">Módulo 4</span>
+      <h3>Conservação e equilíbrio estático</h3>
+      <p>Teoremas de conservação do momento angular, condições de equilíbrio de um corpo
+      extenso e estabilidade.</p>
+      <div class="etiquetas"><span class="etiqueta">Em preparo</span></div>
+    </span>
+
+  </div>
+
+  <h3 class="unidade">Sistemas de coordenadas em movimento</h3>
+
+  <div class="cartoes">
+
+    <span class="cartao em-preparo">
+      <span class="numero">Módulo 5</span>
+      <h3>Matrizes de rotação e transformações de coordenadas</h3>
+      <p>Matrizes ortogonais, rotações próprias e impróprias, composição de rotações e a
+      passagem entre referenciais.</p>
+      <div class="etiquetas"><span class="etiqueta">Em preparo</span></div>
+    </span>
+
+    <span class="cartao em-preparo">
+      <span class="numero">Módulo 6</span>
+      <h3>Referenciais em rotação e forças fictícias</h3>
+      <p>Movimento relativo, força centrífuga, força de Coriolis e de Euler, o pêndulo de
+      Foucault e o desvio de projéteis.</p>
+      <div class="etiquetas"><span class="etiqueta">Em preparo</span></div>
+    </span>
+
+  </div>
+
+  <h3 class="unidade">Noções de cálculo variacional</h3>
+
+  <div class="cartoes">
+
+    <span class="cartao em-preparo">
+      <span class="numero">Módulo 7</span>
+      <h3>Cálculo variacional: ação e caminhos extremos</h3>
+      <p>Funcionais, variação de um caminho, a braquistócrona, a catenária e a superfície
+      mínima de revolução.</p>
+      <div class="etiquetas"><span class="etiqueta">Em preparo</span></div>
+    </span>
+
+    <span class="cartao em-preparo">
+      <span class="numero">Módulo 8</span>
+      <h3>A equação de Euler-Lagrange e o princípio de Hamilton</h3>
+      <p>Dedução da equação de Euler-Lagrange, a identidade de Beltrami, generalizações para
+      vários graus de liberdade e o princípio de Hamilton.</p>
+      <div class="etiquetas"><span class="etiqueta">Em preparo</span></div>
+    </span>
+
+  </div>
+
+  <h3 class="unidade">Formalismo lagrangiano e hamiltoniano</h3>
+
+  <div class="cartoes">
+
+    <span class="cartao em-preparo">
+      <span class="numero">Módulo 9</span>
+      <h3>Coordenadas generalizadas, vínculos e equações de Lagrange</h3>
+      <p>Vínculos holônomos e não holônomos, deslocamentos virtuais, multiplicadores de
+      Lagrange e forças de vínculo.</p>
+      <div class="etiquetas"><span class="etiqueta">Em preparo</span></div>
+    </span>
+
+    <span class="cartao em-preparo">
+      <span class="numero">Módulo 10</span>
+      <h3>Aplicações do formalismo lagrangiano</h3>
+      <p>Pêndulos acoplados, máquina de Atwood, conta no arame girante, simetrias e o
+      teorema de Noether.</p>
+      <div class="etiquetas"><span class="etiqueta">Em preparo</span></div>
+    </span>
+
+    <span class="cartao em-preparo">
+      <span class="numero">Módulo 11</span>
+      <h3>Transformação de Legendre e equações de Hamilton</h3>
+      <p>Momento canônico, a transformação de Legendre, as equações canônicas e quando a
+      hamiltoniana é a energia.</p>
+      <div class="etiquetas"><span class="etiqueta">Em preparo</span></div>
+    </span>
+
+    <span class="cartao em-preparo">
+      <span class="numero">Módulo 12</span>
+      <h3>Espaço de fase e o teorema de Liouville</h3>
+      <p>Retratos de fase, fluxo hamiltoniano, conservação do volume no espaço de fase e a
+      ponte para a Física Estatística.</p>
+      <div class="etiquetas"><span class="etiqueta">Em preparo</span></div>
+    </span>
+
+  </div>
+
+  <hr class="linha">
+
+  <h2 id="plano">O plano de ensino</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Identificação</span>
+    <ul>
+      <li><strong>Curso:</strong> Bacharelado em Física</li>
+      <li><strong>Disciplina:</strong> Mecânica Clássica II (DF006), obrigatória, 5.º semestre</li>
+      <li><strong>Pré-requisito:</strong> DF005</li>
+      <li><strong>Carga horária:</strong> 60 h teóricas, 4 h semanais, 4 créditos</li>
+    </ul>
+  </div>
+
+  <h3>Ementa</h3>
+
+  <p>Corpos rígidos, sistema de coordenadas em movimento, noções de cálculo variacional,
+  formalismo lagrangiano e hamiltoniano.</p>
+
+  <h3>Objetivos</h3>
+
+  <p>Apresentar a aplicação do formalismo newtoniano a corpos rígidos e sistemas de
+  coordenadas em movimento. Introduzir o cálculo variacional e desenvolver os formalismos
+  lagrangiano e hamiltoniano da Mecânica Clássica.</p>
+
+  <h3>Metodologia</h3>
+
+  <p>Aulas expositivas, resolução de problemas e atividades computacionais em Python. A
+  ênfase é na compreensão teórica dos conceitos e na sua aplicação em contextos concretos.
+  Os módulos deste site trazem os simuladores que acompanham as aulas.</p>
+
+  <h3>Avaliação</h3>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Instrumento</th><th>Peso</th><th>O que cobre</th></tr></thead>
+    <tbody>
+      <tr><td>Provas teóricas</td><td>40%</td>
+        <td>Corpos rígidos, sistemas de coordenadas em movimento, cálculo variacional e os
+        formalismos lagrangiano e hamiltoniano.</td></tr>
+      <tr><td>Trabalhos práticos</td><td>30%</td>
+        <td>Resolução de problemas em sala e relatórios sobre aplicações dos tópicos.</td></tr>
+      <tr><td>Projeto final</td><td>30%</td>
+        <td>Projeto de aplicação da Mecânica Clássica a um contexto específico, com
+        apresentação e defesa perante a turma.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Bibliografia básica</h3>
+
+  <ul>
+    <li>THORNTON, S. T.; MARION, J. B. <em>Classical Dynamics of Particles and Systems</em>.
+      5. ed. Cengage Learning, 2003.</li>
+    <li>TAYLOR, J. R. <em>Classical Mechanics</em>. University Science Books, 2005.</li>
+    <li>GOLDSTEIN, H.; POOLE, C.; SAFKO, J. <em>Classical Mechanics</em>. 3. ed.
+      Addison-Wesley, 2001.</li>
+  </ul>
+
+  <div class="bloco def">
+    <span class="rotulo">Disciplinas vizinhas</span>
+    <p>O que vem depois, em <strong>Mecânica Clássica III</strong> (DF007), é gravitação,
+    álgebra tensorial, rotação de corpo rígido pelo formalismo lagrangiano, teoria das
+    pequenas vibrações e uma introdução aos meios contínuos. Onde um assunto daqui
+    reaparece lá com mais profundidade, há um aviso no texto.</p>
+    <p>Em <a href="https://apianomorais.github.io/fisica-estatistica/">Física Estatística</a>
+    o espaço de fase e o teorema de Liouville do módulo 12 voltam como ponto de partida, e o
+    princípio de Hamilton aparece de novo no módulo 2 daquela disciplina.</p>
+  </div>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+</body>
+</html>
