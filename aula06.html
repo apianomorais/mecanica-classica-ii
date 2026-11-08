@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 6: Referenciais em rotação e forças fictícias | Mecânica Clássica II</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611081928">
-<script src="assets/js/comum.js?v=202611081928"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611081937">
+<script src="assets/js/comum.js?v=202611081937"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -154,20 +154,52 @@
     centro da Terra.
   </div>
 
-  <p>A razão \(R/D\) vale 0,0166 para o sistema Terra e Lua, de modo que a expansão em
-  potências dela converge depressa. Escrevendo \(d\) pela lei dos cossenos e expandindo
-  \(1/d^2\), os coeficientes que aparecem são os <strong>polinômios de Legendre</strong>,</p>
+  <p>Convém trabalhar com o potencial, que é escalar. Seja \(r\) a distância ao centro da
+  Terra e \(\theta\) o ângulo entre \(\vet{r}\) e a direção da Lua. Pela lei dos
+  cossenos, \(d^2=D^2+r^2-2Dr\cos\theta\), e portanto</p>
 
-  <p>\[\frac{1}{d}=\frac{1}{D}\sum_{n=0}^{\infty}
-  \left(\frac{R}{D}\right)^{n}P_n\!\left(\cos\theta\right),\]</p>
+  <p>\[\frac{1}{d}=\frac{1}{D}\left[1-2\frac{r}{D}\cos\theta
+  +\left(\frac{r}{D}\right)^2\right]^{-1/2}.\]</p>
 
-  <p>e o termo \(n=0\) é constante, o \(n=1\) é cancelado exatamente pelo desconto da
-  aceleração do centro, e o primeiro que sobrevive é o de \(P_2\). Daí a maré ser um efeito
-  <strong>quadrupolar</strong>. Em componentes, com \(\theta\) medido a partir da direção da
-  Lua,</p>
+  <p>O colchete é exatamente a <strong>função geratriz dos polinômios de Legendre</strong>.
+  Com \(u=r/D\), que vale no máximo 0,0166 para a Lua,</p>
+
+  <p>\[\left[1-2u\cos\theta+u^2\right]^{-1/2}
+  =\sum_{n=0}^{\infty}u^{n}P_n\!\left(\cos\theta\right),\qquad
+  P_0=1,\quad P_1=\cos\theta,\quad P_2=\frac{3\cos^2\theta-1}{2}.\]</p>
+
+  <p>O potencial gravitacional da Lua no ponto fica, então,</p>
+
+  <p>\[\Phi_L=-\frac{GM_L}{d}
+  =-\frac{GM_L}{D}\left[1+\frac{r}{D}\cos\theta
+  +\left(\frac{r}{D}\right)^2\frac{3\cos^2\theta-1}{2}+\cdots\right],\]</p>
+
+  <p>e agora cada termo pode ser lido separadamente. O de \(n=0\) é constante e não produz
+  força. O de \(n=1\) vale \(-\left(GM_L/D^2\right)r\cos\theta\), cujo gradiente é um
+  campo <em>uniforme</em> de módulo \(GM_L/D^2\) apontando para a Lua: é precisamente a
+  aceleração do centro da Terra, e some ao se passar para o referencial que cai com ele.
+  O primeiro termo que sobrevive é o de \(P_2\):</p>
+
+  <div class="destaque">
+    <span class="anuncio">Potencial de maré</span>
+    \[\Phi_{\rm maré}=-\frac{GM_L\,r^2}{D^3}\,
+    \frac{3\cos^2\theta-1}{2}.\]
+    Quadrupolar, porque o monopolo é constante e o dipolo foi cancelado pelo referencial.
+  </div>
+
+  <p>As componentes da aceleração saem do gradiente em coordenadas esféricas,
+  \(a_r=-\partial\Phi/\partial r\) e
+  \(a_\theta=-\left(1/r\right)\partial\Phi/\partial\theta\). Derivando e pondo
+  \(r=R\),</p>
 
   <p>\[a_r=\frac{GM_LR}{D^3}\left(3\cos^2\theta-1\right),\qquad
   a_\theta=-\frac{3}{2}\,\frac{GM_LR}{D^3}\,\sen2\theta.\]</p>
+
+  <p>Confira os valores notáveis. Em \(\theta=0\), o ponto sublunar,
+  \(a_r=+2GM_LR/D^3\): a água é puxada para fora. Em \(\theta=\pi\), o ponto
+  antilunar, \(\cos^2\theta=1\) outra vez e o resultado é o mesmo, <em>também</em> para
+  fora. Em \(\theta=\pi/2\), \(a_r=-GM_LR/D^3\), metade do valor anterior e apontando
+  para dentro. A tangencial é nula nos três e máxima em \(\theta=45^\circ\).</p>
 
   <div data-widget="mare"></div>
 
@@ -191,16 +223,37 @@
 
   <h3>A altura da maré, por um argumento de equilíbrio</h3>
 
-  <p>Imagine dois tubos sem paredes, um vertical de altura \(h\) e outro horizontal ao longo
-  da superfície, ambos cheios de água. A coluna vertical estabelece na base uma pressão
-  excedente \(\varrho gh\); a água do tubo horizontal, para ficar estática, precisa que a
-  componente tangencial da maré equilibre essa mesma pressão. Impondo a igualdade e
-  integrando ao longo do arco de um ponto de maré baixa a um de maré alta,</p>
+  <p>Imagine dois tubos sem paredes, recortados do próprio oceano: um <strong>vertical</strong>
+  de altura \(h\) e outro <strong>horizontal</strong>, acompanhando a superfície do ponto de
+  maré baixa até o de maré alta. A coluna vertical tem peso e estabelece na sua base uma
+  pressão excedente \(\Delta p=\varrho gh\), que empurraria a água de volta para o tubo
+  horizontal. Para que nada escoe, a componente tangencial da maré tem de empurrar no sentido
+  contrário com o mesmo saldo.</p>
+
+  <div data-widget="tubos"></div>
+
+  <p>Escrevendo essa condição como trabalho por unidade de massa ao longo do arco de
+  quadrante,</p>
+
+  <p>\[g\,h=\int_0^{\pi/2}\left|a_\theta\right|R\,d\theta
+  =\frac{3}{2}\frac{GM_LR^2}{D^3}\int_0^{\pi/2}\sen2\theta\,d\theta
+  =\frac{3}{2}\frac{GM_LR^2}{D^3}\left[-\frac{\cos2\theta}{2}\right]_0^{\pi/2},\]</p>
+
+  <p>e como o colchete vale 1,</p>
 
   <div class="destaque">
     <span class="anuncio">Maré de equilíbrio</span>
     \[\Delta h=\frac{3}{2}\,\frac{GM_LR^2}{g\,D^3}.\]
   </div>
+
+  <p>O mesmo resultado sai em uma linha pelo potencial, e vale ver as duas rotas. A superfície
+  livre de um fluido em equilíbrio é uma equipotencial, de modo que
+  \(gh(\theta)+\Phi_{\rm maré}(R,\theta)\) é constante. Logo
+  \(h(\theta)=-\Phi_{\rm maré}/g+\text{const}\), e</p>
+
+  <p>\[\Delta h=h(0)-h\!\left(\tfrac{\pi}{2}\right)
+  =\frac{GM_LR^2}{gD^3}\left[\frac{3-1}{2}-\frac{0-1}{2}\right]
+  =\frac{3}{2}\frac{GM_LR^2}{gD^3}.\]</p>
 
   <p>Com os números da Lua isso dá 53,5 cm, e com os do Sol, 24,6 cm. São valores modestos, e
   deliberadamente: a maré de equilíbrio supõe um oceano global sem continentes nem inércia.
@@ -258,11 +311,33 @@
   <h2 id="s5">5. O teorema do transporte</h2>
 
   <p>O caso girante exige uma ferramenta, e ela já apareceu no módulo 1. Seja \(\vet{Q}\) um
-  vetor qualquer e sejam \(\vers{e}\,'_i\) os versores do referencial que gira com
-  \(\vet{\omega}\). Escrevendo \(\vet{Q}=\sum_iQ'_i\vers{e}\,'_i\) e derivando no referencial
-  fixo, a regra do produto separa dois pedaços: a variação das componentes, que é o que o
-  observador girante mede, e a variação dos versores, que o módulo 1 mostrou valer
-  \(\dot{\vers{e}}\,'_i=\vet{\omega}\cruz\vers{e}\,'_i\). Daí</p>
+  vetor qualquer, que pode ser posição, velocidade, momento angular ou o que for, e sejam
+  \(\vers{e}\,'_i\) os versores do referencial que gira com \(\vet{\omega}\). Expanda
+  \(\vet{Q}\) nessa base:</p>
+
+  <p>\[\vet{Q}=\sum_{i=1}^{3}Q'_i\,\vers{e}\,'_i.\]</p>
+
+  <p>Para quem gira junto, os versores são fixos, e a única coisa que varia são as
+  componentes:</p>
+
+  <p>\[\left(\der{\vet{Q}}{t}\right)_{\!\rm gir}
+  =\sum_i\dot{Q}'_i\,\vers{e}\,'_i.\]</p>
+
+  <p>Para quem está fora, os versores também giram, e a regra do produto acrescenta um
+  termo:</p>
+
+  <p>\[\left(\der{\vet{Q}}{t}\right)_{\!\rm fixo}
+  =\sum_i\dot{Q}'_i\,\vers{e}\,'_i
+  +\sum_i Q'_i\,\der{\vers{e}\,'_i}{t}.\]</p>
+
+  <p>A derivada dos versores é exatamente o teorema do módulo 1,
+  \(\dot{\vers{e}}\,'_i=\vet{\omega}\cruz\vers{e}\,'_i\). Levando isso à segunda soma
+  e pondo \(\vet{\omega}\cruz\) em evidência,</p>
+
+  <p>\[\sum_i Q'_i\left(\vet{\omega}\cruz\vers{e}\,'_i\right)
+  =\vet{\omega}\cruz\sum_i Q'_i\vers{e}\,'_i=\vet{\omega}\cruz\vet{Q},\]</p>
+
+  <p>de onde</p>
 
   <div class="destaque">
     <span class="anuncio">Teorema do transporte</span>
@@ -283,14 +358,26 @@
 
   <p>\[\vet{v}=\vet{v}_{\rm rel}+\vet{\omega}\cruz\vet{r}.\]</p>
 
-  <p>Aplique-o de novo, agora a essa própria igualdade, lembrando de derivar cada parcela com
-  a regra completa:</p>
+  <p>Aplique-o de novo, agora a essa própria igualdade. O vetor a ser derivado é
+  \(\vet{v}_{\rm rel}+\vet{\omega}\cruz\vet{r}\), e o teorema manda derivar no girante e
+  acrescentar \(\vet{\omega}\cruz\) do mesmo vetor:</p>
 
   <p>\[\vet{a}=\left(\der{}{t}\right)_{\!\rm gir}
   \left(\vet{v}_{\rm rel}+\vet{\omega}\cruz\vet{r}\right)
-  +\vet{\omega}\cruz\left(\vet{v}_{\rm rel}+\vet{\omega}\cruz\vet{r}\right),\]</p>
+  +\vet{\omega}\cruz\left(\vet{v}_{\rm rel}+\vet{\omega}\cruz\vet{r}\right).\]</p>
 
-  <p>e reunindo os termos semelhantes,</p>
+  <p>Abra a primeira parcela com a regra do produto, lembrando que
+  \(\left(d\vet{r}/dt\right)_{\rm gir}=\vet{v}_{\rm rel}\) e que
+  \(\dot{\vet{\omega}}\) é a mesma nos dois referenciais, já que
+  \(\vet{\omega}\cruz\vet{\omega}=\vet 0\):</p>
+
+  <p>\[\left(\der{}{t}\right)_{\!\rm gir}
+  \left(\vet{v}_{\rm rel}+\vet{\omega}\cruz\vet{r}\right)
+  =\vet{a}_{\rm rel}+\dot{\vet{\omega}}\cruz\vet{r}
+  +\vet{\omega}\cruz\vet{v}_{\rm rel}.\]</p>
+
+  <p>Somando as duas parcelas, os dois termos \(\vet{\omega}\cruz\vet{v}_{\rm rel}\),
+  um de cada origem, se juntam:</p>
 
   <div class="destaque">
     <span class="anuncio">Aceleração em referencial girante</span>
@@ -354,6 +441,26 @@
   30 000 rpm e 10 cm do eixo, \(\omega=3141\) rad/s e \(\omega^2r=9{,}9\cruz10^5\) m/s², cem
   mil vezes a gravidade, o que basta para separar organelas celulares por densidade.</p>
 
+  <p>A centrífuga é <strong>conservativa</strong>, o que quase nunca se diz. Como ela vale
+  \(m\omega^2\vet{r}_\perp\) e depende apenas da posição, existe um potencial que a
+  gera:</p>
+
+  <p>\[U_{\rm cf}=-\frac12m\omega^2r_\perp^2
+  \qquad\Longrightarrow\qquad
+  -\nabla U_{\rm cf}=m\omega^2\vet{r}_\perp.\]</p>
+
+  <p>Conferindo com \(\vet{\omega}=\omega\vers{z}\), em que
+  \(r_\perp^2=x^2+y^2\), o gradiente de \(-\tfrac12m\omega^2(x^2+y^2)\) com sinal
+  trocado dá \(m\omega^2(x,y,0)\), que é a centrífuga. Somando-o ao potencial das forças
+  reais obtém-se o <strong>potencial efetivo</strong> do referencial girante,</p>
+
+  <p>\[U_{\rm ef}=U-\frac12m\omega^2r_\perp^2,\]</p>
+
+  <p>e com ele a conservação de energia volta a valer no girante, desde que a força de
+  Coriolis não atrapalhe. Ela não atrapalha, porque é perpendicular à velocidade e não
+  realiza trabalho. É esse potencial efetivo que organiza o problema restrito de três corpos
+  e os pontos de Lagrange, em Mecânica Clássica III.</p>
+
   <p>Um detalhe de linguagem que vale corrigir: a chamada força centrípeta e a força
   centrífuga não formam um par de ação e reação. A primeira é real e age no referencial
   inercial; a segunda é fictícia e só existe no girante. Elas nem sequer aparecem na mesma
@@ -416,10 +523,38 @@
   <!-- ================================================== -->
   <h2 id="s11">11. Desvios: queda livre e projéteis</h2>
 
-  <p>Solte um corpo do repouso de uma altura \(h\). Em primeira aproximação ele cai com
-  \(\vet{v}_{\rm rel}\approx-gt\,\vers{z}\), e a força de Coriolis
-  \(-2m\vet{\omega}\cruz\vet{v}_{\rm rel}\) resulta horizontal, apontando para
-  <strong>leste</strong> em qualquer hemisfério. Integrando duas vezes,</p>
+  <p>Monte um sistema de eixos local com \(\vers{x}\) para leste, \(\vers{y}\) para o
+  norte e \(\vers{z}\) para cima. Nessa base a velocidade angular da Terra se decompõe em</p>
+
+  <p>\[\vet{\omega}=\omega\left(0,\;\cos\lambda,\;\sen\lambda\right),\]</p>
+
+  <p>e, com \(\vet{v}=(\dot x,\dot y,\dot z)\), o produto vetorial vale</p>
+
+  <p>\[\vet{\omega}\cruz\vet{v}=\omega
+  \left(\dot z\cos\lambda-\dot y\sen\lambda,\;
+  \dot x\sen\lambda,\;-\dot x\cos\lambda\right).\]</p>
+
+  <p>Levando à equação do movimento \(\vet{a}_{\rm rel}=\vet{g}_{\rm ef}
+  -2\vet{\omega}\cruz\vet{v}\), com \(\vet{g}_{\rm ef}=-g\vers{z}\), saem três
+  equações acopladas:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Queda livre num referencial que gira</span>
+    \[\ddot x=-2\omega\left(\dot z\cos\lambda-\dot y\sen\lambda\right),\qquad
+    \ddot y=-2\omega\dot x\sen\lambda,\qquad
+    \ddot z=-g+2\omega\dot x\cos\lambda.\]
+  </div>
+
+  <p>Resolver isso exatamente é possível e desnecessário: \(\omega\) é pequeno, e a
+  aproximação sucessiva basta. Em ordem zero, despreze todos os termos em \(\omega\) e
+  fique com a queda de sempre, \(\dot z=-gt\), \(\dot x=\dot y=0\). Leve essa solução
+  ao lado direito da primeira equação:</p>
+
+  <p>\[\ddot x\simeq-2\omega\left(-gt\right)\cos\lambda=2\omega g\,t\cos\lambda.\]</p>
+
+  <p>O resultado é positivo, isto é, <strong>para leste</strong>, e em qualquer hemisfério,
+  porque \(\cos\lambda>0\) dos dois lados do equador. Integrando duas vezes a partir do
+  repouso,</p>
 
   <div class="destaque">
     <span class="anuncio">Desvio para leste na queda livre</span>
@@ -452,12 +587,45 @@
 
   <div data-widget="foucault"></div>
 
-  <p>Decompondo \(\vet{\omega}\) na vertical e na horizontal do lugar, apenas a componente
-  vertical, \(\omega\sen\lambda\), produz desvio dentro do plano horizontal. O plano de
-  oscilação precessa com essa taxa, no sentido oposto ao da rotação local:</p>
+  <p>Para pequenas oscilações o movimento é praticamente horizontal, e das três componentes
+  de \(\vet{\omega}\) só a vertical, \(\omega_z=\omega\sen\lambda\), produz
+  aceleração dentro do plano horizontal. Com \(\omega_0^2=g/\ell\), as equações nas duas
+  coordenadas horizontais ficam</p>
+
+  <p>\[\ddot x=-\omega_0^2x+2\omega_z\dot y,\qquad
+  \ddot y=-\omega_0^2y-2\omega_z\dot x.\]</p>
+
+  <p>Elas estão acopladas, e o truque que as desacopla é juntar as duas numa variável
+  complexa. Ponha \(\zeta=x+iy\) e some a primeira equação à segunda multiplicada por
+  \(i\):</p>
+
+  <p>\[\ddot\zeta=-\omega_0^2\zeta+2\omega_z\left(\dot y-i\dot x\right)
+  =-\omega_0^2\zeta-2i\omega_z\dot\zeta,\]</p>
+
+  <p>porque \(\dot y-i\dot x=-i(\dot x+i\dot y)=-i\dot\zeta\). Reorganizando,</p>
+
+  <div class="destaque">
+    <span class="anuncio">Equação do pêndulo de Foucault</span>
+    \[\ddot\zeta+2i\omega_z\dot\zeta+\omega_0^2\zeta=0.\]
+  </div>
+
+  <p>O termo de primeira ordem tem coeficiente imaginário, e isso sugere absorvê-lo numa
+  fase. Substitua \(\zeta=e^{-i\omega_zt}\eta\). Derivando duas vezes e simplificando, os
+  termos em \(\dot\eta\) se cancelam e sobra</p>
+
+  <p>\[\ddot\eta+\left(\omega_0^2+\omega_z^2\right)\eta=0.\]</p>
+
+  <p>Ou seja: \(\eta\) é uma oscilação <em>retilínea</em> comum, de frequência
+  \(\sqrt{\omega_0^2+\omega_z^2}\simeq\omega_0\), já que \(\omega_z\) é
+  desprezível diante de \(\omega_0\). Todo o efeito da rotação está no fator
+  \(e^{-i\omega_zt}\), que é uma rotação rígida do plano de oscilação com velocidade
+  angular \(-\omega_z\). Logo</p>
 
   <p>\[\Omega_{\rm prec}=-\,\omega\sen\lambda,\qquad
   T_{\rm prec}=\frac{23{,}93\ {\rm h}}{\left|\sen\lambda\right|}.\]</p>
+
+  <p>O sinal negativo diz o sentido: no hemisfério norte, com \(\sen\lambda>0\), a
+  precessão é horária vista de cima.</p>
 
   <p>O fator \(\sen\lambda\) é o que transforma a experiência num problema de mecânica. No
   polo o pêndulo mantém o plano fixo em relação às estrelas e o chão gira sob ele em 23,93 h,
@@ -591,6 +759,6 @@
   Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
 </footer>
 
-<script src="assets/js/widgets.js?v=202611081928"></script>
+<script src="assets/js/widgets.js?v=202611081937"></script>
 </body>
 </html>

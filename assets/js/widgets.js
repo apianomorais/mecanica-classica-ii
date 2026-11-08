@@ -3814,6 +3814,768 @@
     registrarRedesenho(desenhar);
   };
 
+
+  /* =================================================================
+     23. Os dois tubos: a altura da maré por equilíbrio
+     A derivação alternativa da altura da maré, que dispensa resolver
+     hidrodinâmica: um tubo vertical na maré alta e um horizontal ao
+     longo da superfície, e a condição de que a água não escoe de um
+     para o outro. A figura mostra de onde vem cada termo da conta.
+     ================================================================= */
+  REGISTRO.tubos = function (raiz) {
+    var GN = 6.67430e-11, RT = 6.371e6, g0 = 9.81;
+    var LUA = { M: 7.342e22, D: 3.844e8 };
+    var est = { th: 45, exa: 1 };
+
+    var corpo = moldura(raiz, 'Os dois tubos: de onde sai a altura da maré');
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'posição do tubo vertical', 2, 88, 1, 45,
+      function (v) { est.th = v; desenhar(); }, function (v) { return v + '°'; });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'força tangencial aqui', k: 'ft' },
+      { rot: 'onde ela é máxima', k: 'max' },
+      { rot: 'integral de 0 a 90°', k: 'int' },
+      { rot: 'altura de equilíbrio h', k: 'h' },
+      { rot: 'pressão na base ρgh', k: 'pr' },
+      { rot: 'comprimento do arco', k: 'arco' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    var A0 = GN * LUA.M * RT / Math.pow(LUA.D, 3);     // amplitude de maré
+    function tang(thg) {
+      return 1.5 * A0 * Math.sin(2 * thg * Math.PI / 180);
+    }
+    var H = 1.5 * GN * LUA.M * RT * RT / (g0 * Math.pow(LUA.D, 3));
+
+    function desenhar() {
+      var alt = 330;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      /* um quadrante da Terra, do ponto sublunar (0°) à maré baixa (90°).
+         O centro fica fora do quadro, embaixo à direita. */
+      var R = Math.min(alt * 1.55, Lp * 0.78);
+      var cx = Lp * 0.86, cy = alt + R * 0.34;
+      var th0 = -Math.PI / 2, th9 = -Math.PI / 2 - Math.PI / 2 * 0.62;
+      function sup(f) {               // f de 0 (maré alta) a 1 (maré baixa)
+        var a = th0 + (th9 - th0) * f;
+        return [cx + R * Math.cos(a), cy + R * Math.sin(a), a];
+      }
+
+      /* a superfície sem maré */
+      ct.beginPath();
+      for (var i = 0; i <= 120; i++) {
+        var q = sup(i / 120);
+        (i ? ct.lineTo : ct.moveTo).call(ct, q[0], q[1]);
+      }
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2.4; ct.stroke();
+      ct.fillStyle = 'rgba(23,107,93,.07)';
+      ct.lineTo(cx, cy); ct.closePath(); ct.fill();
+
+      /* o tubo horizontal, colado à superfície */
+      ct.beginPath();
+      for (var i2 = 0; i2 <= 120; i2++) {
+        var q2 = sup(i2 / 120), d = 13;
+        ct.lineTo(q2[0] - d * Math.cos(q2[2]), q2[1] - d * Math.sin(q2[2]));
+      }
+      for (var i3 = 120; i3 >= 0; i3--) {
+        var q3 = sup(i3 / 120);
+        ct.lineTo(q3[0], q3[1]);
+      }
+      ct.closePath();
+      ct.fillStyle = 'rgba(44,95,141,.16)'; ct.fill();
+      ct.strokeStyle = G.COR.azul; ct.lineWidth = 1.4;
+      ct.setLineDash([5, 4]); ct.stroke(); ct.setLineDash([]);
+
+      /* a força tangencial ao longo do arco, apontando para a maré alta */
+      for (var k = 1; k <= 11; k++) {
+        var f = k / 12, q4 = sup(f);
+        var thg = f * 90;
+        var m = tang(thg) / (1.5 * A0);
+        var tx = Math.sin(q4[2]), ty = -Math.cos(q4[2]);  // sentido de f decrescente
+        var L2 = 10 + 30 * m;
+        seta(ct, q4[0] - 6 * Math.cos(q4[2]), q4[1] - 6 * Math.sin(q4[2]),
+          q4[0] - 6 * Math.cos(q4[2]) + tx * L2, q4[1] - 6 * Math.sin(q4[2]) + ty * L2,
+          G.COR.vinho, 1.8);
+      }
+
+      /* o tubo vertical, na posição escolhida */
+      var fv = est.th / 90, qv = sup(fv);
+      var hpx = 74, larg = 17;
+      var nx = Math.cos(qv[2]), ny = Math.sin(qv[2]);     // para fora
+      var ux = -ny, uy = nx;                              // ao longo da superfície
+      ct.beginPath();
+      ct.moveTo(qv[0] - ux * larg / 2, qv[1] - uy * larg / 2);
+      ct.lineTo(qv[0] - ux * larg / 2 + nx * hpx, qv[1] - uy * larg / 2 + ny * hpx);
+      ct.lineTo(qv[0] + ux * larg / 2 + nx * hpx, qv[1] + uy * larg / 2 + ny * hpx);
+      ct.lineTo(qv[0] + ux * larg / 2, qv[1] + uy * larg / 2);
+      ct.closePath();
+      ct.fillStyle = 'rgba(44,95,141,.3)'; ct.fill();
+      ct.strokeStyle = G.COR.azul; ct.lineWidth = 2; ct.stroke();
+
+      /* o peso da coluna e a pressão que ele estabelece na base */
+      seta(ct, qv[0] + nx * hpx * 0.78, qv[1] + ny * hpx * 0.78,
+        qv[0] + nx * hpx * 0.18, qv[1] + ny * hpx * 0.18, G.COR.tinta, 2.4);
+      rotulo(ct, 'peso ρgh', qv[0] + nx * hpx * 0.55 + ux * 30,
+        qv[1] + ny * hpx * 0.55 + uy * 30, G.COR.tinta);
+      rotulo(ct, 'h', qv[0] + nx * hpx * 0.5 - ux * 26,
+        qv[1] + ny * hpx * 0.5 - uy * 26, G.COR.azul);
+
+      /* rótulos dos extremos */
+      var qa = sup(0), qb = sup(1);
+      rotulo(ct, 'maré alta', qa[0] + 2, qa[1] - 58, G.COR.mestra);
+      rotulo(ct, '(aponta para a Lua)', qa[0] + 2, qa[1] - 42, G.COR.suave,
+        'center', 'middle', '600 10px system-ui, sans-serif');
+      rotulo(ct, 'maré baixa', qb[0] + 54, qb[1] + 6, G.COR.mestra, 'left');
+      rotulo(ct, 'tubo horizontal, ao longo da superfície', 12, alt - 34,
+        G.COR.azul, 'left');
+      rotulo(ct, 'força de maré tangencial, que empurra a água', 12, alt - 16,
+        G.COR.vinho, 'left');
+
+      mostrar({
+        ft: F.fmt(tang(est.th) * 1e6, 3) + ' μm/s²',
+        max: '45°, com ' + F.fmt(1.5 * A0 * 1e6, 3) + ' μm/s²',
+        int: F.fmt(1.5 * A0 * RT, 3) + ' J/kg',
+        h: F.fmt(H * 100, 1) + ' cm',
+        pr: F.fmt(1025 * g0 * H, 0) + ' Pa',
+        arco: F.fmt(Math.PI * RT / 2 / 1e3, 0) + ' km'
+      });
+
+      nota.innerHTML =
+        '<p>Imagine dois tubos sem paredes, cheios de água. Um é <strong>vertical</strong>, '
+        + 'de altura \\(h\\), e o outro é <strong>horizontal</strong>, acompanhando a '
+        + 'superfície do ponto de maré baixa até o de maré alta. Nenhum dos dois é real: são '
+        + 'recortes imaginários do próprio oceano, e a pergunta é que altura \\(h\\) deixa a '
+        + 'água em repouso nos dois.</p>'
+        + '<p>A coluna vertical tem peso, e na sua base estabelece uma pressão excedente</p>'
+        + '\\[\\Delta p=\\varrho\\,g\\,h.\\]'
+        + '<p>Essa pressão empurra a água de volta para dentro do tubo horizontal. Para que '
+        + 'nada escoe, alguém tem de empurrar a água no sentido contrário, e esse alguém é a '
+        + '<strong>componente tangencial</strong> da força de maré, desenhada em vinho. Ela é '
+        + 'nula nos dois extremos, máxima a 45°, e aponta sempre para o ponto de maré '
+        + 'alta.</p>'
+        + '<p>O trabalho dessa força por unidade de massa, ao longo do arco de quadrante, '
+        + 'tem de igualar \\(gh\\):</p>'
+        + '\\[g\\,h=\\int_0^{\\pi/2}a_\\theta\\,R\\,d\\theta'
+        + '=\\int_0^{\\pi/2}\\frac{3}{2}\\frac{GM_LR}{D^3}\\sen2\\theta\\;R\\,d\\theta'
+        + '=\\frac{3}{2}\\frac{GM_LR^2}{D^3},\\]'
+        + '<p>de onde sai, sem resolver equação de movimento nenhuma,</p>'
+        + '\\[h=\\frac{3}{2}\\,\\frac{GM_LR^2}{g\\,D^3}=' + F.fmt(H * 100, 1)
+        + '\\ \\text{cm}.\\]'
+        + '<p>Repare no que o argumento dispensa. Não houve dinâmica, nem equação de onda, '
+        + 'nem atrito: só a exigência de que, no estado final, a água não tenha para onde '
+        + 'escorrer. É um argumento de <strong>equilíbrio</strong>, e por isso o resultado se '
+        + 'chama maré de equilíbrio. Os ' + F.fmt(1025 * g0 * H, 0) + ' Pa de pressão '
+        + 'excedente na base correspondem a meio metro de coluna de água do mar sobre uma '
+        + 'distância de ' + F.fmt(Math.PI * RT / 2 / 1e3, 0) + ' km de arco: uma rampa de uma '
+        + 'parte em vinte milhões, que é o quanto a maré realmente inclina o oceano.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
+
+  /* =================================================================
+     20. O que é um funcional
+     A definição ("uma regra que associa um número a uma função
+     inteira") é abstrata até se ver o número mudar enquanto a curva é
+     deformada. A segunda vista é o ponto alto: J contra o parâmetro
+     de deformação é uma curva comum, com mínimo comum, e δJ = 0 é
+     apenas o fundo dela. Trocando o funcional sem trocar os extremos,
+     o mínimo muda de lugar: a reta ganha em comprimento e em energia,
+     e perde em tempo de descida.
+     ================================================================= */
+  REGISTRO.funcional = function (raiz) {
+    var G0 = 9.80665;
+    var FUNS = {
+      comp: {
+        n: 'comprimento', sim: 'L[y]', uni: 'm',
+        f: function (y, yl) { return Math.sqrt(1 + yl * yl); },
+        tex: '\\displaystyle L[y]=\\int_0^1\\sqrt{1+y\\,\'^2}\\,dx'
+      },
+      tempo: {
+        n: 'tempo de descida', sim: 'T[y]', uni: 's',
+        f: function (y, yl) {
+          return Math.sqrt((1 + yl * yl) / (2 * G0 * Math.max(y, 1e-12)));
+        },
+        tex: '\\displaystyle T[y]=\\int_0^1\\frac{\\sqrt{1+y\\,\'^2}}'
+           + '{\\sqrt{2gy}}\\,dx'
+      },
+      energia: {
+        n: 'energia da corda', sim: 'U[y]', uni: 'J',
+        f: function (y, yl) { return yl * yl; },
+        tex: '\\displaystyle U[y]=\\int_0^1\\left(y\\,\'\\right)^2dx'
+      }
+    };
+    var est = { vista: 'curva', fn: 'comp', a: 0.25 };
+
+    var corpo = moldura(raiz, 'Um funcional é uma máquina: entra uma curva, sai um número');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, [
+      { rot: 'A curva e o número', v: 'curva' },
+      { rot: 'J contra a deformação', v: 'perfil' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    var c1 = el('div', { class: 'controles' });
+    corpo.appendChild(c1);
+    c1.appendChild(el('span', { class: 'etiqueta', texto: 'funcional' }));
+    opcoes(c1, Object.keys(FUNS).map(function (k) {
+      return { rot: FUNS[k].n, v: k };
+    }), 0, function (v) { est.fn = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'deformação a da curva', -0.35, 0.7, 0.01, 0.25,
+      function (v) { est.a = v; desenhar(); }, function (v) { return F.fmt(v, 2); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'funcional', k: 'qual' },
+      { rot: 'valor para esta curva', k: 'val' },
+      { rot: 'valor para a reta (a = 0)', k: 'reta' },
+      { rot: 'diferença', k: 'dif' },
+      { rot: 'a que minimiza', k: 'amin' },
+      { rot: 'qual curva vence', k: 'quem' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* y medido para baixo, de (0,0) a (1,1); a deformação é um seno
+       que se anula nas duas pontas, como manda a definição de variação */
+    function curva(a) {
+      return function (x) { return x + a * Math.sin(Math.PI * x); };
+    }
+    function derivada(a) {
+      return function (x) { return 1 + a * Math.PI * Math.cos(Math.PI * x); };
+    }
+    /* a substituição x = u² remove a singularidade 1/√y na partida */
+    function valor(k, a) {
+      var y = curva(a), yl = derivada(a), f = FUNS[k].f, s = 0, N = 400;
+      for (var i = 0; i < N; i++) {
+        var u = (i + 0.5) / N, x = u * u;
+        s += f(y(x), yl(x)) * 2 * u;
+      }
+      return s / N;
+    }
+    function minimiza(k) {
+      var melhor = -0.35, vm = Infinity;
+      for (var a = -0.35; a <= 0.701; a += 0.005) {
+        var v = valor(k, a);
+        if (v < vm) { vm = v; melhor = a; }
+      }
+      return melhor;
+    }
+
+    function desenhaCurva() {
+      var alt = 310;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var esc = Math.min((alt - 70) / 1.4, (Lp - 120) / 1.3);
+      var x0 = (Lp - esc) / 2, y0 = 34;
+      var X = function (u) { return x0 + u * esc; };
+      var Y = function (u) { return y0 + u * esc; };
+
+      ct.strokeStyle = G.COR.grade; ct.lineWidth = 1;
+      for (var g = 0; g <= 4; g++) {
+        ct.beginPath(); ct.moveTo(X(g / 4), Y(0)); ct.lineTo(X(g / 4), Y(1.08)); ct.stroke();
+        ct.beginPath(); ct.moveTo(X(-0.04), Y(g / 4)); ct.lineTo(X(1.04), Y(g / 4)); ct.stroke();
+      }
+
+      /* a reta, para comparar */
+      ct.beginPath(); ct.moveTo(X(0), Y(0)); ct.lineTo(X(1), Y(1));
+      ct.strokeStyle = G.COR.grade; ct.lineWidth = 2; ct.stroke();
+
+      /* a curva de prova */
+      var y = curva(est.a);
+      ct.beginPath();
+      for (var j = 0; j <= 120; j++) {
+        var x = j / 120;
+        (j ? ct.lineTo : ct.moveTo).call(ct, X(x), Y(y(x)));
+      }
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2.8; ct.stroke();
+
+      /* a curva ótima deste funcional, tracejada */
+      var am = minimiza(est.fn), yo = curva(am);
+      ct.beginPath();
+      for (var j2 = 0; j2 <= 120; j2++) {
+        var x2 = j2 / 120;
+        (j2 ? ct.lineTo : ct.moveTo).call(ct, X(x2), Y(yo(x2)));
+      }
+      ct.strokeStyle = G.COR.bronze; ct.lineWidth = 2;
+      ct.setLineDash([6, 4]); ct.stroke(); ct.setLineDash([]);
+
+      [[0, 0], [1, 1]].forEach(function (q) {
+        ct.beginPath(); ct.arc(X(q[0]), Y(q[1]), 5, 0, 2 * Math.PI);
+        ct.fillStyle = G.COR.tinta; ct.fill();
+      });
+      rotulo(ct, 'A', X(0) - 14, Y(0), G.COR.tinta);
+      rotulo(ct, 'B', X(1) + 14, Y(1), G.COR.tinta);
+      rotulo(ct, 'curva de prova', 10, 16, G.COR.mestra, 'left');
+      rotulo(ct, 'a que minimiza este funcional', 10, 32, G.COR.bronze, 'left');
+      rotulo(ct, 'y cresce para baixo', Lp - 10, alt - 12, G.COR.suave, 'right');
+    }
+
+    function desenhaPerfil() {
+      var k = est.fn, am = minimiza(k);
+      var v0 = valor(k, -0.35), v1 = valor(k, 0.7), vm = valor(k, am);
+      var vmax = Math.max(v0, v1);
+      var folga = (vmax - vm) * 0.18 + 1e-6;
+      var gr = G.eixos(cv, {
+        altura: 310, xmin: -0.35, xmax: 0.7,
+        ymin: vm - folga, ymax: vmax + folga,
+        rotX: 'deformação a', rotY: FUNS[k].sim + '  (' + FUNS[k].uni + ')',
+        marcasX: G.marcasLineares(-0.35, 0.7, 7, 2),
+        formataY: function (v) { return F.fmt(v, 3); }
+      });
+      G.curva(gr, function (a) { return valor(k, a); }, G.COR.mestra, 2.6);
+      G.vertical(gr, est.a, G.COR.suave, '', true);
+      var ct = gr.ct;
+      ct.beginPath(); ct.arc(gr.X(am), gr.Y(vm), 5.5, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.bronze; ct.fill();
+      rotulo(ct, 'mínimo em a = ' + F.fmt(am, 2), gr.X(am), gr.Y(vm) - 16, G.COR.bronze);
+      ct.beginPath(); ct.arc(gr.X(est.a), gr.Y(valor(k, est.a)), 5, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.roxo; ct.fill();
+      rotulo(ct, 'no fundo da curva, δJ = 0', gr.x1 - 8, gr.y0 + 14, G.COR.suave, 'right');
+    }
+
+    function desenhar() {
+      var k = est.fn, F0 = FUNS[k];
+      if (est.vista === 'curva') desenhaCurva();
+      else desenhaPerfil();
+      var v = valor(k, est.a), vr = valor(k, 0), am = minimiza(k);
+      mostrar({
+        qual: F0.n,
+        val: F.fmt(v, 4) + ' ' + F0.uni,
+        reta: F.fmt(vr, 4) + ' ' + F0.uni,
+        dif: (v > vr ? '+' : '') + F.fmt(v - vr, 4),
+        amin: F.fmt(am, 2),
+        quem: Math.abs(am) < 0.01 ? 'a reta' : 'uma curva que afunda'
+      });
+
+      nota.innerHTML =
+        '<p>Um <strong>funcional</strong> é uma regra que associa um número real a uma '
+        + '<em>função inteira</em>, e não ao valor dela num ponto. Escreve-se '
+        + '\\(J[y]\\), com colchetes, justamente para lembrar que a entrada é a curva toda. '
+        + 'Aqui a entrada é uma curva de prova ligando os dois pontos fixos A e B, e o '
+        + 'deslizante a deforma sem mexer nas pontas:</p>'
+        + '\\[y(x)=x+a\\,\\sen\\pi x.\\]'
+        + '<p>Escolhido o funcional, cada valor de \\(a\\) devolve um número. O atual é '
+        + '<strong>' + F.fmt(v, 4) + ' ' + F0.uni + '</strong>, contra ' + F.fmt(vr, 4)
+        + ' da reta.</p>'
+        + '\\[' + F0.tex + '\\]'
+        + '<p>A segunda vista desenha esse número contra \\(a\\), e aí o cálculo variacional '
+        + 'perde o mistério: é uma curva comum, com um mínimo comum, e a condição '
+        + '\\(\\delta J=0\\) é apenas a exigência de estar no fundo dela. A diferença para o '
+        + 'cálculo de sempre é que o espaço de busca não tem uma dimensão, e sim infinitas, '
+        + 'porque a curva pode ser deformada de infinitas maneiras. Esta família de um '
+        + 'parâmetro é uma fatia desse espaço.</p>'
+        + (Math.abs(am) < 0.01
+          ? '<p>Para o ' + F0.n + ', o mínimo está em \\(a=0\\): <strong>a reta '
+            + 'vence</strong>. Era de esperar no comprimento, e é o mesmo resultado na '
+            + 'energia de uma corda esticada, cujo funcional também só penaliza '
+            + 'inclinação.</p>'
+          : '<p>Para o ' + F0.n + ', o mínimo <strong>não</strong> está na reta: ele cai em '
+            + '\\(a=' + F.fmt(am, 2) + '\\), numa curva que afunda primeiro para ganhar '
+            + 'velocidade e só depois se endireita. Os extremos são exatamente os mesmos de '
+            + 'antes; o que mudou foi a pergunta. Essa é a braquistócrona de Johann '
+            + 'Bernoulli, e a solução exata, uma ciclóide, sai no próximo módulo.</p>')
+        + '<p>Troque entre os três funcionais com os mesmos dois pontos e repare que o '
+        + 'vencedor muda. Não existe "a melhor curva": existe a melhor curva <em>para um '
+        + 'funcional</em>.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     21. A corrida da braquistócrona
+     O enunciado é de 1696 e continua contraintuitivo: a reta é o
+     caminho mais curto e não é o mais rápido. Soltar as três contas ao
+     mesmo tempo resolve a discussão em três segundos, e o fato de a
+     ciclóide ainda ganhar do arco de círculo (que foi a resposta
+     errada de Galileu) é o detalhe que mostra que não basta afundar.
+     ================================================================= */
+  REGISTRO.braquistocrona = function (raiz) {
+    var G0 = 9.80665;
+    var est = { xb: 1.4, t: 0, rodando: true };
+
+    var corpo = moldura(raiz, 'A braquistócrona: o caminho mais curto não é o mais rápido');
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'afastamento horizontal de B', 0.4, 3, 0.05, 1.4,
+      function (v) { est.xb = v; est.t = 0; },
+      function (v) { return F.fmt(v, 2) + ' m'; });
+    var bt = el('button', { type: 'button', texto: 'soltar de novo' });
+    bt.addEventListener('click', function () { est.t = 0; est.rodando = true; });
+    ctr.appendChild(bt);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'tempo pela reta', k: 'tr' },
+      { rot: 'tempo pelo arco de círculo', k: 'tc' },
+      { rot: 'tempo pela ciclóide', k: 'tq' },
+      { rot: 'ganho da ciclóide sobre a reta', k: 'gan' },
+      { rot: 'comprimento da reta', k: 'lr' },
+      { rot: 'comprimento da ciclóide', k: 'lq' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    var YB = 1;                       // B está sempre 1 m abaixo de A
+
+    /* resolve (1 − cos θ)/(θ − sen θ) = yB/xB para o parâmetro final */
+    function thetaFinal() {
+      var alvo = YB / est.xb, lo = 1e-4, hi = 2 * Math.PI - 1e-4;
+      for (var i = 0; i < 70; i++) {
+        var m = (lo + hi) / 2;
+        var v = (1 - Math.cos(m)) / (m - Math.sin(m));
+        if (v > alvo) lo = m; else hi = m;
+      }
+      return (lo + hi) / 2;
+    }
+
+    /* cada caminho devolve y(x) e, por integração, o tempo acumulado */
+    function caminhos() {
+      var th1 = thetaFinal(), R = YB / (1 - Math.cos(th1));
+      return [
+        { n: 'reta', cor: G.COR.suave,
+          pt: function (u) { return [est.xb * u, YB * u]; } },
+        { n: 'arco de círculo', cor: G.COR.bronze,
+          pt: function (u) {
+            /* arco que passa por A e B com tangente vertical em A */
+            var r = (est.xb * est.xb + YB * YB) / (2 * est.xb);
+            var fi = u * Math.atan2(est.xb - 0, r - 0) * 0 + u * Math.acos(
+              Math.max(-1, Math.min(1, (r - est.xb) / r * 0 + 1 - est.xb * est.xb /
+                (2 * r * r) * 0)));
+            return null;
+          } },
+        { n: 'ciclóide', cor: G.COR.mestra,
+          pt: function (u) {
+            var th = th1 * u;
+            return [R * (th - Math.sin(th)), R * (1 - Math.cos(th))];
+          } }
+      ];
+    }
+
+    /* o arco de círculo de Galileu: circunferência por A e B com
+       tangente vertical em A, parametrizada pelo ângulo central */
+    function arco() {
+      var r = (est.xb * est.xb + YB * YB) / (2 * YB);
+      /* centro em (0, r); A = (0,0); B tem de estar na circunferência */
+      var fiB = Math.atan2(est.xb, r - YB);
+      return { r: r, fiB: fiB,
+        pt: function (u) {
+          var fi = fiB * u;
+          return [r * Math.sin(fi), r * (1 - Math.cos(fi))];
+        } };
+    }
+
+    /* tabela tempo → posição ao longo de um caminho, por quadratura
+       de dt = ds/√(2gy) com o ponto médio, que evita a singularidade */
+    function tabela(pt) {
+      var N = 600, tt = [0], acc = 0, ant = pt(0);
+      for (var i = 1; i <= N; i++) {
+        var u = i / N, q = pt(u);
+        var dx = q[0] - ant[0], dy = q[1] - ant[1];
+        var ds = Math.sqrt(dx * dx + dy * dy);
+        var ym = (q[1] + ant[1]) / 2;
+        acc += ds / Math.sqrt(2 * G0 * Math.max(ym, 1e-9));
+        tt.push(acc);
+        ant = q;
+      }
+      return tt;
+    }
+    function posicao(pt, tt, t) {
+      var N = tt.length - 1;
+      if (t >= tt[N]) return pt(1);
+      var lo = 0, hi = N;
+      while (hi - lo > 1) {
+        var m = (lo + hi) >> 1;
+        if (tt[m] <= t) lo = m; else hi = m;
+      }
+      var f = (t - tt[lo]) / Math.max(1e-12, tt[hi] - tt[lo]);
+      return pt((lo + f) / N);
+    }
+    function comprimento(pt) {
+      var s = 0, ant = pt(0);
+      for (var i = 1; i <= 400; i++) {
+        var q = pt(i / 400);
+        s += Math.hypot(q[0] - ant[0], q[1] - ant[1]);
+        ant = q;
+      }
+      return s;
+    }
+
+    function pistas() {
+      var th1 = thetaFinal(), R = YB / (1 - Math.cos(th1)), A = arco();
+      return [
+        { n: 'reta', cor: G.COR.vinho,
+          pt: function (u) { return [est.xb * u, YB * u]; } },
+        { n: 'arco de círculo', cor: G.COR.bronze, pt: A.pt },
+        { n: 'ciclóide', cor: G.COR.mestra,
+          pt: function (u) {
+            var th = th1 * u;
+            return [R * (th - Math.sin(th)), R * (1 - Math.cos(th))];
+          } }
+      ];
+    }
+
+    function desenhar() {
+      var alt = 300;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var ps = pistas();
+      var ymax = 1.05, xmax = est.xb;
+      ps.forEach(function (q) {
+        for (var i = 0; i <= 40; i++) {
+          var r = q.pt(i / 40);
+          if (r[1] > ymax) ymax = r[1];
+          if (r[0] > xmax) xmax = r[0];
+        }
+      });
+      var esc = Math.min((Lp - 80) / xmax, (alt - 74) / ymax);
+      var x0 = (Lp - xmax * esc) / 2, y0 = 34;
+      var X = function (u) { return x0 + u * esc; };
+      var Y = function (u) { return y0 + u * esc; };
+
+      ps.forEach(function (q) {
+        var tt = tabela(q.pt);
+        ct.beginPath();
+        for (var i = 0; i <= 200; i++) {
+          var r = q.pt(i / 200);
+          (i ? ct.lineTo : ct.moveTo).call(ct, X(r[0]), Y(r[1]));
+        }
+        ct.strokeStyle = q.cor; ct.lineWidth = 2.2; ct.stroke();
+        q.T = tt[tt.length - 1];
+        var b = posicao(q.pt, tt, est.t);
+        ct.beginPath(); ct.arc(X(b[0]), Y(b[1]), 7, 0, 2 * Math.PI);
+        ct.fillStyle = q.cor; ct.fill();
+        ct.strokeStyle = '#fff'; ct.lineWidth = 1.6; ct.stroke();
+        if (est.t >= q.T) {
+          rotulo(ct, F.fmt(q.T, 3) + ' s', X(b[0]) + 12, Y(b[1]) + 14, q.cor, 'left');
+        }
+      });
+
+      [[0, 0], [est.xb, YB]].forEach(function (q, i) {
+        ct.beginPath(); ct.arc(X(q[0]), Y(q[1]), 5, 0, 2 * Math.PI);
+        ct.fillStyle = G.COR.tinta; ct.fill();
+        rotulo(ct, i ? 'B' : 'A', X(q[0]) + (i ? 14 : -14), Y(q[1]) - 10, G.COR.tinta);
+      });
+
+      ps.forEach(function (q, i) {
+        ct.fillStyle = q.cor;
+        ct.fillRect(10, 12 + i * 16 - 3, 14, 3);
+        rotulo(ct, q.n, 29, 12 + i * 16, q.cor, 'left');
+      });
+
+      var tr = ps[0].T, tc = ps[1].T, tq = ps[2].T;
+      mostrar({
+        tr: F.fmt(tr, 4) + ' s', tc: F.fmt(tc, 4) + ' s', tq: F.fmt(tq, 4) + ' s',
+        gan: F.pct(1 - tq / tr, 2),
+        lr: F.fmt(comprimento(ps[0].pt), 3) + ' m',
+        lq: F.fmt(comprimento(ps[2].pt), 3) + ' m'
+      });
+      return ps;
+    }
+
+    function texto(ps) {
+      var tr = ps[0].T, tc = ps[1].T, tq = ps[2].T;
+      nota.innerHTML =
+        '<p>Em junho de 1696, Johann Bernoulli desafiou os matemáticos da Europa: dados dois '
+        + 'pontos A e B, com B mais baixo mas não diretamente abaixo, qual é a curva ao longo '
+        + 'da qual uma conta desliza sem atrito de A a B no menor tempo? Ele chamou a curva de '
+        + '<em>braquistócrona</em>, do grego para "tempo mais curto".</p>'
+        + '<p>Pela conservação de energia a rapidez vale \\(v=\\sqrt{2gy}\\), com \\(y\\) '
+        + 'medido para baixo a partir de A, e o tempo total é o funcional</p>'
+        + '\\[T[y]=\\int_A^B\\frac{ds}{v}'
+        + '=\\int_{0}^{x_B}\\frac{\\sqrt{1+y\\,\'^2}}{\\sqrt{2gy}}\\,dx.\\]'
+        + '<p>A reta é o caminho mais curto, e perde: ' + F.fmt(tr, 3) + ' s contra '
+        + F.fmt(tq, 3) + ' s da ciclóide, uma diferença de ' + F.pct(1 - tq / tr, 1)
+        + '. O motivo é que a conta parte do repouso, e afundar logo no começo compra '
+        + 'velocidade que será usada no resto do percurso. Vale <strong>andar mais para '
+        + 'chegar antes</strong>, e o comprimento da ciclóide é de fato maior.</p>'
+        + '<p>O arco de círculo, que foi a resposta de Galileu em 1638, também afunda e '
+        + 'também ganha da reta, com ' + F.fmt(tc, 3) + ' s. Mas perde para a ciclóide, e '
+        + 'é esse o detalhe que mostra que não basta afundar: existe uma forma ótima de '
+        + 'afundar, e achá-la é o que o cálculo variacional faz.</p>'
+        + '<p>Newton recebeu o problema ao voltar da Casa da Moeda, resolveu-o durante a '
+        + 'noite e enviou a solução sem assinatura. Bernoulli reconheceu o autor pelo '
+        + 'estilo: <em>tanquam ex ungue leonem</em>, o leão pela garra. A dedução completa, '
+        + 'com a integral de Beltrami, está no módulo 8.</p>';
+      tipografar(corpo);
+    }
+
+    var chaveAnt = '';
+    function quadro() {
+      var ps = desenhar();
+      if (est.rodando) {
+        est.t += 0.012;
+        if (est.t > ps[0].T + 0.9) est.t = 0;
+      }
+      var chave = F.fmt(est.xb, 2);
+      if (chave !== chaveAnt) { chaveAnt = chave; texto(ps); }
+      requestAnimationFrame(quadro);
+    }
+
+    requestAnimationFrame(quadro);
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     22. O problema de Dido
+     Problema isoperimétrico: com o perímetro fixo, qual curva fechada
+     encerra mais área? A resposta é o círculo, e vê-la emergir de uma
+     família de polígonos regulares à medida que os lados aumentam faz
+     o resultado parecer inevitável, que é o que ele é.
+     ================================================================= */
+  REGISTRO.isoperimetrico = function (raiz) {
+    var P = 1;                        // perímetro fixo
+    var est = { n: 5, e: 1 };
+
+    var corpo = moldura(raiz, 'O problema de Dido: perímetro fixo, área máxima');
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'lados do polígono regular', 3, 24, 1, 5,
+      function (v) { est.n = v; desenhar(); },
+      function (v) { return v >= 24 ? 'círculo' : v + ' lados'; });
+    deslizante(ctr, 'achatamento da elipse', 0.15, 1, 0.01, 1,
+      function (v) { est.e = v; desenhar(); },
+      function (v) { return v >= 0.995 ? 'círculo' : F.fmt(v, 2); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'área do polígono', k: 'ap' },
+      { rot: 'área da elipse', k: 'ae' },
+      { rot: 'área do círculo', k: 'ac' },
+      { rot: 'polígono / círculo', k: 'rp' },
+      { rot: 'elipse / círculo', k: 're' },
+      { rot: 'razão isoperimétrica 4πA/P²', k: 'iso' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function areaPoligono(n) {
+      var l = P / n;
+      return n * l * l / (4 * Math.tan(Math.PI / n));
+    }
+    /* elipse de semieixos a e b = e·a, com o perímetro ajustado a P
+       pela aproximação de Ramanujan, invertida numericamente */
+    function semieixos(e) {
+      function per(a) {
+        var b = e * a, h = Math.pow(a - b, 2) / Math.pow(a + b, 2);
+        return Math.PI * (a + b) * (1 + 3 * h / (10 + Math.sqrt(4 - 3 * h)));
+      }
+      var lo = 1e-4, hi = 1;
+      for (var i = 0; i < 60; i++) {
+        var m = (lo + hi) / 2;
+        if (per(m) < P) lo = m; else hi = m;
+      }
+      var a = (lo + hi) / 2;
+      return [a, e * a];
+    }
+
+    function desenhar() {
+      var alt = 300;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var Rc = P / (2 * Math.PI);
+      var ab = semieixos(est.e);
+      var esc = Math.min((alt - 56) / (2.3 * Rc), (Lp / 3 - 24) / (2.3 * Rc));
+      var cy = alt / 2 - 4;
+
+      function painel(cx, desenha, rot, cor, area) {
+        desenha(cx);
+        rotulo(ct, rot, cx, alt - 30, cor);
+        rotulo(ct, 'A = ' + F.fmt(area, 5), cx, alt - 14, G.COR.suave, 'center',
+          'middle', '600 10px system-ui, sans-serif');
+      }
+
+      painel(Lp / 6, function (cx) {
+        ct.beginPath();
+        for (var k = 0; k <= est.n; k++) {
+          var a = -Math.PI / 2 + 2 * Math.PI * k / est.n;
+          var r = P / (2 * est.n * Math.sin(Math.PI / est.n));
+          var px = cx + r * esc * Math.cos(a), py = cy + r * esc * Math.sin(a);
+          (k ? ct.lineTo : ct.moveTo).call(ct, px, py);
+        }
+        ct.closePath();
+        ct.fillStyle = 'rgba(168,96,31,.18)'; ct.fill();
+        ct.strokeStyle = G.COR.bronze; ct.lineWidth = 2.4; ct.stroke();
+      }, est.n >= 24 ? 'círculo' : est.n + ' lados', G.COR.bronze, areaPoligono(est.n));
+
+      painel(Lp / 2, function (cx) {
+        ct.beginPath();
+        ct.ellipse(cx, cy, ab[0] * esc, ab[1] * esc, 0, 0, 2 * Math.PI);
+        ct.fillStyle = 'rgba(107,78,143,.18)'; ct.fill();
+        ct.strokeStyle = G.COR.roxo; ct.lineWidth = 2.4; ct.stroke();
+      }, 'elipse', G.COR.roxo, Math.PI * ab[0] * ab[1]);
+
+      painel(Lp * 5 / 6, function (cx) {
+        ct.beginPath(); ct.arc(cx, cy, Rc * esc, 0, 2 * Math.PI);
+        ct.fillStyle = 'rgba(23,107,93,.2)'; ct.fill();
+        ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2.8; ct.stroke();
+      }, 'círculo', G.COR.mestra, Math.PI * Rc * Rc);
+
+      rotulo(ct, 'os três têm o mesmo perímetro', Lp / 2, 14, G.COR.suave);
+
+      var Ap = areaPoligono(est.n), Ae = Math.PI * ab[0] * ab[1],
+          Ac = Math.PI * Rc * Rc;
+      mostrar({
+        ap: F.fmt(Ap, 5), ae: F.fmt(Ae, 5), ac: F.fmt(Ac, 5),
+        rp: F.pct(Ap / Ac, 2), re: F.pct(Ae / Ac, 2),
+        iso: F.fmt(4 * Math.PI * Math.max(Ap, Ae) / (P * P), 4)
+      });
+
+      nota.innerHTML =
+        '<p>Segundo a lenda, a princesa fenícia Dido comprou de um chefe local toda a terra '
+        + 'que coubesse dentro de uma pele de boi. Ela cortou a pele em tiras finíssimas, '
+        + 'emendou-as numa corda longa e fechou com ela a maior área possível, fundando ali '
+        + 'Cartago. O problema que ela resolveu na prática é o '
+        + '<strong>isoperimétrico</strong>: com o perímetro fixo, qual curva fechada encerra '
+        + 'a maior área?</p>'
+        + '<p>As três figuras têm exatamente o mesmo perímetro, e as áreas estão nos '
+        + 'cartões. O polígono regular melhora à medida que ganha lados, e a elipse melhora '
+        + 'à medida que fica menos achatada; nos dois casos o limite é o mesmo, e nenhum dos '
+        + 'dois chega a superá-lo. A razão isoperimétrica</p>'
+        + '\\[\\frac{4\\pi A}{P^2}\\leq1\\]'
+        + '<p>vale 1 apenas para o círculo, e esse é o enunciado moderno do que Dido sabia.</p>'
+        + '<p>O que torna este problema diferente dos outros desta aula é a '
+        + '<strong>restrição</strong>: não se procura o extremo de um funcional qualquer, e '
+        + 'sim o extremo de um funcional (a área) com outro funcional (o perímetro) mantido '
+        + 'fixo. Problemas assim se chamam isoperimétricos e se resolvem com multiplicadores '
+        + 'de Lagrange aplicados ao cálculo variacional, que é o assunto do módulo 9.</p>'
+        + '<p>Note ainda que os gregos <em>sabiam</em> a resposta desde a Antiguidade, e não '
+        + 'tinham como prová-la. A primeira demonstração completa só veio com Weierstrass, no '
+        + 'século XIX, e precisou exatamente das ferramentas que esta aula começa a '
+        + 'montar.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {
