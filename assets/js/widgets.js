@@ -5474,6 +5474,898 @@
     registrarRedesenho(desenhar);
   };
 
+  /* =================================================================
+     32. Newton contra Lagrange no pêndulo simples
+     Mostra lado a lado o que cada formulação precisa escrever: a
+     decomposição com a tração de um lado, uma linha de álgebra do
+     outro. Integra a equação não-linear e compara com a linearizada.
+     ================================================================= */
+  REGISTRO.pendulolag = function (raiz) {
+    var g0 = 9.80665;
+    var est = { th0: 50, L: 1, t: 0, rodando: true };
+
+    var corpo = moldura(raiz, 'O pêndulo: com tração e sem tração');
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'amplitude inicial', 5, 170, 1, 50,
+      function (v) { est.th0 = v; est.t = 0; }, function (v) { return v + '°'; });
+    deslizante(ctr, 'comprimento do fio', 0.3, 2, 0.05, 1,
+      function (v) { est.L = v; est.t = 0; },
+      function (v) { return F.fmt(v, 2) + ' m'; });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'período linearizado', k: 'T0' },
+      { rot: 'período exato', k: 'Tex' },
+      { rot: 'erro da linearização', k: 'err' },
+      { rot: 'tração no ponto mais baixo', k: 'Tb' },
+      { rot: 'tração no extremo', k: 'Te' },
+      { rot: 'momento conjugado p_θ', k: 'p' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* período exato pela integral elíptica completa, por média
+       aritmético-geométrica: T = 2π/agm(1, cos(θ0/2)) · √(L/g) */
+    function periodoExato(th0, L) {
+      var a = 1, b = Math.cos(th0 / 2);
+      for (var i = 0; i < 40; i++) {
+        var a2 = (a + b) / 2, b2 = Math.sqrt(a * b);
+        a = a2; b = b2;
+      }
+      return 2 * Math.PI / a * Math.sqrt(L / g0);
+    }
+    /* integra θ'' = −(g/L) sen θ por Runge-Kutta 4 */
+    function trajetoria(th0, L, T, N) {
+      var h = T / N, th = th0, w = 0, saida = [[0, th0, 0]];
+      function f(y) { return [y[1], -g0 / L * Math.sin(y[0])]; }
+      var y = [th, w];
+      for (var i = 1; i <= N; i++) {
+        var k1 = f(y);
+        var k2 = f([y[0] + h / 2 * k1[0], y[1] + h / 2 * k1[1]]);
+        var k3 = f([y[0] + h / 2 * k2[0], y[1] + h / 2 * k2[1]]);
+        var k4 = f([y[0] + h * k3[0], y[1] + h * k3[1]]);
+        y = [y[0] + h / 6 * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]),
+             y[1] + h / 6 * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1])];
+        saida.push([i * h, y[0], y[1]]);
+      }
+      return saida;
+    }
+
+    var cacheK = null, cacheV = null;
+    function traj() {
+      var k = est.th0 + ':' + est.L;
+      if (k !== cacheK) {
+        var Tex = periodoExato(est.th0 * Math.PI / 180, est.L);
+        cacheV = { T: Tex, pts: trajetoria(est.th0 * Math.PI / 180, est.L, 2 * Tex, 1200) };
+        cacheK = k;
+      }
+      return cacheV;
+    }
+
+    function desenhar() {
+      var alt = 330;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+      var meia = Lp * 0.44;
+
+      var tj = traj(), Tex = tj.T;
+      var idx = Math.min(tj.pts.length - 1,
+        Math.floor(est.t / (2 * Tex) * (tj.pts.length - 1)));
+      var th = tj.pts[idx][1], w = tj.pts[idx][2];
+
+      /* painel 1: o pêndulo, com as forças que Newton obriga a escrever */
+      var px = meia * 0.5, py = 44;
+      var Rp = Math.min(alt - 120, meia * 0.42);
+      var bx = px + Rp * Math.sin(th), by = py + Rp * Math.cos(th);
+
+      ct.beginPath(); ct.moveTo(px, py); ct.lineTo(px, py + Rp + 26);
+      ct.strokeStyle = G.COR.grade; ct.lineWidth = 1.4;
+      ct.setLineDash([5, 4]); ct.stroke(); ct.setLineDash([]);
+
+      ct.beginPath(); ct.moveTo(px, py); ct.lineTo(bx, by);
+      ct.strokeStyle = G.COR.tinta; ct.lineWidth = 2.4; ct.stroke();
+      ct.beginPath(); ct.arc(px, py, 4, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.tinta; ct.fill();
+
+      /* tração e peso, decompostos */
+      var trac = (3 * Math.cos(th) - 2 * Math.cos(est.th0 * Math.PI / 180));
+      var esc = 42;
+      seta(ct, bx, by, bx + (px - bx) / Rp * esc * Math.max(trac, 0.05),
+        by + (py - by) / Rp * esc * Math.max(trac, 0.05), G.COR.vinho, 2.4);
+      rotulo(ct, 'T', bx + (px - bx) / Rp * esc * trac - 14,
+        by + (py - by) / Rp * esc * trac, G.COR.vinho, 'right');
+      seta(ct, bx, by, bx, by + esc, G.COR.tinta, 2.4);
+      rotulo(ct, 'mg', bx + 14, by + esc * 0.6, G.COR.tinta, 'left');
+      /* a componente tangencial do peso, que é a única que move */
+      seta(ct, bx, by, bx - esc * Math.cos(th) * Math.sin(th),
+        by + esc * Math.cos(th) * Math.cos(th), G.COR.bronze, 2);
+      rotulo(ct, 'mg sen θ', bx - esc * Math.cos(th) * Math.sin(th) - 8,
+        by + esc * Math.cos(th) * Math.cos(th) + 16, G.COR.bronze, 'right');
+
+      ct.beginPath(); ct.arc(bx, by, 10, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.mestra; ct.fill();
+      ct.strokeStyle = '#fff'; ct.lineWidth = 2; ct.stroke();
+
+      rotulo(ct, 'θ = ' + F.fmt(th * 180 / Math.PI, 1) + '°', px, py - 24, G.COR.suave);
+      rotulo(ct, 'Newton precisa das duas forças e da decomposição',
+        12, alt - 14, G.COR.suave, 'left');
+
+      /* painel 2: θ(t), exato contra linearizado */
+      var A = est.th0 * Math.PI / 180, w0 = Math.sqrt(g0 / est.L);
+      var g2 = G.eixos(cv, {
+        altura: alt, xmin: 0, xmax: 2 * Tex,
+        ymin: -A * 1.25 * 180 / Math.PI, ymax: A * 1.25 * 180 / Math.PI,
+        rotX: 't (s)', rotY: 'θ (graus)',
+        marcasX: G.marcasLineares(0, 2 * Tex, 5, 1),
+        formataY: function (v) { return F.fmt(v, 0); },
+        limpar: false, margem: { e: meia + 60, d: 16, c: 16, b: 40 }
+      });
+      G.curva(g2, function (t) {
+        return A * Math.cos(w0 * t) * 180 / Math.PI;
+      }, G.COR.bronze, 2.2, [6, 4]);
+      var c2 = g2.ct;
+      c2.beginPath();
+      tj.pts.forEach(function (q, i) {
+        var X = g2.X(q[0]), Y = g2.Y(q[1] * 180 / Math.PI);
+        (i ? c2.lineTo : c2.moveTo).call(c2, X, Y);
+      });
+      c2.strokeStyle = G.COR.mestra; c2.lineWidth = 2.6; c2.stroke();
+      G.legenda(g2, [
+        { texto: 'exato', cor: G.COR.mestra },
+        { texto: 'linearizado', cor: G.COR.bronze }
+      ]);
+      c2.beginPath();
+      c2.arc(g2.X(tj.pts[idx][0]), g2.Y(th * 180 / Math.PI), 5, 0, 2 * Math.PI);
+      c2.fillStyle = G.COR.roxo; c2.fill();
+
+      var T0 = 2 * Math.PI / w0;
+      var m = 1;
+      mostrar({
+        T0: F.fmt(T0, 4) + ' s',
+        Tex: F.fmt(Tex, 4) + ' s',
+        err: F.pct((Tex - T0) / T0, 2),
+        Tb: F.fmt(m * g0 * (3 - 2 * Math.cos(A)), 3) + ' N por kg',
+        Te: F.fmt(m * g0 * Math.cos(A), 3) + ' N por kg',
+        p: F.fmt(m * est.L * est.L * w, 4) + ' kg·m²/s'
+      });
+
+      nota.innerHTML =
+        '<p>Pela via de Newton é preciso escrever as duas forças que agem na massa, a tração '
+        + '\\(\\vet{T}\\) e o peso \\(m\\vet{g}\\), projetar na direção tangencial, projetar '
+        + 'na radial, e só então reconhecer que a equação radial serve apenas para determinar '
+        + '\\(T\\). A tração é uma incógnita a mais, e ela aparece porque o fio é um '
+        + '<strong>vínculo</strong>.</p>'
+        + '<p>Pela via de Lagrange escolhe-se \\(\\theta\\), que já respeita o vínculo por '
+        + 'construção. Com \\(x=\\ell\\sen\\theta\\) e \\(y=-\\ell\\cos\\theta\\),</p>'
+        + '\\[T=\\tfrac12m\\left(\\dot x^2+\\dot y^2\\right)'
+        + '=\\tfrac12m\\ell^2\\dot\\theta^2,\\qquad V=-mg\\ell\\cos\\theta,\\]'
+        + '<p>de modo que \\(\\Lag=\\tfrac12m\\ell^2\\dot\\theta^2+mg\\ell\\cos\\theta\\). '
+        + 'Daí</p>'
+        + '\\[\\pder{\\Lag}{\\dot\\theta}=m\\ell^2\\dot\\theta,\\qquad'
+        + '\\pder{\\Lag}{\\theta}=-mg\\ell\\sen\\theta'
+        + '\\qquad\\Longrightarrow\\qquad'
+        + '\\ddot\\theta+\\frac{g}{\\ell}\\sen\\theta=0.\\]'
+        + '<p>A tração não aparece em lugar nenhum. Esse é o ganho central do formalismo: '
+        + 'forças de vínculo que não realizam trabalho somem da conta quando as coordenadas '
+        + 'já incorporam o vínculo. Se a tração for de fato necessária, há como recuperá-la, '
+        + 'e o método está na seção dos multiplicadores.</p>'
+        + '<p>O momento conjugado a \\(\\theta\\) vale '
+        + '\\(p_\\theta=\\partial\\Lag/\\partial\\dot\\theta=m\\ell^2\\dot\\theta\\), que é o '
+        + '<em>momento angular</em> em relação ao pivô. Momento conjugado não é sempre massa '
+        + 'vezes velocidade: é o que a derivada da lagrangiana produzir, e as unidades '
+        + 'acompanham a coordenada escolhida.</p>'
+        + '<p>O segundo painel integra a equação completa e compara com a linearização '
+        + '\\(\\sen\\theta\\simeq\\theta\\). Para amplitudes pequenas as duas curvas se '
+        + 'confundem; aumentando a amplitude, o período exato cresce, porque a força '
+        + 'restauradora fica proporcionalmente mais fraca longe do fundo. A '
+        + '' + F.fmt(est.th0, 0) + '° o erro da fórmula elementar já é de '
+        + F.pct((Tex - T0) / T0, 2) + '.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(function () { desenhar(); });
+    (function animar() {
+      if (est.rodando) {
+        est.t += 1 / 60;
+        if (est.t > 2 * traj().T) est.t = 0;
+        desenhar();
+      }
+      requestAnimationFrame(animar);
+    })();
+  };
+
+  /* =================================================================
+     33. Estacionar de ré: um vínculo não-holônomo
+     O carro só anda na direção para onde aponta, e mesmo assim chega a
+     qualquer lugar. É a diferença entre restringir velocidades e
+     restringir configurações.
+     ================================================================= */
+  REGISTRO.estacionar = function (raiz) {
+    var est = { s: 0, rodando: true };
+
+    var corpo = moldura(raiz, 'Estacionar de ré: por que um vínculo de velocidade não tira grau de liberdade');
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    var sl = deslizante(ctr, 'manobra', 0, 1, 0.005, 0,
+      function (v) { est.s = v; est.rodando = false; desenhar(); },
+      function (v) { return F.pct(v, 0); });
+    var bt = el('button', { type: 'button', texto: 'repetir a manobra' });
+    bt.addEventListener('click', function () { est.s = 0; est.rodando = true; });
+    ctr.appendChild(bt);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'coordenadas do carro', k: 'n' },
+      { rot: 'vínculo', k: 'v' },
+      { rot: 'tipo', k: 't' },
+      { rot: 'graus de liberdade', k: 'gl' },
+      { rot: 'deslocamento lateral obtido', k: 'd' },
+      { rot: 'ângulo final', k: 'a' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* A manobra de baliza: dois arcos de ré, de curvatura oposta e mesmo
+       comprimento. O primeiro gira o carro para dentro da vaga, o segundo
+       desfaz o giro. O resultado é translação pura, apesar de o carro
+       jamais ter andado de lado.
+         fase 1:  dθ = +ds/R,  fase 2:  dθ = −ds/R, ambas em marcha a ré
+       Integrando, x = −2R sen Δ e y = −2R(1 − cos Δ), com θ final nulo. */
+    var RG = 1.25, DG = 0.65;          // raio de giro e guinada máxima (rad)
+    function pose(s) {
+      var x = 0, y = 0, th = 0;
+      var N = 600, passos = Math.max(0, Math.round(s * N));
+      var arco = RG * DG, ds = 2 * arco / N;
+      for (var i = 0; i < passos; i++) {
+        var curv = i < N / 2 ? -1 / RG : 1 / RG;
+        th += curv * ds * -1;
+        x += Math.cos(th) * ds * -1;
+        y += Math.sin(th) * ds * -1;
+      }
+      return [x, y, th];
+    }
+
+    function desenhar() {
+      var alt = 320;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var pf = pose(1), p0 = pose(0);
+      var esc = Math.min(Lp / 5.2, alt / 2.2);
+      var ox = Lp * 0.5 - (p0[0] + pf[0]) / 2 * esc;
+      var oy = alt * 0.52 + (p0[1] + pf[1]) / 2 * esc;
+      function X(u) { return ox + u * esc; }
+      function Y(u) { return oy - u * esc; }
+
+      var compr = 0.80, larg = 0.40;      // o carro, em unidades de mundo
+
+      /* o meio-fio e os dois carros estacionados, posicionados em torno
+         da vaga para onde a manobra leva */
+      var ymf = pf[1] - larg * 0.80;
+      ct.beginPath();
+      ct.moveTo(X(pf[0] - 2.6), Y(ymf)); ct.lineTo(X(pf[0] + 2.6), Y(ymf));
+      ct.strokeStyle = G.COR.tinta; ct.lineWidth = 2.4; ct.stroke();
+      ct.fillStyle = 'rgba(27,31,36,.06)';
+      ct.fillRect(X(pf[0] - 2.6), Y(ymf), 5.2 * esc, alt);
+      rotulo(ct, 'meio-fio', X(pf[0] + 2.5), Y(ymf) + 16, G.COR.suave, 'right');
+
+      function carro(q, cor, contorno) {
+        ct.save();
+        ct.translate(X(q[0]), Y(q[1]));
+        ct.rotate(-q[2]);
+        var w = compr * esc, h = larg * esc, r = 6;
+        ct.beginPath();
+        ct.moveTo(-w / 2 + r, -h / 2);
+        ct.arcTo(w / 2, -h / 2, w / 2, h / 2, r);
+        ct.arcTo(w / 2, h / 2, -w / 2, h / 2, r);
+        ct.arcTo(-w / 2, h / 2, -w / 2, -h / 2, r);
+        ct.arcTo(-w / 2, -h / 2, w / 2, -h / 2, r);
+        ct.closePath();
+        ct.fillStyle = cor; ct.fill();
+        if (contorno) { ct.strokeStyle = contorno; ct.lineWidth = 1.6; ct.stroke(); }
+        ct.fillStyle = 'rgba(255,255,255,.5)';
+        ct.fillRect(-w * 0.06, -h / 2 + 3, w * 0.26, h - 6);
+        ct.restore();
+      }
+
+      carro([pf[0] - 1.18, pf[1], 0], 'rgba(27,31,36,.17)');
+      carro([pf[0] + 1.18, pf[1], 0], 'rgba(27,31,36,.17)');
+
+      /* a vaga, entre os dois */
+      ct.strokeStyle = G.COR.clara; ct.lineWidth = 1.6;
+      ct.setLineDash([6, 5]);
+      ct.strokeRect(X(pf[0] - 0.62), Y(pf[1] + larg * 0.62),
+        1.24 * esc, larg * 1.24 * esc);
+      ct.setLineDash([]);
+
+      /* o rastro já percorrido */
+      ct.beginPath();
+      for (var i = 0; i <= 200; i++) {
+        var q = pose(est.s * i / 200);
+        (i ? ct.lineTo : ct.moveTo).call(ct, X(q[0]), Y(q[1]));
+      }
+      ct.strokeStyle = G.COR.bronze; ct.lineWidth = 2;
+      ct.setLineDash([5, 4]); ct.stroke(); ct.setLineDash([]);
+
+      carro(p0, 'rgba(23,107,93,.16)', G.COR.clara);
+      var qa = pose(est.s);
+      carro(qa, G.COR.mestra);
+
+      /* a direção permitida e a proibida */
+      seta(ct, X(qa[0]), Y(qa[1]),
+        X(qa[0]) + Math.cos(qa[2]) * 0.62 * esc,
+        Y(qa[1]) - Math.sin(qa[2]) * 0.62 * esc, G.COR.vinho, 2.2);
+      rotulo(ct, 'única direção possível',
+        X(qa[0]) + Math.cos(qa[2]) * 0.70 * esc + 10,
+        Y(qa[1]) - Math.sin(qa[2]) * 0.70 * esc + 16, G.COR.vinho, 'left');
+      ct.save();
+      ct.strokeStyle = G.COR.bronze; ct.lineWidth = 2;
+      ct.setLineDash([4, 4]);
+      ct.beginPath();
+      ct.moveTo(X(qa[0]), Y(qa[1]));
+      ct.lineTo(X(qa[0]) - Math.sin(qa[2]) * 0.5 * esc,
+        Y(qa[1]) - Math.cos(qa[2]) * 0.5 * esc);
+      ct.stroke(); ct.setLineDash([]); ct.restore();
+      rotulo(ct, 'direção proibida', X(qa[0]) - Math.sin(qa[2]) * 0.52 * esc - 12,
+        Y(qa[1]) - Math.cos(qa[2]) * 0.52 * esc - 10, G.COR.bronze, 'right');
+
+      rotulo(ct, 'dois arcos de ré, curvaturas opostas', 12, 16, G.COR.suave, 'left');
+
+      var fim = pose(est.s);
+      mostrar({
+        n: 'x, y e θ: três',
+        v: 'ẋ sen θ = ẏ cos θ',
+        t: 'não-holônomo',
+        gl: '2 de controle, 3 de configuração',
+        d: F.fmt(Math.abs(fim[1]) / 0.8, 3) + ' comprimentos de carro',
+        a: F.fmt(fim[2] * 180 / Math.PI, 1) + '° (volta ao inicial)'
+      });
+
+      nota.innerHTML =
+        '<p>A configuração de um carro sobre o plano precisa de três números: a posição '
+        + '\\(x\\), a posição \\(y\\) e a orientação \\(\\theta\\). Mas o carro não anda de '
+        + 'lado: a velocidade é sempre paralela ao eixo longitudinal, o que impõe</p>'
+        + '\\[\\dot x\\,\\sen\\theta-\\dot y\\,\\cos\\theta=0.\\]'
+        + '<p>Esse vínculo relaciona <em>velocidades</em>, e não coordenadas. Não existe '
+        + 'função \\(g(x,y,\\theta)\\) cuja derivada total reproduza a relação acima, e por '
+        + 'isso ele é <strong>não-holônomo</strong>: não pode ser integrado.</p>'
+        + '<p>A consequência é a que a manobra mostra. O carro tem apenas dois controles '
+        + '(acelerar e esterçar) e mesmo assim alcança qualquer uma das três coordenadas de '
+        + 'configuração. Combinando avanços e marchas a ré com esterços opostos, ele se '
+        + 'desloca <strong>lateralmente</strong> sem nunca andar de lado, e volta à '
+        + 'orientação inicial. Nenhuma configuração foi eliminada: o vínculo restringe os '
+        + 'caminhos, não o destino.</p>'
+        + '<p>Compare com um vínculo <strong>holônomo</strong>, como uma conta enfiada num '
+        + 'aro de raio \\(R\\). Ali vale \\(x^2+y^2=R^2\\), uma relação entre coordenadas, e o '
+        + 'espaço de configuração encolhe de dois para um: a conta jamais sai do aro. '
+        + 'Holônomo elimina configurações; não-holônomo apenas proíbe direções '
+        + 'instantâneas.</p>'
+        + '<p>A diferença tem consequência prática no formalismo. Vínculos holônomos se '
+        + 'resolvem escolhendo coordenadas generalizadas que já os respeitam, e aí o problema '
+        + 'fica com menos equações. Vínculos não-holônomos não permitem essa eliminação, e '
+        + 'exigem multiplicadores de Lagrange, com uma equação extra para cada vínculo.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+    (function animar() {
+      if (est.rodando) {
+        est.s += 0.004;
+        if (est.s > 1) { est.s = 0; }
+        sl.value = String(est.s);
+        desenhar();
+      }
+      requestAnimationFrame(animar);
+    })();
+  };
+
+  /* =================================================================
+     34. Multiplicadores: a força de vínculo de volta
+     Partícula sobre a esfera e sobre o parabolóide. O multiplicador
+     deixa de ser truque algébrico e vira a normal medida em newtons.
+     ================================================================= */
+  REGISTRO.multiplicador = function (raiz) {
+    var g0 = 9.80665;
+    var est = { caso: 'esfera', v: 4, pos: 35 };
+
+    var corpo = moldura(raiz, 'O multiplicador de Lagrange é a força de vínculo');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, [
+      { rot: 'conta na esfera', v: 'esfera' },
+      { rot: 'conta no parabolóide', v: 'parab' }
+    ], 0, function (v) { est.caso = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'rapidez da partícula', 0.5, 9, 0.1, 4,
+      function (v) { est.v = v; desenhar(); },
+      function (v) { return F.fmt(v, 1) + ' m/s'; });
+    deslizante(ctr, 'posição sobre a superfície', 0, 80, 1, 35,
+      function (v) { est.pos = v; desenhar(); },
+      function (v) { return v + '%'; });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'vínculo g = 0', k: 'g' },
+      { rot: 'gradiente ∇g', k: 'gr' },
+      { rot: 'multiplicador λ', k: 'lam' },
+      { rot: 'força de vínculo |λ∇g|', k: 'F' },
+      { rot: 'comparação clássica', k: 'cl' },
+      { rot: 'direção', k: 'dir' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    var R = 1.6;                      // raio da esfera, em metros
+    function desenhar() {
+      var alt = 320;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var esc = Math.min(Lp * 0.125, alt * 0.26);
+      var ox = Lp * 0.22, oy = alt * 0.60;
+      function X(u) { return ox + u * esc; }
+      function Y(u) { return oy - u * esc; }
+
+      var ang = (est.pos / 100) * Math.PI;    // 0 no topo
+      var P, N, lam, Fv, clas;
+      if (est.caso === 'esfera') {
+        /* corte da esfera */
+        ct.beginPath(); ct.arc(X(0), Y(0), R * esc, 0, 2 * Math.PI);
+        ct.fillStyle = 'rgba(123,184,171,.18)'; ct.fill();
+        ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2.4; ct.stroke();
+        P = [R * Math.sin(ang), R * Math.cos(ang)];
+        N = [P[0] / R, P[1] / R];
+        lam = -1 * est.v * est.v / (2 * R * R);             // por unidade de massa
+        Fv = est.v * est.v / R;
+        clas = 'mv²/R = ' + F.fmt(Fv, 3) + ' N por kg';
+      } else {
+        /* corte do parabolóide z = x² */
+        ct.beginPath();
+        for (var i = 0; i <= 120; i++) {
+          var x = -1.9 + 3.8 * i / 120;
+          (i ? ct.lineTo : ct.moveTo).call(ct, X(x), Y(x * x));
+        }
+        ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2.4; ct.stroke();
+        var xp = 1.9 * est.pos / 100;
+        P = [xp, xp * xp];
+        var nn = Math.hypot(-2 * xp, 1);
+        N = [-2 * xp / nn, 1 / nn];
+        lam = (2 * est.v * est.v + g0) / (1 + 4 * P[1]);
+        Fv = lam * nn;
+        clas = 'no vértice vale g = ' + F.fmt(g0, 2) + ' N por kg';
+      }
+
+      /* a partícula e as setas */
+      ct.beginPath(); ct.arc(X(P[0]), Y(P[1]), 8, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.tinta; ct.fill();
+      /* na esfera a normal de vínculo aponta para dentro; no parabolóide,
+         para fora, porque a superfície empurra a partícula para cima */
+      var sN = 52, sinal = est.caso === 'esfera' ? -1 : 1;
+      var qx = X(P[0]) + sinal * N[0] * sN, qy = Y(P[1]) - sinal * N[1] * sN;
+      seta(ct, X(P[0]), Y(P[1]), qx, qy, G.COR.vinho, 2.6);
+      rotulo(ct, 'λ∇g', qx + 16, qy, G.COR.vinho, 'left');
+      seta(ct, X(P[0]), Y(P[1]), X(P[0]), Y(P[1]) + 44, G.COR.bronze, 2);
+      rotulo(ct, 'peso', X(P[0]) - 14, Y(P[1]) + 30, G.COR.bronze, 'right');
+
+      rotulo(ct, est.caso === 'esfera' ? 'corte da esfera' : 'corte do parabolóide',
+        12, 16, G.COR.suave, 'left');
+
+      /* painel 2: a força de vínculo ao longo da superfície */
+      function forca(u) {
+        if (est.caso === 'esfera') return est.v * est.v / R;
+        var xu = 1.9 * u / 100, zu = xu * xu;
+        return (2 * est.v * est.v + g0) / (1 + 4 * zu) * Math.hypot(-2 * xu, 1);
+      }
+      var fmax = 0;
+      for (var k = 0; k <= 80; k++) fmax = Math.max(fmax, forca(k));
+      fmax = fmax * 1.2 + 0.1;
+      var g2 = G.eixos(cv, {
+        altura: alt, xmin: 0, xmax: 80, ymin: 0, ymax: fmax,
+        rotX: 'posição sobre a superfície (%)', rotY: 'força (N por kg)',
+        marcasX: G.marcasLineares(0, 80, 5, 0),
+        formataY: function (v) { return F.fmt(v, 1); },
+        limpar: false, margem: { e: Lp * 0.56, d: 16, c: 16, b: 40 }
+      });
+      G.curva(g2, forca, G.COR.mestra, 2.6);
+      G.vertical(g2, est.pos, G.COR.suave, '', true);
+
+      mostrar({
+        g: est.caso === 'esfera' ? 'x² + y² + z² − R² = 0' : 'z − x² − y² = 0',
+        gr: est.caso === 'esfera' ? '2r, radial' : '(−2x, −2y, 1)',
+        lam: F.fmt(lam, 4),
+        F: F.fmt(Fv, 3) + ' N por kg',
+        cl: clas,
+        dir: est.caso === 'esfera' ? 'para dentro da esfera' : 'normal à superfície'
+      });
+
+      nota.innerHTML =
+        '<p>Quando o vínculo é holônomo e escrito como \\(g=0\\), há duas saídas. A primeira '
+        + 'é escolher coordenadas que já o respeitem, e então ele desaparece. A segunda é '
+        + 'mantê-lo explícito com um <strong>multiplicador</strong>, somando-o à '
+        + 'lagrangiana:</p>'
+        + '\\[\\tilde\\Lag=\\Lag+\\lambda(t)\\,g\\left(x,y,z\\right).\\]'
+        + '<p>Tratando \\(x\\), \\(y\\), \\(z\\) e \\(\\lambda\\) como independentes, as '
+        + 'equações de Euler-Lagrange devolvem</p>'
+        + '\\[m\\ddot{\\vet{r}}=\\vet{F}+\\lambda\\nabla g,\\]'
+        + '<p>e a variação em \\(\\lambda\\) devolve o próprio vínculo. O termo extra é '
+        + 'paralelo a \\(\\nabla g\\), que é normal à superfície: o multiplicador é, '
+        + 'literalmente, a <strong>força de vínculo</strong>.</p>'
+        + '<p>Na esfera, \\(g=x^2+y^2+z^2-R^2\\) e \\(\\nabla g=2\\vet{r}\\). Derivando o '
+        + 'vínculo duas vezes no tempo vem \\(\\left|\\dot{\\vet{r}}\\right|^2'
+        + '+\\vet{r}\\cdot\\ddot{\\vet{r}}=0\\), e substituindo a equação do movimento,</p>'
+        + '\\[\\lambda=-\\frac{m}{2R^2}\\left|\\dot{\\vet{r}}\\right|^2'
+        + '\\qquad\\Longrightarrow\\qquad'
+        + '\\vet{F}_{\\rm vinc}=2\\lambda\\vet{r}=-\\frac{mv^2}{R}\\,\\vers{r}.\\]'
+        + '<p>É exatamente a força centrípeta, com o módulo \\(mv^2/R\\) de sempre, apontando '
+        + 'para dentro. A conta não supôs movimento circular em nenhum momento: ela saiu do '
+        + 'formalismo.</p>'
+        + '<p>No parabolóide \\(z=x^2+y^2\\) o resultado é mais rico, porque há gravidade. O '
+        + 'mesmo procedimento dá</p>'
+        + '\\[\\lambda=\\frac{m\\left[2\\left(\\dot x^2+\\dot y^2\\right)+g\\right]}{1+4z},\\]'
+        + '<p>com duas parcelas de origem distinta: uma centrípeta, que cresce com a '
+        + 'velocidade tangencial, e uma gravitacional, que sustenta o peso. As duas caem com '
+        + 'a altura, porque a superfície vai ficando mais inclinada e a normal vai perdendo '
+        + 'componente vertical. No vértice, com a partícula parada, sobra '
+        + '\\(\\vet{F}=mg\\vers{z}\\): a normal de uma mesa horizontal.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     35. Coordenadas cíclicas: a órbita em coordenadas polares
+     Phi não aparece na lagrangiana, logo p_phi se conserva. O widget
+     integra a órbita e acompanha as duas quantidades.
+     ================================================================= */
+  REGISTRO.ciclica = function (raiz) {
+    var est = { e: 0.5, t: 0, rodando: true };
+
+    var corpo = moldura(raiz, 'Coordenada cíclica: φ não aparece, p_φ se conserva');
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'excentricidade da órbita', 0, 0.85, 0.01, 0.5,
+      function (v) { est.e = v; est.t = 0; },
+      function (v) { return F.fmt(v, 2); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'momento p_r = m ṙ', k: 'pr' },
+      { rot: 'momento p_φ = m r² φ̇', k: 'pf' },
+      { rot: 'variação de p_φ no período', k: 'dpf' },
+      { rot: 'distância atual r', k: 'r' },
+      { rot: 'velocidade angular φ̇', k: 'w' },
+      { rot: 'área varrida por unidade de tempo', k: 'A' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* órbita de Kepler com semieixo 1 e GM = 1: r = a(1−e²)/(1+e cos φ) */
+    function raio(fi) { return (1 - est.e * est.e) / (1 + est.e * Math.cos(fi)); }
+    var Lang = function () { return Math.sqrt(1 - est.e * est.e); };
+
+    function desenhar() {
+      var alt = 320;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      /* avança φ com dφ/dt = L/r² */
+      var fi = est.t;
+      var esc = Math.min(Lp * 0.17, alt * 0.33) / (1 + est.e);
+      var ox = Lp * 0.26 + est.e * esc, oy = alt * 0.52;
+      function X(u) { return ox + u * esc; }
+      function Y(u) { return oy - u * esc; }
+
+      ct.beginPath();
+      for (var i = 0; i <= 300; i++) {
+        var f2 = i / 300 * 2 * Math.PI, r2 = raio(f2);
+        (i ? ct.lineTo : ct.moveTo).call(ct, X(r2 * Math.cos(f2)), Y(r2 * Math.sin(f2)));
+      }
+      ct.closePath();
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2.4; ct.stroke();
+
+      var r = raio(fi), px = r * Math.cos(fi), py = r * Math.sin(fi);
+
+      /* o setor varrido no último intervalo, que é sempre da mesma área */
+      ct.beginPath();
+      ct.moveTo(X(0), Y(0));
+      for (var k = 0; k <= 30; k++) {
+        var f3 = fi - 0.45 + 0.45 * k / 30, r3 = raio(f3);
+        ct.lineTo(X(r3 * Math.cos(f3)), Y(r3 * Math.sin(f3)));
+      }
+      ct.closePath();
+      ct.fillStyle = 'rgba(168,96,31,.22)'; ct.fill();
+
+      ct.beginPath(); ct.moveTo(X(0), Y(0)); ct.lineTo(X(px), Y(py));
+      ct.strokeStyle = G.COR.suave; ct.lineWidth = 1.4; ct.stroke();
+      ct.beginPath(); ct.arc(X(0), Y(0), 7, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.bronze; ct.fill();
+      ct.beginPath(); ct.arc(X(px), Y(py), 7, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.tinta; ct.fill();
+      rotulo(ct, 'centro de força', X(0), Y(0) - 18, G.COR.bronze);
+      rotulo(ct, 'setores de mesma área em tempos iguais', 12, alt - 14,
+        G.COR.suave, 'left');
+
+      /* painel 2: p_r e p_phi contra o tempo */
+      var Lc = Lang();
+      function pr(f) {
+        var h = 1e-4;
+        var rr1 = raio(f - h), rr2 = raio(f + h);
+        var drdf = (rr2 - rr1) / (2 * h);
+        return drdf * Lc / (raio(f) * raio(f));
+      }
+      var pmax = 0;
+      for (var k2 = 0; k2 <= 60; k2++) {
+        pmax = Math.max(pmax, Math.abs(pr(k2 / 60 * 2 * Math.PI)));
+      }
+      pmax = Math.max(pmax, Lc) * 1.25;
+      var g2 = G.eixos(cv, {
+        altura: alt, xmin: 0, xmax: 2 * Math.PI, ymin: -pmax, ymax: pmax,
+        rotX: 'ângulo φ (rad)', rotY: 'momento (por unidade de massa)',
+        marcasX: G.marcasLineares(0, 2 * Math.PI, 5, 1),
+        formataY: function (v) { return F.fmt(v, 2); },
+        limpar: false, margem: { e: Lp * 0.54, d: 16, c: 16, b: 40 }
+      });
+      G.curva(g2, function () { return Lc; }, G.COR.mestra, 2.8);
+      G.curva(g2, pr, G.COR.vinho, 2.4);
+      G.curva(g2, function () { return 0; }, G.COR.grade, 1.4);
+      G.legenda(g2, [
+        { texto: 'p_φ', cor: G.COR.mestra },
+        { texto: 'p_r', cor: G.COR.vinho }
+      ]);
+      var fm = ((fi % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      G.vertical(g2, fm, G.COR.suave, '', true);
+
+      mostrar({
+        pr: F.fmt(pr(fi), 4),
+        pf: F.fmt(Lc, 6),
+        dpf: 'zero (é constante)',
+        r: F.fmt(r, 4) + ' a',
+        w: F.fmt(Lc / (r * r), 4) + ' rad por unidade de tempo',
+        A: F.fmt(Lc / 2, 4) + ' (metade de p_φ)'
+      });
+
+      nota.innerHTML =
+        '<p>Em coordenadas polares, uma partícula sob força central tem</p>'
+        + '\\[\\Lag=\\tfrac12m\\left(\\dot r^2+r^2\\dot\\varphi^2\\right)-V(r).\\]'
+        + '<p>Repare no que <em>não</em> está escrito: o ângulo \\(\\varphi\\) não aparece em '
+        + 'lugar nenhum, só a sua derivada. Uma coordenada com essa propriedade chama-se '
+        + '<strong>cíclica</strong>, e a equação de Lagrange para ela fica</p>'
+        + '\\[\\der{}{t}\\left(\\pder{\\Lag}{\\dot\\varphi}\\right)=\\pder{\\Lag}{\\varphi}=0'
+        + '\\qquad\\Longrightarrow\\qquad '
+        + 'p_\\varphi=mr^2\\dot\\varphi=\\text{constante}.\\]'
+        + '<p>O momento conjugado a \\(\\varphi\\) é o momento angular, e ele se conserva sem '
+        + 'que seja preciso calcular torque nenhum: basta olhar para a lagrangiana e notar '
+        + 'uma ausência. O segundo painel acompanha as duas quantidades ao longo da órbita. '
+        + '\\(p_r\\) oscila, porque \\(r\\) é uma coordenada comum; \\(p_\\varphi\\) é uma '
+        + 'reta horizontal.</p>'
+        + '<p>A consequência geométrica é a segunda lei de Kepler. A área varrida pelo raio '
+        + 'vetor por unidade de tempo vale \\(\\tfrac12r^2\\dot\\varphi=p_\\varphi/2m\\), que '
+        + 'é constante: os setores desenhados em bronze têm todos a mesma área, mesmo sendo '
+        + 'longos e finos no afélio e curtos e largos no periélio.</p>'
+        + '<p>O padrão é geral, e o módulo 11 lhe dará nome. Toda coordenada ausente da '
+        + 'lagrangiana corresponde a uma simetria, e toda simetria corresponde a uma '
+        + 'quantidade conservada. Aqui a simetria é a invariância por rotação em torno do '
+        + 'centro de força, e a quantidade é o momento angular; se \\(t\\) estiver ausente, a '
+        + 'quantidade conservada é a energia.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+    (function animar() {
+      if (est.rodando) {
+        var r = raio(est.t);
+        est.t += 0.02 * Math.sqrt(1 - est.e * est.e) / (r * r);
+        if (est.t > 2 * Math.PI) est.t -= 2 * Math.PI;
+        desenhar();
+      }
+      requestAnimationFrame(animar);
+    })();
+  };
+
+  /* =================================================================
+     36. Euler-Poisson: a viga
+     Um funcional com y'' produz equação de quarta ordem, e aqui ela é
+     resolvida para as três condições de apoio usuais.
+     ================================================================= */
+  REGISTRO.viga = function (raiz) {
+    var est = { apoio: 'biapoiada', q: 5, alfa: 0 };
+
+    var corpo = moldura(raiz, 'Euler-Poisson: a linha elástica de uma viga');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, [
+      { rot: 'biapoiada', v: 'biapoiada' },
+      { rot: 'engastada nas duas pontas', v: 'biengastada' },
+      { rot: 'em balanço', v: 'balanco' }
+    ], 0, function (v) { est.apoio = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'carga uniforme q₀', 0, 12, 0.2, 5,
+      function (v) { est.q = v; desenhar(); },
+      function (v) { return F.fmt(v, 1) + ' kN/m'; });
+    deslizante(ctr, 'crescimento linear da carga', 0, 10, 0.2, 0,
+      function (v) { est.alfa = v; desenhar(); },
+      function (v) { return F.fmt(v, 1) + ' kN/m²'; });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'equação', k: 'eq' },
+      { rot: 'ordem do polinômio', k: 'ord' },
+      { rot: 'condições de contorno', k: 'cc' },
+      { rot: 'flecha máxima', k: 'fl' },
+      { rot: 'posição da flecha', k: 'xf' },
+      { rot: 'carga total sobre a viga', k: 'tot' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    var EI = 1200, Lv = 6;            // kN·m² e m
+
+    /* y'''' = q(x)/EI, integrado quatro vezes e ajustado às condições */
+    function solucao() {
+      var q0 = est.q, al = est.alfa;
+      function part(x) {
+        return (q0 * Math.pow(x, 4) / 24 + al * Math.pow(x, 5) / 120) / EI;
+      }
+      function d1(x) { return (q0 * Math.pow(x, 3) / 6 + al * Math.pow(x, 4) / 24) / EI; }
+      function d2(x) { return (q0 * x * x / 2 + al * Math.pow(x, 3) / 6) / EI; }
+      function d3(x) { return (q0 * x + al * x * x / 2) / EI; }
+      /* y = part + C1 x³/6 + C2 x²/2 + C3 x + C4, com quatro condições */
+      var A = [], b = [];
+      function linha(tipo, x) {
+        if (tipo === 'y') return [x * x * x / 6, x * x / 2, x, 1];
+        if (tipo === 'yl') return [x * x / 2, x, 1, 0];
+        if (tipo === 'yll') return [x, 1, 0, 0];
+        return [1, 0, 0, 0];
+      }
+      function valor(tipo, x) {
+        if (tipo === 'y') return part(x);
+        if (tipo === 'yl') return d1(x);
+        if (tipo === 'yll') return d2(x);
+        return d3(x);
+      }
+      var cond;
+      if (est.apoio === 'biapoiada') {
+        cond = [['y', 0], ['yll', 0], ['y', Lv], ['yll', Lv]];
+      } else if (est.apoio === 'biengastada') {
+        cond = [['y', 0], ['yl', 0], ['y', Lv], ['yl', Lv]];
+      } else {
+        cond = [['y', 0], ['yl', 0], ['yll', Lv], ['ylll', Lv]];
+      }
+      cond.forEach(function (c) {
+        A.push(linha(c[0], c[1])); b.push(-valor(c[0], c[1]));
+      });
+      /* eliminação de Gauss 4x4 */
+      for (var i = 0; i < 4; i++) {
+        var piv = i;
+        for (var r = i + 1; r < 4; r++) if (Math.abs(A[r][i]) > Math.abs(A[piv][i])) piv = r;
+        var tA = A[i]; A[i] = A[piv]; A[piv] = tA;
+        var tb = b[i]; b[i] = b[piv]; b[piv] = tb;
+        for (var r2 = 0; r2 < 4; r2++) {
+          if (r2 === i || Math.abs(A[i][i]) < 1e-14) continue;
+          var f = A[r2][i] / A[i][i];
+          for (var c2 = 0; c2 < 4; c2++) A[r2][c2] -= f * A[i][c2];
+          b[r2] -= f * b[i];
+        }
+      }
+      var C = [0, 0, 0, 0];
+      for (var i2 = 0; i2 < 4; i2++) C[i2] = Math.abs(A[i2][i2]) < 1e-14 ? 0 : b[i2] / A[i2][i2];
+      return function (x) {
+        return part(x) + C[0] * x * x * x / 6 + C[1] * x * x / 2 + C[2] * x + C[3];
+      };
+    }
+
+    function desenhar() {
+      var y = solucao();
+      var maxi = 0, xmaxi = 0;
+      for (var i = 0; i <= 400; i++) {
+        var x = Lv * i / 400;
+        if (Math.abs(y(x)) > Math.abs(maxi)) { maxi = y(x); xmaxi = x; }
+      }
+      var amp = Math.abs(maxi) + 1e-9;
+      var gr = G.eixos(cv, {
+        altura: 300, xmin: 0, xmax: Lv,
+        ymin: -amp * 1.5 - 0.001, ymax: amp * 0.6 + 0.001,
+        rotX: 'posição ao longo da viga (m)', rotY: 'deflexão (m)',
+        marcasX: G.marcasLineares(0, Lv, 6, 0),
+        formataY: function (v) { return F.fmt(v, 3); }
+      });
+      G.curva(gr, function () { return 0; }, G.COR.grade, 1.6);
+      G.curva(gr, function (x) { return -y(x); }, G.COR.mestra, 2.8);
+      var ct = gr.ct;
+
+      /* as setas da carga distribuída */
+      for (var k = 0; k <= 12; k++) {
+        var xk = Lv * k / 12;
+        var qk = (est.q + est.alfa * xk) / Math.max(est.q + est.alfa * Lv, 0.1);
+        if (qk <= 0.01) continue;
+        seta(ct, gr.X(xk), gr.y0 + 6, gr.X(xk), gr.y0 + 6 + 26 * qk, G.COR.bronze, 1.6);
+      }
+      rotulo(ct, 'carga q(x)', gr.x0 + 6, gr.y0 + 44, G.COR.bronze, 'left');
+
+      /* os apoios */
+      function triangulo(x) {
+        ct.beginPath();
+        ct.moveTo(gr.X(x), gr.Y(0));
+        ct.lineTo(gr.X(x) - 9, gr.Y(0) + 15);
+        ct.lineTo(gr.X(x) + 9, gr.Y(0) + 15);
+        ct.closePath(); ct.fillStyle = G.COR.tinta; ct.fill();
+      }
+      function engaste(x) {
+        ct.fillStyle = G.COR.tinta;
+        ct.fillRect(gr.X(x) - 5, gr.Y(0) - 18, 10, 36);
+      }
+      if (est.apoio === 'biapoiada') { triangulo(0); triangulo(Lv); }
+      else if (est.apoio === 'biengastada') { engaste(0); engaste(Lv); }
+      else { engaste(0); }
+
+      ct.beginPath();
+      ct.arc(gr.X(xmaxi), gr.Y(-maxi), 5, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.vinho; ct.fill();
+
+      mostrar({
+        eq: 'EI y⁗ = q(x)',
+        ord: est.alfa > 0 ? 'quinto grau' : 'quarto grau',
+        cc: est.apoio === 'biapoiada' ? 'y = y″ = 0 nas duas pontas'
+          : (est.apoio === 'biengastada' ? 'y = y′ = 0 nas duas pontas'
+            : 'y = y′ = 0 à esquerda, y″ = y‴ = 0 à direita'),
+        fl: F.fmt(Math.abs(maxi) * 1000, 2) + ' mm',
+        xf: F.fmt(xmaxi, 2) + ' m',
+        tot: F.fmt(est.q * Lv + est.alfa * Lv * Lv / 2, 1) + ' kN'
+      });
+
+      nota.innerHTML =
+        '<p>A energia de uma viga de rigidez \\(EI\\) sob carga distribuída \\(q(x)\\) é a '
+        + 'energia de flexão menos o trabalho da carga:</p>'
+        + '\\[U[y]=\\int_0^{\\ell}\\left[\\tfrac12EI\\left(y\'\'\\right)^2-q(x)\\,y\\right]dx.\\]'
+        + '<p>Aqui o integrando depende de \\(y\'\'\\), e a equação de Euler-Lagrange do '
+        + 'módulo 8 não serve: é preciso integrar por partes <em>duas</em> vezes, o que '
+        + 'introduz um termo com segunda derivada e troca o sinal de volta. O resultado é a '
+        + 'equação de <strong>Euler-Poisson</strong>:</p>'
+        + '\\[\\pder{f}{y}-\\der{}{x}\\left(\\pder{f}{y\'}\\right)'
+        + '+\\dder{}{x}\\left(\\pder{f}{y\'\'}\\right)=0.\\]'
+        + '<p>Com \\(\\partial f/\\partial y=-q\\), \\(\\partial f/\\partial y\'=0\\) e '
+        + '\\(\\partial f/\\partial y\'\'=EIy\'\'\\), sai a equação da linha elástica de '
+        + 'Euler-Bernoulli:</p>'
+        + '\\[EI\\,y^{(4)}=q(x).\\]'
+        + '<p>Note a contagem de condições de contorno. A equação é de quarta ordem e precisa '
+        + 'de <strong>quatro</strong> condições, não duas, e a dedução avisa quais: para que '
+        + 'os termos de fronteira sumissem foi preciso impor \\(\\eta=0\\) e \\(\\eta\'=0\\) '
+        + 'nas duas pontas. Fisicamente, cada ponta oferece duas informações, e quais são '
+        + 'depende do apoio: um apoio simples fixa a altura e deixa o momento nulo '
+        + '(\\(y=y\'\'=0\\)); um engaste fixa a altura e a inclinação (\\(y=y\'=0\\)); uma '
+        + 'ponta livre não fixa nada e impõe momento e cortante nulos '
+        + '(\\(y\'\'=y\'\'\'=0\\)).</p>'
+        + '<p>Troque o apoio e compare as flechas para a mesma carga. A viga biengastada é '
+        + 'cinco vezes mais rígida que a biapoiada, e a viga em balanço é a mais flexível de '
+        + 'todas por uma margem larga. É o mesmo material e a mesma carga: o que muda é '
+        + 'apenas a condição de contorno de um problema variacional.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {
