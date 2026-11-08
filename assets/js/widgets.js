@@ -110,11 +110,11 @@
   }
 
   /* Rótulo com halo branco, legível por cima de qualquer desenho. */
-  function rotulo(ct, texto, x, y, cor, al, bl, fonte) {
+  function rotulo(ct, texto, x, y, cor, al, bl, fonte, corHalo) {
     ct.save();
     ct.font = fonte || '600 11px system-ui, sans-serif';
     ct.textAlign = al || 'center'; ct.textBaseline = bl || 'middle';
-    ct.lineJoin = 'round'; ct.lineWidth = 3.5; ct.strokeStyle = '#fff';
+    ct.lineJoin = 'round'; ct.lineWidth = 3.5; ct.strokeStyle = corHalo || '#fff';
     ct.strokeText(texto, x, y);
     ct.fillStyle = cor; ct.fillText(texto, x, y);
     ct.restore();
@@ -818,6 +818,665 @@
       desenhar();
       var chave = est.vista + '|' + F.fmt(est.lam * est.w * R, 2);
       if (chave !== ultimoTexto) { ultimoTexto = chave; texto(); }
+      requestAnimationFrame(quadro);
+    }
+
+    texto();
+    requestAnimationFrame(quadro);
+    registrarRedesenho(desenhar);
+  };
+
+
+  /* =================================================================
+     4. Momento de inércia: catálogo e teorema de Steiner
+     O catálogo em barras deixa visível o único conteúdo físico do
+     momento de inércia, que é quão longe do eixo a massa está: a casca
+     esférica bate a esfera maciça e o aro bate as duas, com a mesma
+     massa e o mesmo raio. A parábola de Steiner mostra de uma vez que
+     o eixo pelo centro de massa é sempre o de menor inércia.
+     ================================================================= */
+  REGISTRO.inercia = function (raiz) {
+    /* k é o fator adimensional em I = k M R², ou I = k M L² na haste */
+    var CORPOS = [
+      { n: 'esfera maciça', k: 2 / 5, f: '\\tfrac25 MR^2', tipo: 'esfera' },
+      { n: 'cilindro maciço', k: 1 / 2, f: '\\tfrac12 MR^2', tipo: 'disco' },
+      { n: 'casca esférica', k: 2 / 3, f: '\\tfrac23 MR^2', tipo: 'casca' },
+      { n: 'aro ou cilindro oco', k: 1, f: 'MR^2', tipo: 'aro' },
+      { n: 'disco, eixo diametral', k: 1 / 4, f: '\\tfrac14 MR^2', tipo: 'diam' }
+    ];
+    var est = { vista: 'catalogo', k: 1, d: 0.8 };
+
+    var corpo = moldura(raiz, 'Momento de inércia: catálogo e teorema de Steiner');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, [
+      { rot: 'Catálogo', v: 'catalogo' },
+      { rot: 'Teorema de Steiner', v: 'steiner' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    var c1 = el('div', { class: 'controles' });
+    corpo.appendChild(c1);
+    c1.appendChild(el('span', { class: 'etiqueta', texto: 'corpo' }));
+    opcoes(c1, CORPOS.map(function (c, i) { return { rot: c.n, v: i }; }), 1,
+      function (v) { est.k = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'distância do eixo ao centro de massa', 0, 2.5, 0.05, 0.8,
+      function (v) { est.d = v; desenhar(); },
+      function (v) { return F.fmt(v, 2) + ' R'; });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'corpo', k: 'nome' },
+      { rot: 'I pelo centro de massa', k: 'icm' },
+      { rot: 'distância do eixo', k: 'd' },
+      { rot: 'I pelo eixo deslocado', k: 'i' },
+      { rot: 'raio de giração', k: 'kg' },
+      { rot: 'quanto Steiner acrescenta', k: 'razao' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* desenha a seção transversal de cada corpo, em px */
+    function figura(ct, cx, cy, r, tipo) {
+      ct.save();
+      ct.lineWidth = 2;
+      ct.strokeStyle = G.COR.mestra;
+      if (tipo === 'aro') {
+        ct.beginPath(); ct.arc(cx, cy, r, 0, 2 * Math.PI);
+        ct.lineWidth = Math.max(3, r * 0.26);
+        ct.stroke();
+      } else if (tipo === 'casca') {
+        ct.beginPath(); ct.arc(cx, cy, r, 0, 2 * Math.PI);
+        ct.lineWidth = Math.max(2.5, r * 0.16);
+        ct.stroke();
+        ct.lineWidth = 1; ct.setLineDash([2, 3]);
+        ct.beginPath(); ct.arc(cx, cy, r * 0.84, 0, 2 * Math.PI); ct.stroke();
+        ct.setLineDash([]);
+      } else if (tipo === 'diam') {
+        ct.beginPath(); ct.arc(cx, cy, r, 0, 2 * Math.PI);
+        ct.fillStyle = 'rgba(23,107,93,.18)'; ct.fill(); ct.stroke();
+        ct.strokeStyle = G.COR.bronze; ct.lineWidth = 2; ct.setLineDash([4, 3]);
+        ct.beginPath(); ct.moveTo(cx - r * 1.25, cy); ct.lineTo(cx + r * 1.25, cy);
+        ct.stroke(); ct.setLineDash([]);
+      } else {
+        ct.beginPath(); ct.arc(cx, cy, r, 0, 2 * Math.PI);
+        var g = ct.createRadialGradient(cx - r * 0.3, cy - r * 0.3, r * 0.1, cx, cy, r);
+        g.addColorStop(0, tipo === 'esfera' ? 'rgba(23,107,93,.42)' : 'rgba(23,107,93,.24)');
+        g.addColorStop(1, 'rgba(23,107,93,.16)');
+        ct.fillStyle = g; ct.fill(); ct.stroke();
+        if (tipo === 'disco') {
+          ct.lineWidth = 1;
+          ct.beginPath(); ct.moveTo(cx, cy); ct.lineTo(cx, cy - r); ct.stroke();
+        }
+      }
+      ct.restore();
+    }
+
+    function desenhaCatalogo() {
+      var alt = 322;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var n = CORPOS.length, lg = Lp / n;
+      var r = Math.min(lg * 0.26, 30);
+      /* a folga de 26 px abaixo da figura é para o número no topo da
+         barra mais alta não encostar nela */
+      var yFig = 44, yBase = alt - 58, hMax = yBase - (yFig + r + 26);
+
+      ct.strokeStyle = G.COR.grade; ct.lineWidth = 1;
+      ct.beginPath(); ct.moveTo(10, yBase); ct.lineTo(Lp - 10, yBase); ct.stroke();
+
+      CORPOS.forEach(function (c, i) {
+        var cx = lg * i + lg / 2;
+        figura(ct, cx, yFig, r, c.tipo);
+        var h = hMax * c.k;
+        var larg = Math.min(lg * 0.44, 46);
+        ct.fillStyle = i === est.k ? G.COR.mestra : 'rgba(23,107,93,.34)';
+        ct.fillRect(cx - larg / 2, yBase - h, larg, h);
+        rotulo(ct, F.fmt(c.k, 2), cx, yBase - h - 10,
+          i === est.k ? G.COR.mestra : G.COR.suave);
+        var palavras = c.n.split(' ');
+        var linhas = lg < 130 && palavras.length > 1
+          ? [palavras.slice(0, Math.ceil(palavras.length / 2)).join(' '),
+             palavras.slice(Math.ceil(palavras.length / 2)).join(' ')]
+          : [c.n];
+        linhas.forEach(function (t, j) {
+          rotulo(ct, t, cx, yBase + 14 + j * 13, G.COR.tinta, 'center', 'middle',
+            '600 10px system-ui, sans-serif');
+        });
+      });
+
+      rotulo(ct, 'fator k em I = k M R², com a mesma massa e o mesmo raio',
+        10, alt - 8, G.COR.suave, 'left');
+    }
+
+    function desenhaSteiner() {
+      var c = CORPOS[est.k];
+      var gr = G.eixos(cv, {
+        altura: 300, xmin: -2.5, xmax: 2.5, ymin: 0, ymax: c.k + 6.4,
+        rotX: 'posição do eixo, em raios a partir do centro de massa',
+        rotY: 'I / M R²',
+        marcasX: G.marcasLineares(-2.5, 2.5, 10, 1),
+        formataY: function (v) { return F.fmt(v, 1); }
+      });
+      var f = function (x) { return c.k + x * x; };
+      G.area(gr, f, -2.5, 2.5, 'rgba(23,107,93,.10)');
+      G.curva(gr, function () { return c.k; }, G.COR.bronze, 2, [6, 5]);
+      G.curva(gr, f, G.COR.mestra, 2.6);
+      G.vertical(gr, est.d, G.COR.roxo, '', true);
+
+      var ct = gr.ct;
+      /* o ponto de operação e as duas parcelas */
+      var y0 = gr.Y(0), yc = gr.Y(c.k), yt = gr.Y(f(est.d)), px = gr.X(est.d);
+      ct.beginPath(); ct.arc(px, yt, 5, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.roxo; ct.fill();
+      seta(ct, px - 26, y0, px - 26, yc, G.COR.bronze, 1.8);
+      seta(ct, px - 26, yc, px - 26, yt, G.COR.roxo, 1.8);
+      rotulo(ct, 'I_cm', px - 32, (y0 + yc) / 2, G.COR.bronze, 'right');
+      rotulo(ct, 'M d²', px - 32, (yc + yt) / 2, G.COR.roxo, 'right');
+      rotulo(ct, 'mínimo no centro de massa', gr.X(0), yc - 16, G.COR.bronze);
+
+      /* a figura do corpo com o eixo deslocado, no canto */
+      var r = 24, cx = gr.x1 - 64, cy = gr.y0 + 46;
+      if (gr.L > 520) {
+        figura(ct, cx, cy, r, c.tipo);
+        var dx = est.d * r;
+        ct.strokeStyle = G.COR.roxo; ct.lineWidth = 2;
+        ct.beginPath(); ct.moveTo(cx + dx, cy - r - 12); ct.lineTo(cx + dx, cy + r + 12);
+        ct.stroke();
+        rotulo(ct, 'eixo', cx + dx, cy + r + 20, G.COR.roxo);
+      }
+    }
+
+    function desenhar() {
+      var c = CORPOS[est.k];
+      if (est.vista === 'catalogo') desenhaCatalogo();
+      else desenhaSteiner();
+
+      var I = c.k + est.d * est.d;
+      mostrar({
+        nome: c.n,
+        icm: F.fmt(c.k, 3) + ' MR²',
+        d: F.fmt(est.d, 2) + ' R',
+        i: F.fmt(I, 3) + ' MR²',
+        kg: F.fmt(Math.sqrt(I), 3) + ' R',
+        razao: F.fmt(I / c.k, 2) + ' vezes'
+      });
+
+      if (est.vista === 'catalogo') {
+        nota.innerHTML =
+          '<p>Todos os cinco corpos têm a <strong>mesma massa e o mesmo raio</strong>. A '
+          + 'barra é o fator \\(k\\) em \\(I=kMR^2\\), e a ordem não é arbitrária: ela mede '
+          + 'apenas <em>quão longe do eixo a massa foi colocada</em>.</p>'
+          + '<p>O aro tem toda a massa em \\(R\\), e por isso \\(k=1\\), o maior possível '
+          + 'para um corpo que cabe dentro do raio \\(R\\). A casca esférica tem a massa toda '
+          + 'na superfície, mas parte dela perto dos polos, onde a distância ao eixo é '
+          + 'pequena, e cai para \\(2/3\\). A esfera maciça ainda enche o miolo e cai para '
+          + '\\(2/5\\). Nada disso depende do material nem do tamanho.</p>'
+          + '<p>\\[I=\\sum_i m_i\\rho_i^2=\\int \\rho^2\\,dm,\\]</p>'
+          + '<p>com \\(\\rho\\) medido <em>até o eixo</em>, não até o centro. É esse detalhe '
+          + 'que separa o disco girando como um pião (\\(k=1/2\\)) do mesmo disco girando em '
+          + 'torno de um diâmetro (\\(k=1/4\\)): no segundo caso cada ponto está mais perto do '
+          + 'eixo. Repare que \\(1/4+1/4=1/2\\), que é o <strong>teorema dos eixos '
+          + 'perpendiculares</strong> para lâminas, \\(I_z=I_x+I_y\\).</p>';
+      } else {
+        nota.innerHTML =
+          '<p>Para um eixo paralelo ao que passa pelo centro de massa, afastado de \\(d\\),</p>'
+          + '\\[I=I_{\\rm cm}+Md^2,\\]'
+          + '<p>que é o <strong>teorema dos eixos paralelos</strong>, ou teorema de Steiner. '
+          + 'A curva verde é essa parábola para o corpo escolhido; a reta bronze é '
+          + '\\(I_{\\rm cm}\\), e a diferença entre as duas é a parcela \\(Md^2\\).</p>'
+          + '<p>Duas leituras saltam do gráfico. A primeira é que <strong>o eixo pelo centro '
+          + 'de massa é sempre o de menor momento de inércia</strong>, porque \\(Md^2\\) nunca '
+          + 'é negativo: o mínimo da parábola está em \\(d=0\\). A segunda é que a parcela '
+          + 'acrescentada não sabe nada sobre a forma do corpo, só sobre a massa total e a '
+          + 'distância. Aqui ela já multiplica \\(I_{\\rm cm}\\) por '
+          + F.fmt((CORPOS[est.k].k + est.d * est.d) / CORPOS[est.k].k, 2) + '.</p>'
+          + '<p>Por isso, para \\(d\\) grande, todos os corpos convergem: a partir de umas '
+          + 'poucas vezes o raio, qualquer objeto gira como se fosse uma massa pontual presa '
+          + 'a um fio. A Terra em torno do Sol é esse caso extremo.</p>'
+          + '<p>O <strong>raio de giração</strong> \\(k_g=\\sqrt{I/M}\\), que o cartão exibe, '
+          + 'é a distância em que seria preciso pôr toda a massa, concentrada, para obter o '
+          + 'mesmo \\(I\\).</p>';
+      }
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     5. O centro de massa se move como uma partícula
+     Lançar um objeto girando e desenhar dois rastros resolve a seção
+     em silêncio: o da ponta é uma confusão, o do centro de massa é a
+     parábola de sempre. A vista de energia mostra o teorema de König,
+     com a parcela de rotação constante porque a gravidade não exerce
+     torque em torno do centro de massa.
+     ================================================================= */
+  REGISTRO.centromassa = function (raiz) {
+    var G0 = 9.80665, V0 = 8, L = 1;
+    var est = { vista: 'rastro', ang: 55, w: 7, razao: 1, t: 0, rodando: true };
+
+    var corpo = moldura(raiz, 'O centro de massa se move como uma partícula');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, [
+      { rot: 'Os dois rastros', v: 'rastro' },
+      { rot: 'As parcelas da energia', v: 'energia' }
+    ], 0, function (v) { est.vista = v; });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'ângulo de lançamento', 20, 80, 1, 55,
+      function (v) { est.ang = v; }, function (v) { return v + '°'; });
+    deslizante(ctr, 'rotação ω', 0, 14, 0.5, 7,
+      function (v) { est.w = v; }, function (v) { return F.fmt(v, 1) + ' rad/s'; });
+    deslizante(ctr, 'razão entre as massas m₁/m₂', 0.2, 5, 0.1, 1,
+      function (v) { est.razao = v; }, function (v) { return F.fmt(v, 1); });
+    var bt = el('button', { type: 'button', texto: 'pausar' });
+    bt.addEventListener('click', function () {
+      est.rodando = !est.rodando;
+      bt.textContent = est.rodando ? 'pausar' : 'continuar';
+    });
+    ctr.appendChild(bt);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'I em torno do centro de massa', k: 'icm' },
+      { rot: 'energia de translação (J)', k: 'tt' },
+      { rot: 'energia de rotação (J)', k: 'tr' },
+      { rot: 'energia potencial (J)', k: 'u' },
+      { rot: 'soma das três (J)', k: 'tot' },
+      { rot: 'tempo de voo', k: 'tv' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* massas nas pontas de uma haste de comprimento L, massa total 1 kg */
+    function geo() {
+      var m1 = est.razao / (1 + est.razao), m2 = 1 - m1;
+      /* distâncias das pontas ao centro de massa */
+      return { m1: m1, m2: m2, d1: L * m2, d2: L * m1, I: L * L * m1 * m2 };
+    }
+    function voo() {
+      var a = est.ang * Math.PI / 180;
+      return { vx: V0 * Math.cos(a), vy: V0 * Math.sin(a), T: 2 * V0 * Math.sin(a) / G0 };
+    }
+    /* o lançamento parte de uma altura igual ao raio do corpo, para a
+       haste não começar enterrada no chão */
+    function y0() { var g = geo(); return Math.max(g.d1, g.d2) + 0.15; }
+    function cm(t) {
+      var v = voo();
+      return [v.vx * t, y0() + v.vy * t - 0.5 * G0 * t * t];
+    }
+    function pontas(t) {
+      var g = geo(), c = cm(t), th = est.w * t + 0.4;
+      var u = [Math.cos(th), Math.sin(th)];
+      return [[c[0] - g.d1 * u[0], c[1] - g.d1 * u[1]],
+              [c[0] + g.d2 * u[0], c[1] + g.d2 * u[1]]];
+    }
+
+    function desenhaRastro() {
+      var v = voo(), alt = 300;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var g = geo();
+      var alcance = v.vx * v.T, altura = v.vy * v.vy / (2 * G0);
+      var folga = Math.max(g.d1, g.d2) + 0.15;
+      var esc = Math.min((Lp - 50) / (alcance + 2 * folga),
+                         (alt - 40) / (y0() + altura + folga));
+      /* sem linha de chão: o lançamento parte e chega a y0, e uma reta
+         ali embaixo faria o voo parecer terminar no ar */
+      var x0 = 25 + folga * esc, ych = alt - 14;
+      var X = function (u) { return x0 + u * esc; };
+      var Y = function (u) { return ych - u * esc; };
+
+      /* rastro da ponta pesada: a confusão */
+      ct.beginPath(); ct.strokeStyle = 'rgba(168,96,31,.75)'; ct.lineWidth = 1.6;
+      for (var k = 0; k <= 400; k++) {
+        var t = v.T * k / 400 * Math.min(1, est.t / v.T), q = pontas(t)[0];
+        if (est.t <= 0) break;
+        (k ? ct.lineTo : ct.moveTo).call(ct, X(q[0]), Y(q[1]));
+      }
+      ct.stroke();
+
+      /* rastro do centro de massa: a parábola */
+      ct.beginPath(); ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2.4;
+      for (var k2 = 0; k2 <= 200; k2++) {
+        var t2 = Math.min(est.t, v.T) * k2 / 200, q2 = cm(t2);
+        (k2 ? ct.lineTo : ct.moveTo).call(ct, X(q2[0]), Y(q2[1]));
+      }
+      ct.stroke();
+      /* o que ainda falta, tracejado */
+      ct.beginPath(); ct.strokeStyle = 'rgba(23,107,93,.3)'; ct.lineWidth = 2;
+      ct.setLineDash([5, 4]);
+      for (var k3 = 0; k3 <= 200; k3++) {
+        var t3 = Math.min(est.t, v.T) + (v.T - Math.min(est.t, v.T)) * k3 / 200;
+        var q3 = cm(t3);
+        (k3 ? ct.lineTo : ct.moveTo).call(ct, X(q3[0]), Y(q3[1]));
+      }
+      ct.stroke(); ct.setLineDash([]);
+
+      /* o corpo */
+      var tt = Math.min(est.t, v.T), c = cm(tt), pt = pontas(tt);
+      ct.strokeStyle = G.COR.tinta; ct.lineWidth = 2.4;
+      ct.beginPath(); ct.moveTo(X(pt[0][0]), Y(pt[0][1]));
+      ct.lineTo(X(pt[1][0]), Y(pt[1][1])); ct.stroke();
+      [[pt[0], g.m1, G.COR.bronze], [pt[1], g.m2, G.COR.azul]].forEach(function (b) {
+        ct.beginPath();
+        ct.arc(X(b[0][0]), Y(b[0][1]), 4 + 9 * Math.pow(b[1], 1 / 3), 0, 2 * Math.PI);
+        ct.fillStyle = b[2]; ct.fill();
+      });
+      ct.beginPath(); ct.arc(X(c[0]), Y(c[1]), 4.5, 0, 2 * Math.PI);
+      ct.fillStyle = '#fff'; ct.fill();
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2.4; ct.stroke();
+
+      rotulo(ct, 'rastro da ponta', 10, 14, G.COR.bronze, 'left');
+      rotulo(ct, 'rastro do centro de massa: uma parábola', 10, 30, G.COR.mestra, 'left');
+    }
+
+    function desenhaEnergia() {
+      var v = voo(), g = geo();
+      var Tr = 0.5 * g.I * est.w * est.w;
+      var gr = G.eixos(cv, {
+        altura: 300, xmin: 0, xmax: v.T, ymin: 0, ymax: (0.5 * V0 * V0 + Tr) * 1.22,
+        rotX: 'tempo (s)', rotY: 'energia (J)',
+        marcasX: G.marcasLineares(0, v.T, 5, 2),
+        formataY: function (x) { return F.fmt(x, 0); }
+      });
+      var fU = function (t) { return G0 * cm(t)[1]; };
+      var fUT = function (t) {
+        var vy = v.vy - G0 * t;
+        return G0 * cm(t)[1] + 0.5 * (v.vx * v.vx + vy * vy);
+      };
+      var fTot = function (t) { return fUT(t) + Tr; };
+
+      /* faixas opacas, desenhadas da maior para a menor: empilhar
+         camadas translúcidas dá um cinza que não lembra nenhuma delas */
+      G.area(gr, fTot, 0, v.T, '#d7e9e4');
+      G.area(gr, fUT, 0, v.T, '#f0e4d2');
+      G.area(gr, fU, 0, v.T, '#dce6f0');
+      G.curva(gr, fU, G.COR.azul, 2.2);
+      G.curva(gr, fUT, G.COR.bronze, 2.2);
+      G.curva(gr, fTot, G.COR.mestra, 2.6);
+      G.vertical(gr, Math.min(est.t, v.T), G.COR.suave, '', true);
+
+      var ct = gr.ct;
+      rotulo(ct, 'potencial M g y', gr.X(v.T * 0.5), gr.Y(fU(v.T * 0.5)) + 14, '#20486c');
+      rotulo(ct, '+ translação ½MV²', gr.X(v.T * 0.18),
+        gr.Y((fU(v.T * 0.18) + fUT(v.T * 0.18)) / 2), '#7a4a12', 'left');
+      rotulo(ct, '+ rotação ½Iω², constante', gr.X(v.T * 0.5),
+        gr.Y((fUT(v.T * 0.5) + fTot(v.T * 0.5)) / 2), G.COR.mestra);
+    }
+
+    function desenhar() {
+      if (est.vista === 'rastro') desenhaRastro();
+      else desenhaEnergia();
+
+      var v = voo(), g = geo(), t = Math.min(est.t, v.T);
+      var vy = v.vy - G0 * t;
+      var Tt = 0.5 * (v.vx * v.vx + vy * vy), Tr = 0.5 * g.I * est.w * est.w;
+      var U = G0 * cm(t)[1];
+      mostrar({
+        icm: F.fmt(g.I, 3) + ' kg·m²',
+        tt: F.fmt(Tt, 2), tr: F.fmt(Tr, 2), u: F.fmt(U, 2),
+        tot: F.fmt(Tt + Tr + U, 2), tv: F.fmt(v.T, 2) + ' s'
+      });
+    }
+
+    function texto() {
+      var g = geo();
+      var comum = '<p>Duas massas nas pontas de uma haste de 1 m, somando 1 kg, lançadas a '
+        + V0 + ' m/s. A razão \\(m_1/m_2\\) desloca o centro de massa ao longo da haste, e '
+        + 'o momento de inércia em torno dele vale '
+        + '\\(I_{\\rm cm}=m_1d_1^2+m_2d_2^2=\\mu L^2\\), com \\(\\mu=m_1m_2/M\\) a massa '
+        + 'reduzida: aqui, ' + F.fmt(g.I, 3) + ' kg·m².</p>';
+      if (est.vista === 'rastro') {
+        nota.innerHTML = comum
+          + '<p>A ponta descreve uma curva complicada, que muda inteiramente quando se mexe '
+          + 'em \\(\\omega\\) ou nas massas. O centro de massa, não: ele traça a mesma '
+          + 'parábola de um projétil pontual, e <strong>nenhum dos deslizantes a altera</strong>, '
+          + 'exceto o ângulo de lançamento.</p>'
+          + '<p>A razão está em somar \\(\\vet{F}_i=m_i\\ddot{\\vet{r}}_i\\) sobre todas as '
+          + 'partículas. Pela terceira lei, as forças internas se cancelam aos pares, e sobra</p>'
+          + '\\[\\vet{F}^{\\rm ext}=M\\ddot{\\vet{R}},\\qquad \\vet{R}=\\frac1M\\sum_i m_i\\vet{r}_i.\\]'
+          + '<p>É a segunda lei de Newton outra vez, agora para um ponto que talvez nem seja '
+          + 'material. Essa é a justificativa de tratar bolas, cometas e planetas como '
+          + 'partículas: o que se estava descrevendo o tempo todo era o centro de massa.</p>'
+          + '<p>Como corolário, \\(\\vet{P}=M\\vet{V}_{\\rm cm}\\) e, sem força externa, o '
+          + 'centro de massa segue em linha reta por mais violenta que seja a agitação '
+          + 'interna. Uma granada que explode no ar tem os estilhaços espalhados, mas o '
+          + 'centro de massa dos estilhaços continua na parábola original até o primeiro '
+          + 'tocar o chão.</p>';
+      } else {
+        nota.innerHTML = comum
+          + '<p>Separando cada posição em \\(\\vet{r}_i=\\vet{R}+\\vet{r}\\,\'_i\\) e usando '
+          + 'que \\(\\sum_i m_i\\vet{r}\\,\'_i=\\vet 0\\) por definição de centro de massa, o '
+          + 'termo cruzado da energia cinética morre e sobra o <strong>teorema de '
+          + 'König</strong>:</p>'
+          + '\\[T=\\underbrace{\\tfrac12 MV_{\\rm cm}^2}_{\\text{translação}}'
+          + '+\\underbrace{\\tfrac12 I_{\\rm cm}\\omega^2}_{\\text{rotação}}.\\]'
+          + '<p>No gráfico, a faixa azul é a energia potencial, a bronze é a translação e a '
+          + 'verde é a rotação. As duas primeiras trocam de lugar o tempo todo, como em '
+          + 'qualquer lançamento; a <strong>faixa de rotação tem espessura constante</strong>, '
+          + 'e esse é o conteúdo físico da figura: a gravidade age no centro de massa e '
+          + 'portanto não exerce torque em torno dele. Sem torque, \\(\\omega\\) não muda.</p>'
+          + '<p>A soma das três é uma reta horizontal, que é a conservação da energia. '
+          + 'Experimente \\(\\omega=0\\): a faixa verde some e fica o lançamento de sempre.</p>';
+      }
+      tipografar(corpo);
+    }
+
+    var chaveAnt = '';
+    function quadro() {
+      var v = voo();
+      if (est.rodando) {
+        est.t += 0.016;
+        if (est.t > v.T + 0.45) est.t = 0;
+      }
+      desenhar();
+      var chave = est.vista + '|' + F.fmt(geo().I, 3);
+      if (chave !== chaveAnt) { chaveAnt = chave; texto(); }
+      requestAnimationFrame(quadro);
+    }
+
+    texto();
+    requestAnimationFrame(quadro);
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     6. A corrida no plano inclinado
+     O resultado que mais surpreende o aluno em todo o módulo: a ordem
+     de chegada não depende da massa nem do raio, só do fator k. Os
+     deslizantes de massa e de raio estão aqui de propósito, para que
+     se veja que mexer neles não muda nada.
+     ================================================================= */
+  REGISTRO.descida = function (raiz) {
+    var G0 = 9.80665, S = 3;                  // comprimento da rampa, em metros
+    var CORRE = [
+      { n: 'esfera maciça', k: 2 / 5, cor: '#176b5d', tipo: 'esfera' },
+      { n: 'cilindro maciço', k: 1 / 2, cor: '#a8601f', tipo: 'disco' },
+      { n: 'casca esférica', k: 2 / 3, cor: '#6b4e8f', tipo: 'casca' },
+      { n: 'aro', k: 1, cor: '#8c2f39', tipo: 'aro' },
+      { n: 'bloco sem atrito', k: 0, cor: '#2c5f8d', tipo: 'bloco' }
+    ];
+    var est = { vista: 'corrida', ang: 20, raio: 0.18, massa: 1, t: 0, rodando: true };
+
+    var corpo = moldura(raiz, 'A corrida no plano inclinado');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, [
+      { rot: 'A corrida', v: 'corrida' },
+      { rot: 'Como a energia se reparte', v: 'reparte' }
+    ], 0, function (v) { est.vista = v; });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'inclinação', 5, 40, 1, 20,
+      function (v) { est.ang = v; }, function (v) { return v + '°'; });
+    deslizante(ctr, 'raio (não muda nada)', 0.08, 0.3, 0.01, 0.18,
+      function (v) { est.raio = v; }, function (v) { return F.fmt(v, 2) + ' m'; });
+    deslizante(ctr, 'massa (também não)', 0.2, 5, 0.1, 1,
+      function (v) { est.massa = v; }, function (v) { return F.fmt(v, 1) + ' kg'; });
+    var bt = el('button', { type: 'button', texto: 'soltar de novo' });
+    bt.addEventListener('click', function () { est.t = 0; est.rodando = true; });
+    ctr.appendChild(bt);
+
+    var mostrar = cartoes(corpo, CORRE.map(function (c, i) {
+      return { rot: c.n, k: 'c' + i };
+    }).concat([{ rot: 'g sen θ (m/s²)', k: 'gs' }]));
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function acel(k) { return G0 * Math.sin(est.ang * Math.PI / 180) / (1 + k); }
+    function tempo(k) { return Math.sqrt(2 * S / acel(k)); }
+    function pos(k, t) { return Math.min(S, 0.5 * acel(k) * t * t); }
+
+    function desenhaCorrida() {
+      var alt = 310;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var n = CORRE.length, faixa = (alt - 40) / n;
+      /* a folga à direita acomoda o corpo parado sobre a linha de
+         chegada e o tempo escrito ao lado dele */
+      var marg = 108, comp = Lp - marg - 92;
+
+      CORRE.forEach(function (c, i) {
+        var y = 26 + faixa * i + faixa / 2;
+        /* a pista */
+        ct.strokeStyle = G.COR.grade; ct.lineWidth = 2;
+        ct.beginPath(); ct.moveTo(marg, y + 10); ct.lineTo(marg + comp, y + 10); ct.stroke();
+        rotulo(ct, c.n, marg - 8, y, c.cor, 'right');
+
+        var s = pos(c.k, est.t), x = marg + comp * s / S;
+        var r = Math.max(9, est.raio * 58);
+        var fi = c.tipo === 'bloco' ? 0 : s / est.raio;
+
+        ct.save();
+        ct.translate(x, y + 10 - r);
+        if (c.tipo === 'bloco') {
+          ct.fillStyle = 'rgba(44,95,141,.24)';
+          ct.fillRect(-r, -r * 0.7, 2 * r, r * 1.7);
+          ct.strokeStyle = c.cor; ct.lineWidth = 2;
+          ct.strokeRect(-r, -r * 0.7, 2 * r, r * 1.7);
+        } else {
+          ct.rotate(fi);
+          ct.beginPath(); ct.arc(0, 0, r, 0, 2 * Math.PI);
+          if (c.tipo === 'aro' || c.tipo === 'casca') {
+            ct.strokeStyle = c.cor;
+            ct.lineWidth = c.tipo === 'aro' ? Math.max(3, r * 0.3) : Math.max(2.4, r * 0.18);
+            ct.stroke();
+          } else {
+            ct.fillStyle = c.cor + '33'; ct.fill();
+            ct.strokeStyle = c.cor; ct.lineWidth = 2; ct.stroke();
+          }
+          ct.beginPath(); ct.moveTo(0, 0); ct.lineTo(0, -r);
+          ct.strokeStyle = c.cor; ct.lineWidth = 1.4; ct.stroke();
+        }
+        ct.restore();
+
+        if (s >= S) {
+          rotulo(ct, F.fmt(tempo(c.k), 2) + ' s',
+            marg + comp + Math.max(9, est.raio * 58) + 8, y, c.cor, 'left');
+        }
+      });
+
+      /* linha de chegada */
+      ct.strokeStyle = G.COR.tinta; ct.lineWidth = 2; ct.setLineDash([4, 4]);
+      ct.beginPath(); ct.moveTo(marg + comp, 20); ct.lineTo(marg + comp, alt - 14);
+      ct.stroke(); ct.setLineDash([]);
+      rotulo(ct, 'chegada', marg + comp, 12, G.COR.tinta);
+      rotulo(ct, 'rampa de ' + S + ' m a ' + est.ang + '°', 6, 12, G.COR.suave, 'left');
+    }
+
+    function desenhaReparte() {
+      var alt = 310;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var n = CORRE.length, lg = Lp / n;
+      var yBase = alt - 52, hMax = yBase - 54;
+
+      CORRE.forEach(function (c, i) {
+        var cx = lg * i + lg / 2, larg = Math.min(lg * 0.5, 54);
+        var fTrans = 1 / (1 + c.k), fRot = c.k / (1 + c.k);
+        var hT = hMax * fTrans, hR = hMax * fRot;
+        ct.fillStyle = c.cor;
+        ct.fillRect(cx - larg / 2, yBase - hT, larg, hT);
+        ct.fillStyle = c.cor + '55';
+        ct.fillRect(cx - larg / 2, yBase - hT - hR, larg, hR);
+        rotulo(ct, F.pct(fTrans, 0), cx, yBase - hT / 2, '#fff', 'center', 'middle',
+          null, c.cor);
+        if (hR > 16) rotulo(ct, F.pct(fRot, 0), cx, yBase - hT - hR / 2, c.cor);
+        var ps = c.n.split(' ');
+        rotulo(ct, ps[0], cx, yBase + 14, G.COR.tinta, 'center', 'middle',
+          '600 10px system-ui, sans-serif');
+        if (ps[1]) rotulo(ct, ps.slice(1).join(' '), cx, yBase + 27, G.COR.tinta,
+          'center', 'middle', '600 10px system-ui, sans-serif');
+      });
+
+      rotulo(ct, 'parte da energia que vira translação (sólido) e rotação (claro)',
+        8, 14, G.COR.suave, 'left');
+      rotulo(ct, 'quanto mais vai para a rotação, mais devagar o corpo desce',
+        8, 30, G.COR.suave, 'left');
+    }
+
+    function desenhar() {
+      if (est.vista === 'corrida') desenhaCorrida();
+      else desenhaReparte();
+      var vals = { gs: F.fmt(G0 * Math.sin(est.ang * Math.PI / 180), 2) };
+      CORRE.forEach(function (c, i) {
+        vals['c' + i] = F.fmt(tempo(c.k), 2) + ' s';
+      });
+      mostrar(vals);
+    }
+
+    function texto() {
+      nota.innerHTML =
+        '<p>Todos partem juntos do alto de uma rampa de ' + S + ' m. Conservando a energia '
+        + 'ao descer uma altura \\(h\\), e usando \\(v=\\omega R\\) do rolamento,</p>'
+        + '\\[Mgh=\\tfrac12MV^2+\\tfrac12 I\\omega^2=\\tfrac12MV^2\\left(1+k\\right),'
+        + '\\qquad I=kMR^2,\\]'
+        + '<p>e a aceleração ao longo da rampa sai disso:</p>'
+        + '\\[a=\\frac{g\\sen\\theta}{1+k}.\\]'
+        + '<p>Olhe o que <strong>não</strong> está nessa fórmula: nem \\(M\\), nem \\(R\\). '
+        + 'Os dois se cancelam, e os deslizantes de massa e de raio estão aí para você '
+        + 'conferir que mexer neles não muda tempo nenhum. Uma bola de gude e uma bola de '
+        + 'boliche descem lado a lado.</p>'
+        + '<p>O que decide a corrida é só o fator \\(k\\), que mede quanto da energia precisa '
+        + 'ser desviado para a rotação em vez de virar avanço. A esfera maciça, com '
+        + '\\(k=2/5\\), gasta 29% na rotação e chega primeiro entre os que rolam. O aro, com '
+        + '\\(k=1\\), gasta metade e chega por último. O bloco que desliza sem atrito não '
+        + 'gasta nada e ganha de todos, com \\(a=g\\sen\\theta\\).</p>'
+        + '<p>Uma consequência que surpreende: a ordem de chegada é a mesma em qualquer '
+        + 'planeta e em qualquer inclinação. Mudar \\(\\theta\\) muda todos os tempos pelo '
+        + 'mesmo fator \\(1/\\sqrt{\\sen\\theta}\\), nunca a ordem.</p>';
+      tipografar(corpo);
+    }
+
+    var chaveAnt = '';
+    function quadro() {
+      if (est.rodando) {
+        est.t += 0.016;
+        if (est.t > tempo(1) + 1.2) est.rodando = false;
+      }
+      desenhar();
+      if (est.vista !== chaveAnt) { chaveAnt = est.vista; texto(); }
       requestAnimationFrame(quadro);
     }
 

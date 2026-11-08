@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 2: Centro de massa e momentos de inércia | Mecânica Clássica II</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611081833">
+<script src="assets/js/comum.js?v=202611081833"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Mecânica Clássica II <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html">Início</a>
+      <span class="grupo">Corpos rígidos</span>
+      <a href="aula01.html" class="num" title="Módulo 1: Cinemática dos corpos rígidos">1</a>
+      <a href="aula02.html" class="num ativo" title="Módulo 2: Centro de massa e momentos de inércia">2</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+<aside class="lateral">
+  <h4>Neste módulo</h4>
+  <ol>
+    <li><a href="#s1">1. O centro de massa</a></li>
+    <li><a href="#s2">2. O teorema do centro de massa</a></li>
+    <li><a href="#s3">3. Separando o movimento em duas partes</a></li>
+    <li><a href="#s4">4. O teorema de König</a></li>
+    <li><a href="#s5">5. A energia potencial interna é constante</a></li>
+    <li><a href="#s6">6. O momento de inércia</a></li>
+    <li><a href="#s7">7. O catálogo e o que ele ensina</a></li>
+    <li><a href="#s8">8. Os dois teoremas de eixos</a></li>
+    <li><a href="#s9">9. A corrida no plano inclinado</a></li>
+    <li><a href="#s10">10. O limite do escalar</a></li>
+    <li><a href="#s11">11. Exercícios resolvidos</a></li>
+    <li><a href="#s12">12. Exercícios propostos</a></li>
+  </ol>
+</aside>
+
+<main class="conteudo">
+
+  <p class="chapeu">Módulo 2 · Corpos rígidos</p>
+  <h1>Centro de massa e momentos de inércia</h1>
+  <p class="subtitulo">Um corpo extenso tem seis graus de liberdade, e a maneira mais útil de
+  organizá-los é separar três deles. O centro de massa carrega a translação e obedece à
+  segunda lei de Newton como se fosse uma partícula; tudo o mais é rotação em torno dele, e
+  essa parte é governada por um número novo, o momento de inércia, que mede não quanta massa
+  existe, mas quão longe do eixo ela está.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Objetivos</span>
+    <ul>
+      <li>Definir o centro de massa e provar que ele se move como uma partícula;</li>
+      <li>Separar \(\vet{r}_i=\vet{R}+\vet{r}\,'_i\) e mostrar que o termo cruzado morre;</li>
+      <li>Obter o teorema de König, \(T=\tfrac12MV^2+\tfrac12I\omega^2\);</li>
+      <li>Calcular \(I=\int\rho^2dm\) para os corpos usuais e interpretar o fator \(k\);</li>
+      <li>Aplicar os teoremas dos eixos paralelos e dos eixos perpendiculares;</li>
+      <li>Resolver a descida de um corpo que rola e explicar por que \(M\) e \(R\) somem.</li>
+    </ul>
+  </div>
+
+  <hr class="linha">
+
+  <!-- ================================================== -->
+  <h2 id="s1">1. O centro de massa</h2>
+
+  <p>Dado um sistema de \(N\) partículas de massas \(m_i\) e posições \(\vet{r}_i\) medidas a
+  partir de uma origem \(O\), o <strong>centro de massa</strong> é o ponto</p>
+
+  <div class="destaque">
+    <span class="anuncio">Centro de massa</span>
+    \[\vet{R}=\frac{1}{M}\sum_{i=1}^{N}m_i\vet{r}_i,
+    \qquad\text{ou}\qquad
+    \vet{R}=\frac{1}{M}\int\vet{r}\,dm,\]
+    com \(M=\sum_i m_i\) a massa total. A forma integral vale quando a distribuição de massa
+    é tratada como contínua, com \(dm=\varrho\,dV\).
+  </div>
+
+  <p>Duas observações antes de seguir. A primeira é que o centro de massa <em>não precisa
+  estar dentro do corpo</em>: o de um aro está no vazio do meio, o de um bumerangue está fora
+  da madeira. A segunda é que a definição não depende da origem escolhida, no sentido de que
+  o ponto físico apontado é sempre o mesmo; mudar \(O\) muda as coordenadas de \(\vet{R}\)
+  exatamente como muda as de qualquer outro ponto.</p>
+
+  <p>A propriedade que faz todo o trabalho é esta: se medirmos as posições <em>a partir do
+  próprio centro de massa</em>, escrevendo \(\vet{r}_i=\vet{R}+\vet{r}\,'_i\), então</p>
+
+  <p>\[\sum_i m_i\vet{r}\,'_i=\sum_i m_i\vet{r}_i-\vet{R}\sum_i m_i=M\vet{R}-M\vet{R}=\vet 0.\]</p>
+
+  <p>Essa soma nula vai aparecer três vezes neste módulo, sempre matando um termo cruzado
+  inconveniente. Vale guardá-la.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s2">2. O teorema do centro de massa</h2>
+
+  <p>Derivando a definição duas vezes, \(M\ddot{\vet{R}}=\sum_i m_i\ddot{\vet{r}}_i=
+  \sum_i\vet{F}_i\), onde \(\vet{F}_i\) é a força total sobre a partícula \(i\). Separe-a em
+  externa e interna:</p>
+
+  <p>\[M\ddot{\vet{R}}=\sum_i\vet{F}^{\rm ext}_i+\sum_i\sum_{j\neq i}\vet{f}_{ij}.\]</p>
+
+  <p>Na soma dupla, cada par aparece duas vezes, como \(\vet{f}_{ij}\) e \(\vet{f}_{ji}\).
+  Pela terceira lei de Newton as duas são opostas, e a soma inteira se anula. Resta</p>
+
+  <div class="destaque">
+    <span class="anuncio">Teorema do centro de massa</span>
+    \[\vet{F}^{\rm ext}=M\ddot{\vet{R}}=\der{\vet{P}}{t},\qquad \vet{P}=M\vet{V}_{\rm cm}.\]
+    O centro de massa move-se exatamente como uma partícula de massa \(M\) sujeita à
+    resultante das forças externas. As forças internas, por mais violentas que sejam, não
+    conseguem movê-lo.
+  </div>
+
+  <p>Esse é o teorema que autoriza o hábito, tomado desde o primeiro curso, de tratar bolas,
+  cometas e planetas como pontos. O que estávamos descrevendo o tempo todo era o centro de
+  massa. Um corolário imediato: sem força externa resultante, \(\vet{P}\) é constante e o
+  centro de massa segue em linha reta com velocidade constante. Uma granada que explode no
+  ar tem estilhaços por toda parte, mas o centro de massa dos estilhaços continua na
+  parábola original até que o primeiro deles toque o chão.</p>
+
+  <div data-widget="centromassa"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. Separando o movimento em duas partes</h2>
+
+  <p>Com \(\vet{r}_i=\vet{R}+\vet{r}\,'_i\) e \(\vet{v}_i=\vet{V}+\vet{v}\,'_i\), o momento
+  angular total em relação à origem fica</p>
+
+  <p>\[\vet{L}=\sum_i m_i\vet{r}_i\cruz\vet{v}_i
+  =\sum_i m_i\left(\vet{R}+\vet{r}\,'_i\right)\cruz\left(\vet{V}+\vet{v}\,'_i\right).\]</p>
+
+  <p>Expandindo, aparecem quatro termos. Os dois cruzados contêm \(\sum_i m_i\vet{r}\,'_i\) e
+  \(\sum_i m_i\vet{v}\,'_i\), ambos nulos pela seção 1. Sobram apenas os dois primeiros:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Decomposição do momento angular</span>
+    \[\vet{L}=\underbrace{M\vet{R}\cruz\vet{V}}_{\text{orbital}}
+    +\underbrace{\sum_i m_i\vet{r}\,'_i\cruz\vet{v}\,'_i}_{\text{em torno do centro de massa}}
+    =\vet{L}_{\rm orb}+\vet{L}_{\rm cm}.\]
+  </div>
+
+  <p>O primeiro termo é o momento angular de uma partícula de massa \(M\) na posição do centro
+  de massa, e depende da origem escolhida. O segundo é intrínseco ao corpo e <em>não</em>
+  depende dela. É a mesma separação que se usa para a Terra: o momento angular orbital em
+  torno do Sol, mais o momento angular de rotação em torno do próprio eixo. O módulo 3
+  retomará \(\vet{L}_{\rm cm}\) do lado da dinâmica.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. O teorema de König</h2>
+
+  <p>A energia cinética recebe o mesmo tratamento:</p>
+
+  <p>\[T=\frac12\sum_i m_iv_i^2=\frac12\sum_i m_i
+  \left(\vet{V}+\vet{v}\,'_i\right)\cdot\left(\vet{V}+\vet{v}\,'_i\right)
+  =\frac12MV^2+\vet{V}\cdot\sum_i m_i\vet{v}\,'_i+\frac12\sum_i m_iv_i'^2.\]</p>
+
+  <p>O termo do meio morre de novo, e para um corpo rígido o último pode ser calculado com a
+  equação fundamental do módulo 1: no referencial do centro de massa,
+  \(\vet{v}\,'_i=\vet{\omega}\cruz\vet{r}\,'_i\), de modo que
+  \(v_i'=\omega\rho_i\), com \(\rho_i\) a distância ao eixo de rotação. Logo</p>
+
+  <div class="destaque">
+    <span class="anuncio">Teorema de König</span>
+    \[T=\underbrace{\tfrac12MV_{\rm cm}^2}_{\text{translação}}
+    +\underbrace{\tfrac12 I_{\rm cm}\,\omega^2}_{\text{rotação}},
+    \qquad I_{\rm cm}=\sum_i m_i\rho_i^2.\]
+  </div>
+
+  <p>Duas parcelas, e nenhum termo cruzado. O número \(I_{\rm cm}\) que apareceu aí é o
+  <strong>momento de inércia</strong>, e o resto do módulo é dedicado a ele.</p>
+
+  <p>Na segunda vista do simulador acima, as três faixas são a energia potencial, a de
+  translação e a de rotação. As duas primeiras trocam de lugar durante o voo; a de rotação
+  tem espessura constante, porque a gravidade age no centro de massa e portanto não exerce
+  torque em torno dele.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. A energia potencial interna é constante</h2>
+
+  <p>Um detalhe que costuma passar batido e que simplifica tudo o que vem depois. Se todas as
+  forças, externas e internas, forem conservativas, a energia potencial total de um sistema
+  de partículas se escreve</p>
+
+  <p>\[U=U^{\rm ext}+\frac12\sum_i\sum_{j\neq i}U_{ij}\left(r_{ij}\right),\]</p>
+
+  <p>com \(r_{ij}=|\vet{r}_i-\vet{r}_j|\) a distância entre cada par. Mas num corpo rígido
+  <em>todas</em> essas distâncias são constantes por definição. Logo a soma dupla inteira é
+  uma constante, e constantes aditivas na energia potencial não têm consequência física
+  nenhuma: podem ser descartadas.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que isso importa</span>
+    <p>É por essa razão que, num problema de corpo rígido, basta escrever a energia potencial
+    <em>externa</em>, tipicamente \(Mgy_{\rm cm}\) para a gravidade uniforme. As forças
+    internas que seguram o corpo, que são incontáveis e desconhecidas, não aparecem nem no
+    balanço de energia nem no de momento linear.</p>
+    <p>Guarde essa observação: ela é o primeiro exemplo de forças de vínculo que não realizam
+    trabalho e por isso somem da conta. Nos módulos 7 a 9 esse fato deixará de ser uma
+    felicidade ocasional e virará o princípio organizador de toda a mecânica.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. O momento de inércia</h2>
+
+  <p>Para a rotação em torno de um eixo fixo, define-se</p>
+
+  <div class="destaque">
+    <span class="anuncio">Momento de inércia em torno de um eixo</span>
+    \[I=\sum_i m_i\rho_i^2=\int\rho^2\,dm=\int\rho^2\varrho\,dV,\]
+    com \(\rho\) a distância de cada elemento de massa <strong>até o eixo</strong>, e não até
+    o centro nem até a origem.
+  </div>
+
+  <p>A analogia com a massa é exata e vale explicitar, porque ela organiza metade do curso:</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Translação</th><th>Rotação em torno de eixo fixo</th></tr></thead>
+    <tbody>
+      <tr><td>massa \(M\)</td><td>momento de inércia \(I\)</td></tr>
+      <tr><td>velocidade \(\vet{v}\)</td><td>velocidade angular \(\vet{\omega}\)</td></tr>
+      <tr><td>momento \(p=Mv\)</td><td>momento angular \(L=I\omega\)</td></tr>
+      <tr><td>força \(F\)</td><td>torque \(\tau\)</td></tr>
+      <tr><td>\(F=M\dot v\)</td><td>\(\tau=I\dot\omega\)</td></tr>
+      <tr><td>\(T=\tfrac12Mv^2\)</td><td>\(T=\tfrac12I\omega^2\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Mas a analogia tem um limite importante, e ele não é um detalhe técnico: a massa é uma
+  propriedade do corpo, enquanto <strong>o momento de inércia é uma propriedade do corpo
+  <em>e</em> do eixo</strong>. O mesmo disco tem \(I=\tfrac12MR^2\) girando como um pião e
+  \(I=\tfrac14MR^2\) girando em torno de um diâmetro. Trocar o eixo troca o número. A seção
+  10 mostra até onde isso vai.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. O catálogo e o que ele ensina</h2>
+
+  <p>Para os corpos homogêneos usuais, girando em torno do eixo de simetria que passa pelo
+  centro de massa, o resultado tem sempre a forma \(I=kMR^2\), com \(k\) um número puro:</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Corpo</th><th>Eixo</th><th>\(I\)</th><th>\(k\)</th></tr></thead>
+    <tbody>
+      <tr><td>aro fino ou cilindro oco</td><td>de simetria</td><td>\(MR^2\)</td><td>1</td></tr>
+      <tr><td>casca esférica fina</td><td>por um diâmetro</td><td>\(\tfrac23MR^2\)</td><td>0,667</td></tr>
+      <tr><td>cilindro ou disco maciço</td><td>de simetria</td><td>\(\tfrac12MR^2\)</td><td>0,5</td></tr>
+      <tr><td>esfera maciça</td><td>por um diâmetro</td><td>\(\tfrac25MR^2\)</td><td>0,4</td></tr>
+      <tr><td>disco maciço</td><td>por um diâmetro</td><td>\(\tfrac14MR^2\)</td><td>0,25</td></tr>
+      <tr><td>haste fina de comprimento \(L\)</td><td>pelo centro, perpendicular</td><td>\(\tfrac{1}{12}ML^2\)</td><td>0,083</td></tr>
+      <tr><td>haste fina de comprimento \(L\)</td><td>por uma ponta, perpendicular</td><td>\(\tfrac13ML^2\)</td><td>0,333</td></tr>
+      <tr><td>placa \(a\cruz b\)</td><td>pelo centro, perpendicular</td><td>\(\tfrac{1}{12}M(a^2+b^2)\)</td><td></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div data-widget="inercia"></div>
+
+  <p>A ordenação da tabela não é acidente de álgebra. Com a mesma massa e o mesmo raio, o que
+  decide \(I\) é só uma coisa: <strong>quão longe do eixo a massa foi posta</strong>. O aro
+  põe tudo em \(R\) e chega ao máximo possível, \(k=1\). A casca esférica também põe tudo na
+  superfície, mas parte dela perto dos polos, onde \(\rho\) é pequeno, e cai para \(2/3\). A
+  esfera maciça enche ainda o miolo e cai para \(2/5\). Nenhum desses números depende do
+  material.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A conta da esfera maciça</span>
+    <p>Fatie a esfera em discos perpendiculares ao eixo. O disco à altura \(z\) tem raio
+    \(r=\sqrt{R^2-z^2}\), massa \(dm=\varrho\pi r^2dz\) e momento de inércia
+    \(\tfrac12 r^2dm\). Então</p>
+    \[I=\frac{\varrho\pi}{2}\int_{-R}^{R}\left(R^2-z^2\right)^2dz
+    =\frac{\varrho\pi}{2}\cdot\frac{16R^5}{15}=\frac{8\pi\varrho R^5}{15}.\]
+    <p>Com \(M=\tfrac43\pi\varrho R^3\), o \(\varrho\) sai e sobra \(I=\tfrac25MR^2\).
+    Repare que o fator \(\tfrac12r^2\) usado para cada disco já é o resultado do disco, de
+    modo que a conta reaproveita a linha anterior do catálogo. É assim que se constrói a
+    tabela inteira.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. Os dois teoremas de eixos</h2>
+
+  <h3>Eixos paralelos, ou teorema de Steiner</h3>
+
+  <p>Seja \(I_{\rm cm}\) o momento de inércia em torno de um eixo que passa pelo centro de
+  massa, e \(I\) o momento em torno de um eixo <em>paralelo</em> a ele, afastado de \(d\).
+  Escrevendo \(\vet{\rho}_i=\vet{\rho}\,'_i+\vet{d}\), com \(\vet{\rho}\,'_i\) medido a
+  partir do eixo pelo centro de massa,</p>
+
+  <p>\[I=\sum_i m_i\left|\vet{\rho}\,'_i+\vet{d}\right|^2
+  =\sum_i m_i\rho_i'^2+2\vet{d}\cdot\sum_i m_i\vet{\rho}\,'_i+d^2\sum_i m_i.\]</p>
+
+  <p>O termo do meio é nulo pela seção 1, pela terceira e última vez neste módulo. Portanto</p>
+
+  <div class="destaque">
+    <span class="anuncio">Teorema dos eixos paralelos</span>
+    \[I=I_{\rm cm}+Md^2.\]
+  </div>
+
+  <p>Duas consequências que o simulador exibe de uma vez. Como \(Md^2\geq0\), <strong>o eixo
+  pelo centro de massa é sempre o de menor momento de inércia</strong> entre todos os eixos
+  paralelos a ele. E como a parcela acrescentada não sabe nada sobre a forma do corpo, para
+  \(d\) grande todos os corpos convergem: a alguns raios de distância, qualquer coisa gira
+  como uma massa pontual na ponta de um fio.</p>
+
+  <p>Atenção ao enunciado: o teorema só vale quando <em>um</em> dos dois eixos passa pelo
+  centro de massa. Relacionar dois eixos paralelos quaisquer exige aplicá-lo duas vezes.</p>
+
+  <h3>Eixos perpendiculares</h3>
+
+  <p>Para um corpo <strong>plano</strong>, uma lâmina contida no plano \(xy\), vale uma
+  identidade ainda mais simples. Como \(z_i=0\) para todo elemento,</p>
+
+  <p>\[I_x=\sum_i m_iy_i^2,\qquad I_y=\sum_i m_ix_i^2,\qquad
+  I_z=\sum_i m_i\left(x_i^2+y_i^2\right),\]</p>
+
+  <p>e portanto</p>
+
+  <div class="destaque">
+    <span class="anuncio">Teorema dos eixos perpendiculares (só para lâminas)</span>
+    \[I_z=I_x+I_y.\]
+  </div>
+
+  <p>É de onde sai, sem integral nenhuma, o momento de inércia do disco em torno de um
+  diâmetro: por simetria \(I_x=I_y\), e como \(I_z=\tfrac12MR^2\), cada um vale
+  \(\tfrac14MR^2\). Confira na tabela da seção 7.</p>
+
+  <p>O <strong>raio de giração</strong> \(k_g=\sqrt{I/M}\) fecha a seção: é a distância em
+  que seria preciso concentrar toda a massa, num ponto, para obter o mesmo \(I\). Para a
+  esfera maciça, \(k_g=R\sqrt{2/5}=0{,}632R\).</p>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. A corrida no plano inclinado</h2>
+
+  <p>Agora o momento de inércia é posto para trabalhar no problema que melhor mostra o que
+  ele significa. Um corpo de massa \(M\), raio \(R\) e \(I=kMR^2\) rola sem deslizar por uma
+  rampa, descendo uma altura \(h\). Conservando a energia e usando o vínculo \(v=\omega R\)
+  do módulo 1,</p>
+
+  <p>\[Mgh=\frac12MV^2+\frac12I\omega^2=\frac12MV^2\left(1+k\right),\]</p>
+
+  <p>de onde \(V=\sqrt{2gh/(1+k)}\) e, derivando ao longo da rampa,</p>
+
+  <div class="destaque">
+    <span class="anuncio">Aceleração de um corpo que rola</span>
+    \[a=\frac{g\sen\theta}{1+k},\qquad I=kMR^2.\]
+  </div>
+
+  <p>Olhe o que <em>não</em> aparece nessa fórmula: nem \(M\), nem \(R\). Uma bola de gude e
+  uma bola de boliche descem lado a lado, e chegam juntas. O que decide a corrida é só o
+  fator \(k\), isto é, que fração da energia precisa ser desviada para a rotação em vez de
+  virar avanço: essa fração é \(k/(1+k)\).</p>
+
+  <div data-widget="descida"></div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que o atrito não aparece no balanço de energia</span>
+    <p>O rolamento exige atrito estático, sem o qual o corpo apenas desliza. Mesmo assim a
+    conservação de energia foi usada acima sem termo de perda. A razão é que o atrito
+    estático age no ponto de contato, e pelo módulo 1 <strong>o ponto de contato tem
+    velocidade nula</strong>. Força aplicada em um ponto parado não realiza trabalho.</p>
+    <p>O atrito está presente e é essencial, mas o seu papel é exercer o torque que põe o
+    corpo a girar, e não dissipar energia. É por isso que a conta fecha.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. O limite do escalar</h2>
+
+  <p>Tudo o que foi feito até aqui supôs rotação em torno de um <em>eixo fixo e conhecido</em>,
+  e aí \(I\) é um número. Vale registrar onde essa descrição deixa de bastar, porque isso
+  define a fronteira entre este curso e o seguinte.</p>
+
+  <p>Considere um corpo girando em torno de um eixo arbitrário que passa pela origem, com
+  \(\vet{\omega}\) numa direção qualquer. Calculando o momento angular pela definição, com
+  \(\vet{v}_i=\vet{\omega}\cruz\vet{r}_i\), aparecem naturalmente somas do tipo
+  \(-\sum_i m_ix_iy_i\), os chamados <strong>produtos de inércia</strong>. Eles em geral não
+  se anulam, e a consequência é desconfortável:</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O momento angular pode não acompanhar a velocidade angular</span>
+    <p>Em geral, \(\vet{L}\) <strong>não é paralelo</strong> a \(\vet{\omega}\). Uma roda
+    desbalanceada gira em torno do seu eixo e ainda assim tem momento angular apontando para
+    outro lado, que precessa junto com ela e exige dos mancais uma força que varia a cada
+    volta. É esse o motivo físico de se balancear pneus.</p>
+    <p>A relação correta não é \(L=I\omega\) com \(I\) escalar, e sim
+    \(L_i=I_{ij}\omega_j\) com \(\Ten{I}\) um <strong>tensor</strong> simétrico de nove
+    componentes. Há sempre três eixos perpendiculares, os <em>eixos principais</em>, em que
+    ele fica diagonal e a relação simples volta a valer.</p>
+  </div>
+
+  <p>O tensor de inércia, os eixos principais, as equações de Euler e o movimento do pião são
+  assunto de <strong>Mecânica Clássica III</strong>, junto com a álgebra tensorial necessária
+  para tratá-los. Aqui ficamos com o caso de eixo fixo, que já dá conta de volantes, roldanas,
+  pêndulos físicos e de tudo o que rola, e que é o que os módulos 3 e 4 vão usar.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. Exercícios resolvidos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 2.1 · A haste, pelo centro e pela ponta</span>
+    <p>Calcule o momento de inércia de uma haste fina e homogênea de massa \(M\) e
+    comprimento \(L\) em torno de um eixo perpendicular que passe (a) pelo centro e (b) por
+    uma extremidade. Verifique a consistência com o teorema de Steiner.</p>
+    <p><strong>Solução.</strong> Com densidade linear \(\lambda=M/L\) e \(x\) medido a partir
+    do centro,</p>
+    \[I_{\rm cm}=\int_{-L/2}^{L/2}x^2\lambda\,dx=\lambda\frac{L^3}{12}=\frac{1}{12}ML^2.\]
+    <p>Pela ponta, com \(x\) de \(0\) a \(L\),</p>
+    \[I_{\rm ponta}=\int_{0}^{L}x^2\lambda\,dx=\lambda\frac{L^3}{3}=\frac13ML^2.\]
+    <p>E o teorema de Steiner, com \(d=L/2\), dá
+    \(\tfrac{1}{12}ML^2+M\left(L/2\right)^2=\tfrac{1}{12}ML^2+\tfrac14ML^2=\tfrac13ML^2\),
+    que confere. Note que \(I\) quadruplicou ao mudar de eixo, sem que uma grama de massa
+    mudasse de lugar no corpo.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 2.2 · Disco em torno de uma tangente</span>
+    <p>Determine o momento de inércia de um disco maciço de massa \(M\) e raio \(R\) em torno
+    de (a) uma reta tangente contida no plano do disco e (b) uma reta tangente perpendicular
+    ao plano.</p>
+    <p><strong>Solução.</strong> Os dois saem combinando os dois teoremas da seção 8, sem
+    nenhuma integral nova.</p>
+    <p>(a) Em torno de um diâmetro, pelo teorema dos eixos perpendiculares,
+    \(I_{\rm diam}=\tfrac12I_z=\tfrac14MR^2\). Levando esse eixo até a borda, paralelo a si
+    mesmo, com \(d=R\):</p>
+    \[I=\frac14MR^2+MR^2=\frac54MR^2.\]
+    <p>(b) Em torno do eixo de simetria, \(I_z=\tfrac12MR^2\). Deslocando até a borda,</p>
+    \[I=\frac12MR^2+MR^2=\frac32MR^2.\]
+    <p>Confira os dois no simulador da seção 7 pondo o deslizante em \(d=1{,}00\,R\): com
+    "disco, eixo diametral" ele exibe 1,250 e com "cilindro maciço", 1,500.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 2.3 · Quem chega primeiro</span>
+    <p>Uma esfera maciça e um aro, de massas e raios quaisquer, são soltos do alto de uma
+    rampa de 3,0 m inclinada a 20°. Determine as acelerações, os tempos de descida e a razão
+    entre eles.</p>
+    <p><strong>Solução.</strong> \(g\sen20^\circ=9{,}807\cruz0{,}3420=3{,}354\) m/s². Com
+    \(k=2/5\) e \(k=1\),</p>
+    \[a_{\rm esfera}=\frac{3{,}354}{1{,}4}=2{,}396\ {\rm m/s^2},\qquad
+    a_{\rm aro}=\frac{3{,}354}{2}=1{,}677\ {\rm m/s^2}.\]
+    <p>De \(s=\tfrac12at^2\) com \(s=3{,}0\) m,
+    \(t=\sqrt{2s/a}\), ou seja \(t_{\rm esfera}=1{,}58\) s e \(t_{\rm aro}=1{,}89\) s. A
+    razão é</p>
+    \[\frac{t_{\rm aro}}{t_{\rm esfera}}=\sqrt{\frac{1+1}{1+2/5}}=\sqrt{\frac{2}{1{,}4}}
+    =1{,}195,\]
+    <p>que não depende do ângulo nem do comprimento da rampa. Mudar \(\theta\) muda todos os
+    tempos pelo mesmo fator \(1/\sqrt{\sen\theta}\), e por isso nunca altera a ordem de
+    chegada.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 2.4 · A energia de um ioiô</span>
+    <p>Um ioiô é um cilindro maciço de massa \(M\) e raio \(R\) cujo fio está enrolado no
+    próprio raio externo. Soltando-o do repouso, determine a aceleração do centro e a tração
+    no fio.</p>
+    <p><strong>Solução.</strong> O fio desenrola sem deslizar, de modo que vale \(v=\omega R\)
+    e o ponto do fio em contato está parado, exatamente como no rolamento. Pela energia, com
+    \(k=1/2\),</p>
+    \[Mgh=\frac12MV^2\left(1+\tfrac12\right)\quad\Longrightarrow\quad
+    a=\frac{g}{1+\tfrac12}=\frac23g=6{,}54\ {\rm m/s^2}.\]
+    <p>É o caso \(\theta=90^\circ\) da fórmula da seção 9, o que faz sentido: um ioiô é um
+    corpo rolando numa rampa vertical, em que o fio faz o papel do contato. Para a tração,
+    da segunda lei aplicada ao centro de massa, \(Mg-T=Ma\), e portanto</p>
+    \[T=M\left(g-\tfrac23g\right)=\frac13Mg.\]
+    <p>O fio sustenta apenas um terço do peso. Os outros dois terços aceleram o ioiô para
+    baixo.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s12">12. Exercícios propostos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Para resolver</span>
+    <ol>
+      <li><b>2.1</b> Localize o centro de massa (a) de um triângulo homogêneo de vértices
+      \((0,0)\), \((a,0)\) e \((0,b)\); (b) de um semidisco homogêneo de raio \(R\);
+      (c) de um cone maciço homogêneo de altura \(h\). Em quais deles o centro de massa está
+      fora do material?</li>
+
+      <li><b>2.2</b> Deduza \(I=\tfrac23MR^2\) para uma casca esférica fina, integrando sobre
+      anéis de latitude. Compare com a esfera maciça e explique a diferença em uma frase,
+      sem usar a conta.</li>
+
+      <li><b>2.3</b> Uma placa retangular homogênea de lados \(a\) e \(b\) gira em torno de
+      um eixo perpendicular pelo centro. Use o teorema dos eixos perpendiculares para obter
+      \(I=\tfrac{1}{12}M(a^2+b^2)\) a partir dos momentos em torno dos dois eixos no plano.</li>
+
+      <li><b>2.4</b> Mostre que, para qualquer corpo e qualquer direção de eixo, a função
+      \(d\mapsto I(d)\) dos eixos paralelos é uma parábola com um único mínimo, e que esse
+      mínimo ocorre no eixo que passa pelo centro de massa. Em que ponto da demonstração a
+      identidade \(\sum_i m_i\vet{r}\,'_i=\vet 0\) foi usada?</li>
+
+      <li><b>2.5</b> Um pêndulo físico é uma haste de massa \(M\) e comprimento \(L\)
+      pendurada por um ponto a uma distância \(d\) do centro. Mostre que o período para
+      pequenas oscilações é \(T=2\pi\sqrt{I/(Mgd)}\) e determine o valor de \(d\) que o torna
+      mínimo. (Resposta: \(d=L/\sqrt{12}\).)</li>
+
+      <li><b>2.6</b> Uma esfera maciça e uma casca esférica de mesma massa e mesmo raio são
+      soltas juntas numa rampa. Calcule a razão entre os tempos de descida e mostre que ela
+      não depende de \(\theta\). Depois repita para uma esfera e um bloco que desliza sem
+      atrito.</li>
+
+      <li><b>2.7</b> Um ioiô cujo fio está enrolado num eixo interno de raio \(r&lt;R\) tem
+      \(I=\tfrac12MR^2\). Refaça o exercício resolvido 2.4 e mostre que
+      \(a=g/\left(1+R^2/2r^2\right)\). Por que um ioiô de eixo fino desce tão devagar?</li>
+
+      <li><b>2.8</b> Duas crianças de massas \(m_1\) e \(m_2\) estão nas pontas de uma
+      gangorra de massa desprezível e comprimento \(L\). Onde deve ficar o apoio? Agora repita
+      com uma prancha homogênea de massa \(M\) e discuta como o resultado muda.</li>
+
+      <li><b>2.9</b> Discuta em meia página: por que uma patinadora acelera ao encolher os
+      braços, se ela não aplica torque externo nenhum? Identifique o que se conserva, o que
+      muda, e de onde vem a energia cinética adicional.</li>
+    </ol>
+  </div>
+
+  <nav class="nav-aulas">
+    <a href="aula01.html"><small>Módulo anterior</small>← 1. Cinemática dos corpos rígidos</a>
+    <span class="em-breve"><small>Em preparação</small>3. Momento angular e torque</span>
+  </nav>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+<script src="assets/js/widgets.js?v=202611081833"></script>
+</body>
+</html>
