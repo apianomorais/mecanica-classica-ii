@@ -308,24 +308,29 @@ var G = (function () {
   };
 
   /* Prepara o canvas para telas de alta densidade */
-  function preparar(cv, altura) {
+  /* naoLimpar serve para desenhar um segundo painel sobre a mesma tela:
+     mexer em cv.width apaga o conteudo, de modo que so redimensionamos
+     quando a medida realmente muda. */
+  function preparar(cv, altura, naoLimpar) {
     var larg = cv.clientWidth || cv.parentNode.clientWidth || 600;
     var alt = altura || Math.round(larg * 0.56);
     var dpr = window.devicePixelRatio || 1;
-    cv.width = Math.round(larg * dpr);
-    cv.height = Math.round(alt * dpr);
+    var w = Math.round(larg * dpr), h = Math.round(alt * dpr);
+    if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
     cv.style.height = alt + 'px';
     var ct = cv.getContext('2d');
     ct.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ct.clearRect(0, 0, larg, alt);
-    ct.fillStyle = COR.fundo;
-    ct.fillRect(0, 0, larg, alt);
+    if (!naoLimpar) {
+      ct.clearRect(0, 0, larg, alt);
+      ct.fillStyle = COR.fundo;
+      ct.fillRect(0, 0, larg, alt);
+    }
     return { ct: ct, L: larg, A: alt };
   }
 
   /* Cria um sistema de eixos. op: {xmin,xmax,ymin,ymax,rotX,rotY,formataX,formataY} */
   function eixos(cv, op) {
-    var p = preparar(cv, op.altura);
+    var p = preparar(cv, op.altura, op.limpar === false);
     var ct = p.ct;
     var m = op.margem || { e: 60, d: 16, c: 14, b: 40 };
     var x0 = m.e, x1 = p.L - m.d, y0 = m.c, y1 = p.A - m.b;
@@ -372,7 +377,10 @@ var G = (function () {
     if (op.rotX) { ct.textAlign = 'center'; ct.textBaseline = 'bottom';
       ct.fillText(op.rotX, (x0 + x1) / 2, p.A - 2); }
     if (op.rotY) {
-      ct.save(); ct.translate(11, (y0 + y1) / 2); ct.rotate(-Math.PI / 2);
+      /* o titulo do eixo y fica colado a margem esquerda do proprio painel,
+         e nao do canvas, para que dois paineis lado a lado nao se sobreponham */
+      ct.save(); ct.translate(Math.max(11, m.e - 49), (y0 + y1) / 2);
+      ct.rotate(-Math.PI / 2);
       ct.textAlign = 'center'; ct.textBaseline = 'top'; ct.fillText(op.rotY, 0, 0); ct.restore();
     }
 

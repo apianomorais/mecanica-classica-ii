@@ -4652,6 +4652,828 @@
     registrarRedesenho(desenhar);
   };
 
+  /* =================================================================
+     27. O resíduo de Euler-Lagrange: o teste ponto a ponto
+     A condição delta-J = 0 é global; a equação de Euler-Lagrange é a
+     sua tradução local. O widget mostra as duas coisas ao mesmo tempo:
+     o valor do funcional contra a deformação e o resíduo
+     G(x) = f_y - d/dx(f_y') ao longo do intervalo.
+     ================================================================= */
+  REGISTRO.residuoel = function (raiz) {
+    var CASOS = {
+      comp: {
+        n: 'comprimento', sim: 'L[y]',
+        f: function (x, y, d) { return Math.sqrt(1 + d * d); },
+        ex: function (x) { return x; },
+        eq: 'y\'\' = 0', sol: 'a reta y = x'
+      },
+      quad: {
+        n: 'quadrático com y²', sim: 'J[y]',
+        f: function (x, y, d) { return d * d + y * y; },
+        ex: function (x) { return Math.sinh(x) / Math.sinh(1); },
+        eq: 'y\'\' = y', sol: 'y = senh x / senh 1'
+      },
+      forca: {
+        n: 'com termo de fonte', sim: 'J[y]',
+        f: function (x, y, d) { return d * d - 4 * x * y; },
+        ex: function (x) { return x * x; },
+        eq: 'y\'\' = -2x', sol: 'a parábola y = x²'
+      }
+    };
+    var est = { k: 'comp', a: 0.25, vista: 'curva' };
+
+    var corpo = moldura(raiz, 'A equação de Euler-Lagrange é o teste ponto a ponto');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, [
+      { rot: 'A curva e o resíduo', v: 'curva' },
+      { rot: 'J contra a deformação', v: 'perfil' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+    opcoes(c0, Object.keys(CASOS).map(function (k) {
+      return { rot: CASOS[k].n, v: k };
+    }), 0, function (v) { est.k = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'deformação a', -0.5, 0.5, 0.01, 0.25,
+      function (v) { est.a = v; desenhar(); },
+      function (v) { return F.fmt(v, 2); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'equação de Euler-Lagrange', k: 'eq' },
+      { rot: 'extremante', k: 'sol' },
+      { rot: 'J para esta curva', k: 'j' },
+      { rot: 'J para a extremante', k: 'j0' },
+      { rot: 'maior resíduo |G|', k: 'res' },
+      { rot: 'δJ para esta deformação', k: 'dj' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function curva(a, x) { return CASOS[est.k].ex(x) + a * Math.sin(Math.PI * x); }
+    function dcurva(a, x) {
+      return (curva(a, x + 1e-5) - curva(a, x - 1e-5)) / 2e-5;
+    }
+    function valor(a) {
+      var N = 600, s = 0;
+      for (var i = 0; i < N; i++) {
+        var x = (i + 0.5) / N;
+        s += CASOS[est.k].f(x, curva(a, x), dcurva(a, x));
+      }
+      return s / N;
+    }
+    /* resíduo G(x) = f_y − d/dx(f_y'), por diferenças centradas */
+    function residuo(a, x) {
+      var f = CASOS[est.k].f, h = 1e-4;
+      function fy(xx) {
+        var y = curva(a, xx), d = dcurva(a, xx);
+        return (f(xx, y + h, d) - f(xx, y - h, d)) / (2 * h);
+      }
+      function fd(xx) {
+        var y = curva(a, xx), d = dcurva(a, xx);
+        return (f(xx, y, d + h) - f(xx, y, d - h)) / (2 * h);
+      }
+      var dx = 2e-3;
+      return fy(x) - (fd(x + dx) - fd(x - dx)) / (2 * dx);
+    }
+    function maiorResiduo(a) {
+      var m = 0;
+      for (var i = 1; i < 60; i++) m = Math.max(m, Math.abs(residuo(a, i / 60)));
+      return m;
+    }
+
+    function desenhaCurva() {
+      var alt = 320;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+      var meia = Lp / 2 - 10;
+
+      /* painel 1: a curva de prova contra a extremante */
+      var ymin = -0.4, ymax = 1.6;
+      var g1 = G.eixos(cv, {
+        altura: alt, xmin: 0, xmax: 1, ymin: ymin, ymax: ymax,
+        rotX: 'x', rotY: 'y(x)',
+        marcasX: G.marcasLineares(0, 1, 6, 1),
+        limpar: false, margem: { e: 52, d: Lp - meia + 10, c: 16, b: 40 }
+      });
+      G.curva(g1, function (x) { return CASOS[est.k].ex(x); }, G.COR.bronze, 2.4, [6, 4]);
+      G.curva(g1, function (x) { return curva(est.a, x); }, G.COR.mestra, 2.6);
+      G.legenda(g1, [
+        { texto: 'extremante', cor: G.COR.bronze },
+        { texto: 'curva de prova', cor: G.COR.mestra }
+      ]);
+
+      /* painel 2: o resíduo ao longo do intervalo */
+      var rm = Math.max(maiorResiduo(est.a), maiorResiduo(0.5)) * 1.15 + 1e-9;
+      var g2 = G.eixos(cv, {
+        altura: alt, xmin: 0, xmax: 1, ymin: -rm, ymax: rm,
+        rotX: 'x', rotY: 'G(x)',
+        marcasX: G.marcasLineares(0, 1, 6, 1),
+        formataY: function (v) { return F.fmt(v, 1); },
+        limpar: false, margem: { e: meia + 56, d: 16, c: 16, b: 40 }
+      });
+      G.curva(g2, function (x) { return 0; }, G.COR.grade, 1.6);
+      G.curva(g2, function (x) { return residuo(0, x); }, G.COR.bronze, 2.2, [6, 4]);
+      G.curva(g2, function (x) { return residuo(est.a, x); }, G.COR.vinho, 2.6);
+      rotulo(g2.ct, 'resíduo da extremante: zero em todo x',
+        g2.x1 - 6, g2.y0 + 12, G.COR.bronze, 'right');
+    }
+
+    function desenhaPerfil() {
+      var v0 = valor(-0.5), v1 = valor(0.5), vm = valor(0);
+      var vmax = Math.max(v0, v1), folga = (vmax - vm) * 0.2 + 1e-6;
+      var gr = G.eixos(cv, {
+        altura: 320, xmin: -0.5, xmax: 0.5,
+        ymin: vm - folga, ymax: vmax + folga,
+        rotX: 'deformação a', rotY: CASOS[est.k].sim,
+        marcasX: G.marcasLineares(-0.5, 0.5, 6, 2),
+        formataY: function (v) { return F.fmt(v, 3); }
+      });
+      G.curva(gr, valor, G.COR.mestra, 2.6);
+      G.vertical(gr, est.a, G.COR.suave, '', true);
+      var ct = gr.ct;
+      ct.beginPath(); ct.arc(gr.X(0), gr.Y(vm), 5.5, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.bronze; ct.fill();
+      rotulo(ct, 'a = 0: a extremante', gr.X(0), gr.Y(vm) - 18, G.COR.bronze);
+      ct.beginPath(); ct.arc(gr.X(est.a), gr.Y(valor(est.a)), 5, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.roxo; ct.fill();
+    }
+
+    function desenhar() {
+      var C0 = CASOS[est.k];
+      if (est.vista === 'curva') desenhaCurva(); else desenhaPerfil();
+      var h = 1e-3;
+      var dj = (valor(est.a + h) - valor(est.a - h)) / (2 * h);
+      mostrar({
+        eq: C0.eq, sol: C0.sol,
+        j: F.fmt(valor(est.a), 5),
+        j0: F.fmt(valor(0), 5),
+        res: F.fmt(maiorResiduo(est.a), 4),
+        dj: F.fmt(dj, 4) + ' por unidade de a'
+      });
+      nota.innerHTML =
+        '<p>A condição \\(\\delta J=0\\) é uma afirmação sobre a curva <em>inteira</em>: o '
+        + 'número \\(J\\) tem de ficar estacionário diante de qualquer deformação. A equação '
+        + 'de Euler-Lagrange é a tradução disso para cada ponto:</p>'
+        + '\\[G(x)=\\pder{f}{y}-\\der{}{x}\\left(\\pder{f}{y\'}\\right)=0'
+        + '\\qquad\\text{para todo } x.\\]'
+        + '<p>O segundo painel desenha \\(G(x)\\) calculado numericamente. Para a extremante '
+        + '(tracejado bronze) ele é nulo em todo o intervalo; para qualquer outra curva ele é '
+        + 'diferente de zero em algum lugar, e o maior valor em módulo está no cartão. Repare '
+        + 'que não basta \\(G\\) ser pequeno em média: o lema fundamental, demonstrado no '
+        + 'módulo 7, exige que seja nulo ponto a ponto, porque a deformação pode ser '
+        + 'concentrada em qualquer pedacinho.</p>'
+        + '<p>A outra vista mostra a mesma coisa pelo lado global: \\(J\\) contra a deformação '
+        + '\\(a\\), com o mínimo em \\(a=0\\). O cartão \\(\\delta J\\) é a inclinação dessa '
+        + 'curva, que se anula exatamente onde o resíduo some.</p>'
+        + '<p>Troque de funcional e compare as três equações resultantes. A primeira dá '
+        + '\\(y\'\'=0\\) porque \\(f\\) não depende de \\(y\\); a segunda acopla \\(y\'\'\\) a '
+        + '\\(y\\) e produz senos hiperbólicos; a terceira tem uma fonte \\(-4xy\\) que '
+        + 'empurra a solução para a parábola.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     28. A ciclóide resolvida: Beltrami em ação
+     Resolve o parâmetro da ciclóide para o ponto B escolhido e mostra
+     que a combinação de Beltrami é constante ao longo dela e não ao
+     longo da reta.
+     ================================================================= */
+  REGISTRO.cicloide = function (raiz) {
+    var G0 = 9.80665;
+    var est = { xb: 1.4, mostrarK: true };
+
+    var corpo = moldura(raiz, 'A ciclóide: a integral de Beltrami resolve a braquistócrona');
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'afastamento horizontal de B', 0.4, 3, 0.05, 1.4,
+      function (v) { est.xb = v; desenhar(); },
+      function (v) { return F.fmt(v, 2) + ' m'; });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'parâmetro a da ciclóide', k: 'a' },
+      { rot: 'ângulo final θ₁', k: 'th' },
+      { rot: 'constante K = y(1+y\'²)', k: 'K' },
+      { rot: 'K = 2a (verificação)', k: 'K2' },
+      { rot: 'tempo pela ciclóide', k: 'tc' },
+      { rot: 'tempo pela reta', k: 'tr' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    var YB = 1;
+    function thetaFinal() {
+      var alvo = YB / est.xb, lo = 1e-4, hi = 2 * Math.PI - 1e-4;
+      for (var i = 0; i < 80; i++) {
+        var m = (lo + hi) / 2;
+        if ((1 - Math.cos(m)) / (m - Math.sin(m)) > alvo) lo = m; else hi = m;
+      }
+      return (lo + hi) / 2;
+    }
+    function tempo(pt) {
+      var N = 4000, acc = 0, ant = pt(0);
+      for (var i = 1; i <= N; i++) {
+        var q = pt(i / N);
+        var ds = Math.hypot(q[0] - ant[0], q[1] - ant[1]);
+        acc += ds / Math.sqrt(2 * G0 * Math.max((q[1] + ant[1]) / 2, 1e-12));
+        ant = q;
+      }
+      return acc;
+    }
+
+    function desenhar() {
+      var th1 = thetaFinal(), a = YB / (1 - Math.cos(th1));
+      function cic(u) {
+        var th = th1 * u;
+        return [a * (th - Math.sin(th)), a * (1 - Math.cos(th))];
+      }
+      function reta(u) { return [est.xb * u, YB * u]; }
+
+      var alt = 320;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+      var meia = Lp * 0.52;
+
+      /* painel 1: as duas curvas */
+      var xmax = Math.max(est.xb, cic(1)[0]), ymax = 1.05;
+      for (var i = 0; i <= 60; i++) ymax = Math.max(ymax, cic(i / 60)[1]);
+      var esc = Math.min((meia - 70) / xmax, (alt - 74) / ymax);
+      var x0 = 34, y0 = 34;
+      function X(u) { return x0 + u * esc; }
+      function Y(u) { return y0 + u * esc; }
+
+      [[reta, G.COR.vinho, 'reta'], [cic, G.COR.mestra, 'ciclóide']].forEach(function (q, k) {
+        ct.beginPath();
+        for (var i2 = 0; i2 <= 240; i2++) {
+          var r = q[0](i2 / 240);
+          (i2 ? ct.lineTo : ct.moveTo).call(ct, X(r[0]), Y(r[1]));
+        }
+        ct.strokeStyle = q[1]; ct.lineWidth = 2.4; ct.stroke();
+        ct.fillStyle = q[1];
+        ct.fillRect(14, alt - 34 + k * 16 - 3, 13, 3);
+        rotulo(ct, q[2], 32, alt - 34 + k * 16, q[1], 'left');
+      });
+
+      /* a roda que gera a ciclóide, no ponto médio */
+      var tm = th1 * 0.5;
+      var centro = [a * tm, a];
+      ct.beginPath();
+      ct.arc(X(centro[0]), Y(centro[1]), a * esc, 0, 2 * Math.PI);
+      ct.strokeStyle = G.COR.clara; ct.lineWidth = 1.4;
+      ct.setLineDash([5, 4]); ct.stroke(); ct.setLineDash([]);
+      var pc = cic(0.5);
+      ct.beginPath();
+      ct.moveTo(X(centro[0]), Y(centro[1])); ct.lineTo(X(pc[0]), Y(pc[1]));
+      ct.strokeStyle = G.COR.clara; ct.stroke();
+      ct.beginPath(); ct.arc(X(pc[0]), Y(pc[1]), 5, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.mestra; ct.fill();
+      rotulo(ct, 'a roda que rola', X(centro[0]), Y(centro[1] - a) - 12, G.COR.clara);
+
+      [[0, 0, 'A'], [est.xb, YB, 'B']].forEach(function (q) {
+        ct.beginPath(); ct.arc(X(q[0]), Y(q[1]), 5, 0, 2 * Math.PI);
+        ct.fillStyle = G.COR.tinta; ct.fill();
+        rotulo(ct, q[2], X(q[0]) + 14, Y(q[1]) - 10, G.COR.tinta);
+      });
+
+      /* painel 2: a combinação de Beltrami ao longo de cada curva */
+      function beltrami(pt, u) {
+        var e = 1e-4;
+        var q1 = pt(Math.max(0, u - e)), q2 = pt(Math.min(1, u + e));
+        var dy = (q2[1] - q1[1]), dx = (q2[0] - q1[0]);
+        var d = dx === 0 ? 1e6 : dy / dx;
+        var y = pt(u)[1];
+        return y * (1 + d * d);
+      }
+      var g2 = G.eixos(cv, {
+        altura: alt, xmin: 0.02, xmax: 1, ymin: 0, ymax: 4 * a,
+        rotX: 'fração do percurso', rotY: 'y (1 + y\'²)',
+        marcasX: G.marcasLineares(0, 1, 5, 1),
+        formataY: function (v) { return F.fmt(v, 2); },
+        limpar: false, margem: { e: meia + 56, d: 16, c: 16, b: 40 }
+      });
+      G.curva(g2, function (u) { return beltrami(reta, u); }, G.COR.vinho, 2.4);
+      G.curva(g2, function (u) { return beltrami(cic, u); }, G.COR.mestra, 2.8);
+      G.curva(g2, function () { return 2 * a; }, G.COR.bronze, 1.8, [6, 4]);
+      rotulo(g2.ct, 'K = 2a', g2.x1 - 6, g2.Y(2 * a) - 12, G.COR.bronze, 'right');
+
+      mostrar({
+        a: F.fmt(a, 4) + ' m',
+        th: F.fmt(th1 * 180 / Math.PI, 1) + '°',
+        K: F.fmt(beltrami(cic, 0.5), 4),
+        K2: F.fmt(2 * a, 4),
+        tc: F.fmt(tempo(cic), 4) + ' s',
+        tr: F.fmt(tempo(reta), 4) + ' s'
+      });
+
+      nota.innerHTML =
+        '<p>O integrando da braquistócrona, \\(f=\\sqrt{(1+y\'^2)/y}\\), não depende '
+        + 'explicitamente de \\(x\\). Vale então a integral de Beltrami, e a conta se reduz '
+        + 'a uma equação de primeira ordem:</p>'
+        + '\\[f-y\'\\pder{f}{y\'}=\\frac{1}{\\sqrt{y\\left(1+y\'^2\\right)}}=C'
+        + '\\qquad\\Longrightarrow\\qquad y\\left(1+y\'^2\\right)=K.\\]'
+        + '<p>O segundo painel testa isso diretamente: ao longo da ciclóide a combinação '
+        + '\\(y(1+y\'^2)\\) é a mesma em todo ponto, e vale exatamente \\(2a\\); ao longo da '
+        + 'reta ela varia, e por isso a reta não resolve a equação. É a verificação numérica '
+        + 'de uma conta feita à mão.</p>'
+        + '<p>A substituição \\(y=\\tfrac{K}{2}(1-\\cos\\theta)\\) converte '
+        + '\\(y\'=\\sqrt{(K-y)/y}\\) em \\(\\cotg(\\theta/2)\\), e integrar devolve '
+        + '\\(x=\\tfrac{K}{2}(\\theta-\\sen\\theta)\\). Com \\(a=K/2\\),</p>'
+        + '\\[x=a\\left(\\theta-\\sen\\theta\\right),\\qquad y=a\\left(1-\\cos\\theta\\right),\\]'
+        + '<p>que é a ciclóide traçada pelo ponto de uma roda rolando sem deslizar, desenhada '
+        + 'em tracejado no primeiro painel. O valor de \\(a\\) sai da exigência de que a curva '
+        + 'passe por B, e com o B atual vale ' + F.fmt(a, 4) + ' m.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     29. A catenária e a parábola
+     Resolve L = 2C senh(a/C) por bisseção e compara a forma com a
+     parábola de mesma flecha, que é a resposta errada de Galileu e a
+     resposta certa para uma ponte pênsil.
+     ================================================================= */
+  REGISTRO.catenaria = function (raiz) {
+    var est = { L: 12, a: 5 };
+
+    var corpo = moldura(raiz, 'A catenária contra a parábola');
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'comprimento da corrente', 10.4, 26, 0.2, 12,
+      function (v) { est.L = v; desenhar(); },
+      function (v) { return F.fmt(v, 1) + ' m'; });
+    deslizante(ctr, 'meia distância entre os apoios', 3, 8, 0.1, 5,
+      function (v) { est.a = v; desenhar(); },
+      function (v) { return F.fmt(v, 1) + ' m'; });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'parâmetro C', k: 'C' },
+      { rot: 'flecha da catenária', k: 'fl' },
+      { rot: 'razão L / 2a', k: 'raz' },
+      { rot: 'diferença no quarto do vão', k: 'dif' },
+      { rot: 'tensão horizontal / peso', k: 'tens' },
+      { rot: 'y / √(1+y\'²) (Beltrami)', k: 'bel' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* L = 2C senh(a/C): C grande dá L → 2a, C pequeno dá L enorme */
+    function resolveC() {
+      var lo = 1e-3, hi = 1e4;
+      for (var i = 0; i < 200; i++) {
+        var m = Math.sqrt(lo * hi);
+        if (2 * m * Math.sinh(est.a / m) > est.L) lo = m; else hi = m;
+      }
+      return Math.sqrt(lo * hi);
+    }
+
+    function desenhar() {
+      if (est.L <= 2 * est.a + 0.05) est.L = 2 * est.a + 0.4;
+      var C = resolveC();
+      var flecha = C * Math.cosh(est.a / C) - C;
+      function cat(x) { return C * Math.cosh(x / C) - C; }
+      function par(x) { return flecha * x * x / (est.a * est.a); }
+
+      var gr = G.eixos(cv, {
+        altura: 330, xmin: -est.a, xmax: est.a,
+        ymin: -flecha * 0.08, ymax: flecha * 1.14 + 0.01,
+        rotX: 'x (m)', rotY: 'altura acima do ponto mais baixo (m)',
+        marcasX: G.marcasLineares(-est.a, est.a, 7, 1),
+        formataY: function (v) { return F.fmt(v, 2); }
+      });
+      G.curva(gr, par, G.COR.bronze, 2.4, [6, 4]);
+      G.curva(gr, cat, G.COR.mestra, 2.8);
+      G.legenda(gr, [
+        { texto: 'catenária C cosh(x/C)', cor: G.COR.mestra },
+        { texto: 'parábola de mesma flecha', cor: G.COR.bronze }
+      ]);
+      var ct = gr.ct;
+      [-est.a, est.a].forEach(function (x) {
+        ct.beginPath(); ct.arc(gr.X(x), gr.Y(flecha), 5, 0, 2 * Math.PI);
+        ct.fillStyle = G.COR.tinta; ct.fill();
+      });
+      var xq = est.a / 2;
+      ct.beginPath();
+      ct.moveTo(gr.X(xq), gr.Y(cat(xq))); ct.lineTo(gr.X(xq), gr.Y(par(xq)));
+      ct.strokeStyle = G.COR.vinho; ct.lineWidth = 2; ct.stroke();
+      rotulo(ct, 'diferença aqui', gr.X(xq) + 10,
+        (gr.Y(cat(xq)) + gr.Y(par(xq))) / 2, G.COR.vinho, 'left');
+
+      var d = Math.abs(cat(xq) - par(xq));
+      var yq = C * Math.cosh(xq / C), dq = Math.sinh(xq / C);
+      mostrar({
+        C: F.fmt(C, 3) + ' m',
+        fl: F.fmt(flecha, 3) + ' m',
+        raz: F.fmt(est.L / (2 * est.a), 3),
+        dif: F.fmt(d * 100, 1) + ' cm',
+        tens: F.fmt(C / est.L, 3),
+        bel: F.fmt(yq / Math.sqrt(1 + dq * dq), 4) + ' = C'
+      });
+
+      nota.innerHTML =
+        '<p>A corrente assume a forma que minimiza a energia potencial, '
+        + '\\(U=\\varrho g\\int y\\sqrt{1+y\'^2}\\,dx\\), com o comprimento mantido fixo. O '
+        + 'integrando não depende de \\(x\\), e Beltrami dá de imediato</p>'
+        + '\\[y\\sqrt{1+y\'^2}-y\'\\frac{y\\,y\'}{\\sqrt{1+y\'^2}}'
+        + '=\\frac{y}{\\sqrt{1+y\'^2}}=C.\\]'
+        + '<p>Isolando \\(y\'=\\sqrt{(y^2-C^2)}/C\\) e integrando sai '
+        + '\\(x=C\\,\\mathrm{arccosh}(y/C)+K\\), ou seja a <strong>catenária</strong> '
+        + '\\(y=C\\cosh\\left[(x-K)/C\\right]\\). O cartão de Beltrami mostra o valor dessa '
+        + 'combinação medido no quarto do vão: dá \\(C\\), como deve.</p>'
+        + '<p>Para apoios na mesma altura a simetria impõe \\(K=0\\), e o comprimento se '
+        + 'calcula de uma vez, porque \\(\\sqrt{1+\\mathrm{senh}^2}=\\cosh\\):</p>'
+        + '\\[L=\\int_{-a}^{a}\\cosh\\frac{x}{C}\\,dx=2C\\,\\mathrm{senh}\\frac{a}{C}.\\]'
+        + '<p>Essa equação transcendental determina \\(C\\) a partir de \\(L\\) e \\(a\\), e é '
+        + 'o que os deslizantes resolvem numericamente. Quanto mais folgada a corrente, menor '
+        + 'o \\(C\\) e mais fundo o barrigão.</p>'
+        + '<p>A parábola de mesma flecha está em tracejado. As duas curvas são parecidas e não '
+        + 'são iguais: no quarto do vão elas diferem de ' + F.fmt(d * 100, 1) + ' cm. Galileu '
+        + 'apostou na parábola em 1638 e errou; mas a parábola é a resposta <em>certa</em> '
+        + 'para o cabo de uma ponte pênsil, que carrega um tabuleiro de peso distribuído '
+        + 'horizontalmente em vez do próprio peso distribuído ao longo do arco.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     30. Fermat e a lei de Snell
+     O ponto de cruzamento escolhido à mão, o caminho óptico como
+     função dele, e a verificação de n1 sen t1 = n2 sen t2 no mínimo.
+     ================================================================= */
+  REGISTRO.snell = function (raiz) {
+    var est = { x: 1.3, n1: 1.00, n2: 1.33 };
+    var A = { x: 0, y: 1.2 }, B = { x: 3.0, y: -1.6 };
+
+    var corpo = moldura(raiz, 'O princípio de Fermat e a lei de Snell');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, [
+      { rot: 'ar e água (1,00 e 1,33)', v: 0 },
+      { rot: 'ar e vidro (1,00 e 1,52)', v: 1 },
+      { rot: 'vidro e ar (1,52 e 1,00)', v: 2 }
+    ], 0, function (v) {
+      est.n1 = [1.00, 1.00, 1.52][v];
+      est.n2 = [1.33, 1.52, 1.00][v];
+      desenhar();
+    });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    var slider = deslizante(ctr, 'ponto de cruzamento', 0.05, 2.95, 0.01, 1.3,
+      function (v) { est.x = v; desenhar(); },
+      function (v) { return F.fmt(v, 2) + ' m'; });
+    var bt = el('button', { type: 'button', texto: 'ir para o mínimo' });
+    bt.addEventListener('click', function () {
+      slider.value = String(otimo()); slider.dispatchEvent(new Event('input'));
+    });
+    ctr.appendChild(bt);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'caminho óptico n₁d₁ + n₂d₂', k: 'co' },
+      { rot: 'mínimo possível', k: 'min' },
+      { rot: 'ângulo de incidência θ₁', k: 't1' },
+      { rot: 'ângulo de refração θ₂', k: 't2' },
+      { rot: 'n₁ sen θ₁', k: 's1' },
+      { rot: 'n₂ sen θ₂', k: 's2' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function caminho(x) {
+      return est.n1 * Math.hypot(x - A.x, A.y) + est.n2 * Math.hypot(B.x - x, B.y);
+    }
+    function otimo() {
+      var lo = 0.001, hi = 2.999;
+      for (var i = 0; i < 120; i++) {
+        var m1 = lo + (hi - lo) / 3, m2 = hi - (hi - lo) / 3;
+        if (caminho(m1) < caminho(m2)) hi = m2; else lo = m1;
+      }
+      return Math.round((lo + hi) / 2 * 100) / 100;
+    }
+
+    function desenhar() {
+      var alt = 330;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+      var meia = Lp * 0.54;
+
+      var esc = Math.min((meia - 70) / 3.2, (alt - 60) / 3.2);
+      var ox = 40, oy = alt / 2;
+      function X(u) { return ox + u * esc; }
+      function Y(u) { return oy - u * esc; }
+
+      ct.fillStyle = 'rgba(123,184,171,.18)';
+      ct.fillRect(0, oy, meia, alt - oy);
+      ct.beginPath(); ct.moveTo(0, oy); ct.lineTo(meia, oy);
+      ct.strokeStyle = G.COR.tinta; ct.lineWidth = 2; ct.stroke();
+      rotulo(ct, 'n₁ = ' + F.fmt(est.n1, 2), 10, 16, G.COR.suave, 'left');
+      rotulo(ct, 'n₂ = ' + F.fmt(est.n2, 2), 10, alt - 16, G.COR.azul, 'left');
+
+      var P = { x: est.x, y: 0 };
+      ct.beginPath();
+      ct.moveTo(X(A.x), Y(A.y)); ct.lineTo(X(P.x), Y(0)); ct.lineTo(X(B.x), Y(B.y));
+      ct.strokeStyle = G.COR.vinho; ct.lineWidth = 2.6; ct.stroke();
+
+      var xo = otimo();
+      ct.beginPath();
+      ct.moveTo(X(A.x), Y(A.y)); ct.lineTo(X(xo), Y(0)); ct.lineTo(X(B.x), Y(B.y));
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2;
+      ct.setLineDash([6, 4]); ct.stroke(); ct.setLineDash([]);
+
+      ct.beginPath();
+      ct.moveTo(X(P.x), Y(1.0)); ct.lineTo(X(P.x), Y(-1.3));
+      ct.strokeStyle = G.COR.suave; ct.lineWidth = 1.2;
+      ct.setLineDash([4, 4]); ct.stroke(); ct.setLineDash([]);
+      rotulo(ct, 'normal', X(P.x) + 8, Y(1.0) + 8, G.COR.suave, 'left');
+
+      [[A, 'A'], [B, 'B']].forEach(function (q) {
+        ct.beginPath(); ct.arc(X(q[0].x), Y(q[0].y), 5, 0, 2 * Math.PI);
+        ct.fillStyle = G.COR.tinta; ct.fill();
+        rotulo(ct, q[1], X(q[0].x) - 14, Y(q[0].y), G.COR.tinta, 'right');
+      });
+      ct.beginPath(); ct.arc(X(P.x), Y(0), 5, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.vinho; ct.fill();
+
+      var t1 = Math.atan2(Math.abs(P.x - A.x), A.y);
+      var t2 = Math.atan2(Math.abs(B.x - P.x), Math.abs(B.y));
+      rotulo(ct, 'θ₁', X(P.x) - 26, Y(0.52), G.COR.vinho, 'right');
+      rotulo(ct, 'θ₂', X(P.x) + 26, Y(-0.52), G.COR.vinho, 'left');
+
+      /* painel 2: o caminho óptico contra a posição do cruzamento */
+      var vmin = caminho(xo), vmax = Math.max(caminho(0.05), caminho(2.95));
+      var g2 = G.eixos(cv, {
+        altura: alt, xmin: 0, xmax: 3,
+        ymin: vmin - (vmax - vmin) * 0.12, ymax: vmax + (vmax - vmin) * 0.08,
+        rotX: 'posição do cruzamento (m)', rotY: 'caminho óptico (m)',
+        marcasX: G.marcasLineares(0, 3, 7, 1),
+        formataY: function (v) { return F.fmt(v, 2); },
+        limpar: false, margem: { e: meia + 60, d: 16, c: 16, b: 40 }
+      });
+      G.curva(g2, caminho, G.COR.mestra, 2.6);
+      G.vertical(g2, est.x, G.COR.vinho, '', true);
+      var c2 = g2.ct;
+      c2.beginPath(); c2.arc(g2.X(xo), g2.Y(vmin), 5.5, 0, 2 * Math.PI);
+      c2.fillStyle = G.COR.bronze; c2.fill();
+      rotulo(c2, 'mínimo', g2.X(xo), g2.Y(vmin) - 18, G.COR.bronze);
+
+      mostrar({
+        co: F.fmt(caminho(est.x), 4) + ' m',
+        min: F.fmt(vmin, 4) + ' m',
+        t1: F.fmt(t1 * 180 / Math.PI, 2) + '°',
+        t2: F.fmt(t2 * 180 / Math.PI, 2) + '°',
+        s1: F.fmt(est.n1 * Math.sin(t1), 4),
+        s2: F.fmt(est.n2 * Math.sin(t2), 4)
+      });
+
+      nota.innerHTML =
+        '<p>A luz sai de A, cruza a interface num ponto de abscissa \\(x\\) e chega a B. Com '
+        + '\\(d_1=\\sqrt{x^2+a^2}\\) e \\(d_2=\\sqrt{(b-x)^2+c^2}\\), o caminho óptico é</p>'
+        + '\\[\\Lambda(x)=n_1\\sqrt{x^2+a^2}+n_2\\sqrt{(b-x)^2+c^2},\\]'
+        + '<p>e aqui não é preciso cálculo variacional nenhum: a incógnita é um único número, '
+        + 'e basta derivar. Impondo \\(d\\Lambda/dx=0\\),</p>'
+        + '\\[n_1\\frac{x}{\\sqrt{x^2+a^2}}=n_2\\frac{b-x}{\\sqrt{(b-x)^2+c^2}}'
+        + '\\qquad\\Longrightarrow\\qquad n_1\\sen\\theta_1=n_2\\sen\\theta_2.\\]'
+        + '<p>Mova o cruzamento e compare os dois últimos cartões: eles só coincidem no '
+        + 'mínimo do segundo painel. A lei de Snell não é uma regra empírica à parte, é a '
+        + 'condição de estacionariedade do tempo de percurso.</p>'
+        + '<p>Para um meio estratificado, com \\(n=n(y)\\), a conta vira variacional de '
+        + 'verdade e o integrando \\(n(y)\\sqrt{1+y\'^2}\\) não depende de \\(x\\). Beltrami '
+        + 'devolve \\(n(y)/\\sqrt{1+y\'^2}=\\) constante, isto é</p>'
+        + '\\[n(y)\\,\\sen\\theta=\\text{constante ao longo do raio},\\]'
+        + '<p>que é a lei de Snell escrita de forma contínua. É dessa invariante que saem as '
+        + 'miragens: perto do asfalto quente o ar é menos denso, \\(n\\) cai, e o raio tem de '
+        + 'inclinar-se até rasar o chão e voltar a subir.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     31. O princípio de Hamilton
+     Um lançamento vertical, a ação calculada sobre caminhos de prova,
+     e a demonstração de que o mínimo está na parábola de Galileu.
+     ================================================================= */
+  REGISTRO.acao = function (raiz) {
+    var g0 = 9.80665, W = 2;          // W: frequência da mola, em rad/s
+    var est = { a: 0.35, T: 2, modo: 'acao', pot: 'grav' };
+
+    var corpo = moldura(raiz, 'O princípio de Hamilton: a ação sobre caminhos de prova');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, [
+      { rot: 'ação S = ∫(T − V)dt', v: 'acao' },
+      { rot: 'energia E = T + V', v: 'energia' }
+    ], 0, function (v) { est.modo = v; desenhar(); });
+    opcoes(c0, [
+      { rot: 'queda livre', v: 'grav' },
+      { rot: 'oscilador harmônico', v: 'mola' }
+    ], 0, function (v) { est.pot = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'deformação do caminho', -1, 1, 0.02, 0.35,
+      function (v) { est.a = v; desenhar(); },
+      function (v) { return F.fmt(v, 2); });
+    deslizante(ctr, 'duração do percurso', 1, 4, 0.1, 2,
+      function (v) { est.T = v; desenhar(); },
+      function (v) { return F.fmt(v, 1) + ' s'; });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'ação deste caminho', k: 'S' },
+      { rot: 'ação do caminho real', k: 'S0' },
+      { rot: 'diferença', k: 'dS' },
+      { rot: 'natureza do extremo', k: 'hmax' },
+      { rot: '⟨T⟩ do caminho real', k: 'Tm' },
+      { rot: '⟨V⟩ do caminho real', k: 'Vm' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* caminho real: na gravidade, sobe e volta ao chão em T; na mola, um
+       seno de amplitude 1 m. Em ambos os casos a deformação de prova se
+       anula nas duas pontas, de modo que os extremos ficam fixos. */
+    function real(t) {
+      return est.pot === 'grav' ? g0 * t * (est.T - t) / 2 : Math.sin(W * t);
+    }
+    function pot(y) { return est.pot === 'grav' ? g0 * y : 0.5 * W * W * y * y; }
+    function prova(a, t) { return real(t) + a * Math.sin(Math.PI * t / est.T); }
+    function vel(a, t) {
+      return (prova(a, t + 1e-5) - prova(a, t - 1e-5)) / 2e-5;
+    }
+    function acao(a) {
+      var N = 1200, s = 0;
+      for (var i = 0; i < N; i++) {
+        var t = (i + 0.5) * est.T / N, v = vel(a, t);
+        s += (0.5 * v * v - pot(prova(a, t))) * est.T / N;
+      }
+      return s;
+    }
+    function medias() {
+      var N = 1200, cT = 0, cV = 0;
+      for (var i = 0; i < N; i++) {
+        var t = (i + 0.5) * est.T / N, v = vel(0, t);
+        cT += 0.5 * v * v / N; cV += pot(prova(0, t)) / N;
+      }
+      return [cT, cV];
+    }
+    /* sinal da segunda variação ao longo da deformação escolhida */
+    function tipoExtremo() {
+      var h = 0.02;
+      return acao(h) + acao(-h) - 2 * acao(0) > 0 ? 'mínimo' : 'ponto de sela';
+    }
+
+    function desenhar() {
+      var alt = 330;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+      var meia = Lp * 0.52;
+
+      var hmax = 0;
+      for (var k0 = 0; k0 <= 60; k0++) {
+        hmax = Math.max(hmax, Math.abs(prova(est.a, k0 * est.T / 60)),
+          Math.abs(real(k0 * est.T / 60)));
+      }
+      var g1 = G.eixos(cv, {
+        altura: alt, xmin: 0, xmax: est.T,
+        ymin: est.pot === 'grav' ? -hmax * 0.3 - 0.1 : -hmax * 1.3 - 0.1,
+        ymax: hmax * 1.35 + 0.1,
+        rotX: 't (s)', rotY: 'altura (m)',
+        marcasX: G.marcasLineares(0, est.T, 5, 1),
+        formataY: function (v) { return F.fmt(v, 1); },
+        limpar: false, margem: { e: 56, d: Lp - meia + 10, c: 16, b: 40 }
+      });
+      G.curva(g1, function (t) { return real(t); }, G.COR.bronze, 2.4, [6, 4]);
+      G.curva(g1, function (t) { return prova(est.a, t); }, G.COR.mestra, 2.8);
+      G.legenda(g1, [
+        { texto: 'caminho real', cor: G.COR.bronze },
+        { texto: 'caminho de prova', cor: G.COR.mestra }
+      ]);
+
+      if (est.modo === 'acao') {
+        var sm = acao(0), sa = acao(-1), sb = acao(1);
+        var s1 = Math.max(sa, sb, sm), s2 = Math.min(sa, sb, sm);
+        var folga = (s1 - s2) * 0.14 + 0.01;
+        var g2 = G.eixos(cv, {
+          altura: alt, xmin: -1, xmax: 1,
+          ymin: s2 - folga, ymax: s1 + folga,
+          rotX: 'deformação a', rotY: 'S (J·s por kg)',
+          marcasX: G.marcasLineares(-1, 1, 5, 1),
+          formataY: function (v) { return F.fmt(v, 2); },
+          limpar: false, margem: { e: meia + 60, d: 16, c: 16, b: 40 }
+        });
+        G.curva(g2, acao, G.COR.mestra, 2.6);
+        G.vertical(g2, est.a, G.COR.suave, '', true);
+        var c2 = g2.ct;
+        c2.beginPath(); c2.arc(g2.X(0), g2.Y(sm), 5.5, 0, 2 * Math.PI);
+        c2.fillStyle = G.COR.bronze; c2.fill();
+        var ac = tipoExtremo();
+        rotulo(c2, 'a = 0: o caminho real (' + ac + ')',
+          g2.X(0), g2.Y(sm) + (ac === 'mínimo' ? -18 : 20), G.COR.bronze);
+      } else {
+        var emax = 0;
+        for (var i = 0; i <= 40; i++) {
+          var t = i * est.T / 40, v = vel(est.a, t);
+          emax = Math.max(emax, 0.5 * v * v + pot(prova(est.a, t)));
+        }
+        var g3 = G.eixos(cv, {
+          altura: alt, xmin: 0, xmax: est.T, ymin: 0, ymax: emax * 1.2,
+          rotX: 't (s)', rotY: 'energia por kg (J/kg)',
+          marcasX: G.marcasLineares(0, est.T, 5, 1),
+          formataY: function (v) { return F.fmt(v, 0); },
+          limpar: false, margem: { e: meia + 60, d: 16, c: 16, b: 40 }
+        });
+        G.curva(g3, function (t) {
+          var v = vel(est.a, t); return 0.5 * v * v;
+        }, G.COR.azul, 2.2);
+        G.curva(g3, function (t) { return pot(prova(est.a, t)); }, G.COR.bronze, 2.2);
+        G.curva(g3, function (t) {
+          var v = vel(est.a, t); return 0.5 * v * v + pot(prova(est.a, t));
+        }, G.COR.vinho, 2.8);
+        G.legenda(g3, [
+          { texto: 'T', cor: G.COR.azul },
+          { texto: 'V', cor: G.COR.bronze },
+          { texto: 'T + V', cor: G.COR.vinho }
+        ]);
+      }
+
+      var md = medias();
+      mostrar({
+        S: F.fmt(acao(est.a), 4),
+        S0: F.fmt(acao(0), 4),
+        dS: (acao(est.a) > acao(0) ? '+' : '') + F.fmt(acao(est.a) - acao(0), 4),
+        hmax: tipoExtremo(),
+        Tm: F.fmt(md[0], 2) + ' J/kg',
+        Vm: F.fmt(md[1], 2) + ' J/kg'
+      });
+
+      nota.innerHTML =
+        '<p>Dois estados, dois instantes, e entre eles cabe qualquer história imaginável. O '
+        + 'princípio de Hamilton associa a cada uma delas um número, a '
+        + '<strong>ação</strong>:</p>'
+        + '\\[\\Acao[q]=\\int_{t_1}^{t_2}\\Lag\\,dt,\\qquad\\Lag=T-V.\\]'
+        + '<p>O deslizante deforma o caminho sem mexer nas pontas, e o segundo painel desenha '
+        + '\\(\\Acao\\) contra essa deformação. O ponto \\(a=0\\) é sempre estacionário, e é '
+        + 'ali que está o caminho que o sistema de fato percorre. Nenhuma lei de força foi '
+        + 'imposta: a trajetória <em>saiu</em> da condição de extremo.</p>'
+        + '<p>Na queda livre, \\(\\Lag=\\tfrac12m\\dot y^2-mgy\\), de modo que '
+        + '\\(\\partial\\Lag/\\partial\\dot y=m\\dot y\\) e \\(\\partial\\Lag/\\partial y=-mg\\). '
+        + 'A equação de Euler-Lagrange devolve</p>'
+        + '\\[\\der{}{t}\\left(m\\dot y\\right)+mg=0\\qquad\\Longrightarrow\\qquad\\ddot y=-g,\\]'
+        + '<p>que é a segunda lei de Newton. Na mola, com '
+        + '\\(\\Lag=\\tfrac12m\\dot y^2-\\tfrac12m\\omega^2y^2\\), a mesma equação dá '
+        + '\\(\\ddot y=-\\omega^2y\\). O princípio de Hamilton e as equações de Newton dizem a '
+        + 'mesma coisa, e a diferença está em como dizem: uma fala de forças instante a '
+        + 'instante, a outra fala do caminho inteiro de uma vez.</p>'
+        + '<p>A vista de energia mostra por que o integrando é \\(T-V\\) e não \\(T+V\\). A '
+        + 'energia total é constante ao longo do caminho real, e um funcional construído com '
+        + 'ela não distinguiria caminho nenhum. É a <em>diferença</em> que carrega a '
+        + 'informação dinâmica.</p>'
+        + '<p>Agora a ressalva que a literatura costuma atropelar: a ação é '
+        + '<strong>estacionária</strong>, e não necessariamente mínima. Na queda livre o '
+        + 'potencial é linear em \\(y\\), a segunda variação vale '
+        + '\\(\\int\\dot\\eta^2dt>0\\) e o caminho real é sempre mínimo, por mais longo que '
+        + 'seja o percurso. Troque para o oscilador e aumente a duração: com '
+        + '\\(\\eta=\\sen(\\pi t/T)\\) a segunda variação vale</p>'
+        + '\\[\\delta^2\\Acao=\\frac{T}{2}\\left[\\left(\\frac{\\pi}{T}\\right)^2'
+        + '-\\omega^2\\right],\\]'
+        + '<p>que muda de sinal em \\(T=\\pi/\\omega\\), isto é, em meio período. Passado esse '
+        + 'ponto, o caminho real continua estacionário e deixa de ser mínimo: o cartão da '
+        + 'natureza do extremo acusa a troca. Com \\(\\omega=2\\) rad/s isso acontece em '
+        + 'T = 1,57 s. O nome "princípio da mínima ação" é, nesse sentido, uma imprecisão '
+        + 'consagrada.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {

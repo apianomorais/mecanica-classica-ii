@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 8: A equação de Euler-Lagrange e o princípio de Hamilton | Mecânica Clássica II</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611082024">
+<script src="assets/js/comum.js?v=202611082024"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Mecânica Clássica II <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html">Início</a>
+      <span class="grupo">Corpos rígidos</span>
+      <a href="aula01.html" class="num" title="Módulo 1: Cinemática dos corpos rígidos">1</a>
+      <a href="aula02.html" class="num" title="Módulo 2: Centro de massa e momentos de inércia">2</a>
+      <a href="aula03.html" class="num" title="Módulo 3: Momento angular, torque e equações de movimento">3</a>
+      <a href="aula04.html" class="num" title="Módulo 4: Conservação e equilíbrio estático">4</a>
+      <span class="grupo">Referenciais</span>
+      <a href="aula05.html" class="num" title="Módulo 5: Matrizes de rotação e transformações de coordenadas">5</a>
+      <a href="aula06.html" class="num" title="Módulo 6: Referenciais em rotação e forças fictícias">6</a>
+      <span class="grupo">Variacional</span>
+      <a href="aula07.html" class="num" title="Módulo 7: Cálculo variacional: ação e caminhos extremos">7</a>
+      <a href="aula08.html" class="num ativo" title="Módulo 8: A equação de Euler-Lagrange e o princípio de Hamilton">8</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+<aside class="lateral">
+  <h4>Neste módulo</h4>
+  <ol>
+    <li><a href="#s1">1. O problema geral</a></li>
+    <li><a href="#s2">2. Dedução da equação</a></li>
+    <li><a href="#s3">3. A equação de Euler-Lagrange</a></li>
+    <li><a href="#s4">4. Dois casos especiais</a></li>
+    <li><a href="#s5">5. A braquistócrona resolvida</a></li>
+    <li><a href="#s6">6. A catenária e a catenoide</a></li>
+    <li><a href="#s7">7. Fermat e a lei de Snell</a></li>
+    <li><a href="#s8">8. Resumo dos três problemas</a></li>
+    <li><a href="#s9">9. O princípio de Hamilton</a></li>
+    <li><a href="#s10">10. Estacionária, não mínima</a></li>
+    <li><a href="#s11">11. Exercícios resolvidos</a></li>
+    <li><a href="#s12">12. Exercícios propostos</a></li>
+  </ol>
+</aside>
+
+<main class="conteudo">
+
+  <p class="chapeu">Módulo 8 · Noções de cálculo variacional</p>
+  <h1>A equação de Euler-Lagrange e o princípio de Hamilton</h1>
+  <p class="subtitulo">O módulo anterior montou o vocabulário e parou na véspera da conta. Aqui
+  a condição \(\delta J=0\), que é uma afirmação sobre o caminho inteiro, vira uma equação
+  diferencial ponto a ponto. Com ela os três problemas clássicos caem em poucas linhas, e a
+  mecânica inteira ganha uma formulação nova.</p>
+
+  <hr class="linha">
+
+  <!-- ================================================== -->
+  <h2 id="s1">1. O problema geral</h2>
+
+  <p>O objeto de estudo é o funcional</p>
+
+  <p>\[J[y]=\int_{x_1}^{x_2}f\left(x,y,y'\right)dx,\]</p>
+
+  <p>em que \(y=y(x)\) é a função procurada, \(y'=dy/dx\) e \(f\) é uma função dada de três
+  argumentos, chamada <strong>integrando</strong>. Os extremos estão presos: \(y(x_1)=y_1\) e
+  \(y(x_2)=y_2\). A pergunta é qual \(y(x)\) torna \(J\) extremo.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que essa forma e não outra</span>
+    <p>O integrando depende de \(x\), de \(y\) e de \(y'\), e não de \(y''\) nem de valores de
+    \(y\) em outros pontos. Essa restrição não é arbitrária: ela cobre a esmagadora maioria
+    dos problemas físicos, porque as leis da mecânica são de segunda ordem no tempo, e uma
+    lagrangiana com \(\dot q\) produz exatamente isso. Integrandos com \(y''\) existem, e
+    levam a equações de quarta ordem. O caso geral aparece no módulo 9.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s2">2. Dedução da equação</h2>
+
+  <h3>Passo 1: parametrizar as curvas vizinhas</h3>
+
+  <p>Tome a curva candidata \(y(x)\) e deforme-a de maneira controlada,</p>
+
+  <p>\[y(x)\;\longrightarrow\;y(x)+\varepsilon\,\eta(x),\]</p>
+
+  <p>com \(\varepsilon\ll1\) e \(\eta\) uma função arbitrária que se anula nas pontas,
+  \(\eta(x_1)=\eta(x_2)=0\), para que as condições de contorno não sejam violadas. A função
+  \(\eta\) escolhe a <em>direção</em> da perturbação, e \(\varepsilon\) mede o quanto se anda
+  nessa direção. O funcional vira uma função comum de uma variável:</p>
+
+  <p>\[J(\varepsilon)=\int_{x_1}^{x_2}
+  f\left(x,\;y+\varepsilon\eta,\;y'+\varepsilon\eta'\right)dx.\]</p>
+
+  <p>Com isso o problema de dimensão infinita foi reduzido, ao longo de cada direção, a um
+  problema de cálculo de uma variável. É o truque central da dedução.</p>
+
+  <h3>Passo 2: derivar e avaliar em \(\varepsilon=0\)</h3>
+
+  <p>Se \(y\) é extremante, \(J(\varepsilon)\) tem extremo em \(\varepsilon=0\) qualquer que
+  seja \(\eta\). Pela regra da cadeia,</p>
+
+  <p>\[\der{J}{\varepsilon}=\int_{x_1}^{x_2}\left(\pder{f}{y}\,\eta
+  +\pder{f}{y'}\,\eta'\right)dx,\]</p>
+
+  <p>e a condição de extremo é que essa integral se anule em \(\varepsilon=0\).</p>
+
+  <h3>Passo 3: integrar por partes</h3>
+
+  <p>A integral tem \(\eta\) no primeiro termo e \(\eta'\) no segundo, e enquanto isso durar
+  não há como fatorar \(\eta\). A integração por partes resolve:</p>
+
+  <p>\[\int_{x_1}^{x_2}\pder{f}{y'}\,\eta'\,dx
+  =\left[\pder{f}{y'}\,\eta\right]_{x_1}^{x_2}
+  -\int_{x_1}^{x_2}\der{}{x}\left(\pder{f}{y'}\right)\eta\,dx.\]</p>
+
+  <p>O colchete é avaliado nos extremos, onde \(\eta\) foi construída para se anular, de modo
+  que o termo de fronteira desaparece. É aqui que a hipótese de extremos fixos entra de fato
+  na conta, e é por isso que problemas de extremos livres têm condições adicionais: o colchete
+  sobrevive e precisa ser anulado de outra maneira.</p>
+
+  <h3>Passo 4: aplicar o lema fundamental</h3>
+
+  <p>Juntando as duas parcelas, a condição de extremo fica</p>
+
+  <p>\[\der{J}{\varepsilon}\bigg|_{\varepsilon=0}
+  =\int_{x_1}^{x_2}\left[\pder{f}{y}
+  -\der{}{x}\left(\pder{f}{y'}\right)\right]\eta(x)\,dx=0,\]</p>
+
+  <p>e isso tem de valer para <em>toda</em> \(\eta\) admissível. O lema fundamental, provado no
+  módulo anterior, converte essa condição integral numa condição ponto a ponto: o colchete tem
+  de ser identicamente nulo.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. A equação de Euler-Lagrange</h2>
+
+  <div class="destaque">
+    <span class="anuncio">Equação de Euler-Lagrange</span>
+    \[\pder{f}{y}-\der{}{x}\left(\pder{f}{y'}\right)=0.\]
+    Condição necessária para que \(y(x)\) torne extremo o funcional
+    \(J[y]=\int f\left(x,y,y'\right)dx\).
+  </div>
+
+  <p>Abrindo a derivada total do segundo termo,</p>
+
+  <p>\[\der{}{x}\left(\pder{f}{y'}\right)
+  =\frac{\partial^2f}{\partial x\,\partial y'}
+  +\frac{\partial^2f}{\partial y\,\partial y'}\,y'
+  +\frac{\partial^2f}{\partial y'^2}\,y'',\]</p>
+
+  <p>de modo que a equação é, em geral, uma equação diferencial ordinária de <strong>segunda
+  ordem</strong> para \(y(x)\). As duas constantes de integração que ela traz são fixadas
+  pelas duas condições de contorno, e o problema fecha.</p>
+
+  <div data-widget="residuoel"></div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exemplo · A menor distância, enfim demonstrada</span>
+    <p>Para \(L[y]=\int\sqrt{1+y'^2}\,dx\) o integrando não depende de \(y\), e</p>
+    \[\pder{f}{y}=0,\qquad\pder{f}{y'}=\frac{y'}{\sqrt{1+y'^2}}.\]
+    <p>A equação de Euler-Lagrange reduz-se a dizer que essa segunda derivada é constante:</p>
+    \[\frac{y'}{\sqrt{1+y'^2}}=C\quad\Longrightarrow\quad
+    y'^2\left(1-C^2\right)=C^2\quad\Longrightarrow\quad
+    y'=\frac{C}{\sqrt{1-C^2}}=m,\]
+    <p>com \(m\) constante. Integrando, \(y=mx+b\): a reta. O resultado era esperado, e o que
+    se ganha é confiança no método para os casos em que a resposta não é óbvia.</p>
+  </div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Geodésicas</span>
+    <p>O mesmo funcional, escrito sobre uma superfície curva, define as geodésicas dela. Na
+    esfera a resposta são os círculos máximos, que é o motivo de um voo de São Paulo a Tóquio
+    passar perto do Alasca: a rota que parece torta no mapa plano é a mais curta sobre a
+    Terra. Em relatividade geral a trajetória de uma partícula livre é a geodésica do
+    espaço-tempo, e a equação acima, escrita com a métrica, é a equação do movimento.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. Dois casos especiais</h2>
+
+  <h3>Quando \(f\) não depende de \(y\)</h3>
+
+  <p>Se \(f=f(x,y')\), então \(\partial f/\partial y=0\) e a equação diz que a derivada total
+  de \(\partial f/\partial y'\) é nula. Integrando de uma vez,</p>
+
+  <div class="destaque">
+    <span class="anuncio">Primeira integral</span>
+    \[\pder{f}{y'}=\text{constante}.\]
+  </div>
+
+  <p>Uma equação de segunda ordem foi trocada por uma de primeira. Foi exatamente isso que
+  aconteceu no exemplo da reta, e é o que acontece sempre que a coordenada \(y\) é
+  <strong>cíclica</strong>, isto é, não aparece explicitamente. No módulo 11 esse mesmo fato
+  reaparece com outro nome: a quantidade conservada é o momento conjugado, e a conservação vem
+  de uma simetria.</p>
+
+  <h3>Quando \(f\) não depende de \(x\)</h3>
+
+  <p>Se \(f=f(y,y')\) há outra quantidade conservada, menos evidente. Tome a derivada total de
+  \(f\) ao longo da curva,</p>
+
+  <p>\[\der{f}{x}=\pder{f}{y}\,y'+\pder{f}{y'}\,y'',\]</p>
+
+  <p>e substitua \(\partial f/\partial y\) pela equação de Euler-Lagrange, isto é por
+  \(\frac{d}{dx}(\partial f/\partial y')\):</p>
+
+  <p>\[\der{f}{x}=\der{}{x}\left(\pder{f}{y'}\right)y'
+  +\pder{f}{y'}\,y''=\der{}{x}\left(y'\pder{f}{y'}\right).\]</p>
+
+  <p>Os dois lados são derivadas totais, e subtrair um do outro dá uma constante:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Integral de Beltrami</span>
+    \[f-y'\,\pder{f}{y'}=\text{constante}.\]
+  </div>
+
+  <p>Essa é a ferramenta que resolve a braquistócrona, a catenária e as geodésicas de várias
+  superfícies, e todas pelo mesmo motivo: nenhuma delas tem \(x\) aparecendo explicitamente no
+  integrando. Guarde a forma dessa combinação, porque ela voltará no módulo 11 como a
+  <strong>energia</strong>, quando a variável independente for o tempo.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. A braquistócrona resolvida</h2>
+
+  <p>O funcional montado no módulo 7 era</p>
+
+  <p>\[T[y]=\int_0^{x_B}\frac{\sqrt{1+y'^2}}{\sqrt{2gy}}\,dx
+  =\frac{1}{\sqrt{2g}}\int_0^{x_B}\sqrt{\frac{1+y'^2}{y}}\;dx,\]</p>
+
+  <p>com \(y\) medido para baixo a partir de A. O integrando
+  \(f=\sqrt{(1+y'^2)/y}\) não contém \(x\), e Beltrami se aplica. Calculando a derivada
+  parcial,</p>
+
+  <p>\[\pder{f}{y'}=\frac{y'}{\sqrt{y\left(1+y'^2\right)}},\]</p>
+
+  <p>e substituindo na combinação de Beltrami, os dois termos se juntam sobre o mesmo
+  denominador e o numerador colapsa:</p>
+
+  <p>\[\frac{\sqrt{1+y'^2}}{\sqrt{y}}-\frac{y'^2}{\sqrt{y\left(1+y'^2\right)}}
+  =\frac{\left(1+y'^2\right)-y'^2}{\sqrt{y\left(1+y'^2\right)}}
+  =\frac{1}{\sqrt{y\left(1+y'^2\right)}}=C.\]</p>
+
+  <p>Logo</p>
+
+  <div class="destaque">
+    <span class="anuncio">A equação da braquistócrona</span>
+    \[y\left(1+y'^2\right)=\frac{1}{C^2}=K,\qquad\text{ou}\qquad
+    y'=\sqrt{\frac{K-y}{y}}.\]
+  </div>
+
+  <p>Essa equação de primeira ordem é separável, e a substituição que a resolve é
+  \(y=\frac{K}{2}\left(1-\cos\theta\right)\). Com ela, \(dy=\frac{K}{2}\sen\theta\,d\theta\)
+  e \(y'=\cotg(\theta/2)\), de modo que</p>
+
+  <p>\[x=\int\frac{dy}{y'}
+  =\int\frac{\frac{K}{2}\sen\theta}{\cotg(\theta/2)}\,d\theta
+  =\frac{K}{2}\left(\theta-\sen\theta\right)+\text{const}.\]</p>
+
+  <p>A condição \(x(0)=y(0)=0\) zera a constante, e escrevendo \(a=K/2\),</p>
+
+  <div class="destaque">
+    <span class="anuncio">A ciclóide</span>
+    \[x=a\left(\theta-\sen\theta\right),\qquad
+    y=a\left(1-\cos\theta\right).\]
+  </div>
+
+  <p>São as equações paramétricas da curva traçada por um ponto fixo de uma roda que rola sem
+  deslizar sobre uma reta. O parâmetro \(a\) é determinado pela exigência de que a curva passe
+  pelo ponto B.</p>
+
+  <div data-widget="cicloide"></div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que mergulhar compensa</span>
+    <p>A conta não explica, ela calcula. A explicação é a seguinte: a conta parte do repouso, e
+    cada metro de queda inicial compra velocidade que será usada no resto do percurso. Um
+    caminho que mergulhe cedo é mais longo, e percorre esse comprimento extra depressa; um
+    caminho reto é curto e é percorrido devagar no começo, quando a velocidade ainda é pequena.
+    O ótimo negocia os dois efeitos, e a negociação tem nome: ciclóide. Quem esquia sabe disso
+    por experiência: desce-se rápido primeiro e atravessa-se depois.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. A catenária e a catenoide</h2>
+
+  <p>Uma corrente flexível e inextensível de densidade linear \(\varrho\), pendurada por duas
+  pontas, assume a forma que minimiza a energia potencial</p>
+
+  <p>\[U[y]=\varrho g\int_{x_1}^{x_2}y\sqrt{1+y'^2}\;dx.\]</p>
+
+  <p>De novo o integrando \(f=y\sqrt{1+y'^2}\) ignora \(x\), e de novo Beltrami corta caminho.
+  Com \(\partial f/\partial y'=yy'/\sqrt{1+y'^2}\),</p>
+
+  <p>\[y\sqrt{1+y'^2}-\frac{y\,y'^2}{\sqrt{1+y'^2}}
+  =\frac{y\left[\left(1+y'^2\right)-y'^2\right]}{\sqrt{1+y'^2}}
+  =\frac{y}{\sqrt{1+y'^2}}=C.\]</p>
+
+  <p>Isolando \(y'=\sqrt{y^2-C^2}/C\) e integrando,</p>
+
+  <p>\[x=C\int\frac{dy}{\sqrt{y^2-C^2}}=C\,\mathrm{arccosh}\frac{y}{C}+K,\]</p>
+
+  <div class="destaque">
+    <span class="anuncio">A catenária</span>
+    \[y(x)=C\cosh\left(\frac{x-K}{C}\right).\]
+  </div>
+
+  <p>Para apoios na mesma altura a simetria impõe \(K=0\), o ponto mais baixo fica em \(x=0\)
+  com \(y(0)=C\), e o comprimento sai de uma conta limpa, porque
+  \(\sqrt{1+\mathrm{senh}^2u}=\cosh u\):</p>
+
+  <p>\[L=\int_{-a}^{a}\cosh\frac{x}{C}\,dx=2C\,\mathrm{senh}\frac{a}{C}.\]</p>
+
+  <div data-widget="catenaria"></div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Catenária ou parábola</span>
+    <p>As duas curvas se parecem o bastante para terem sido confundidas por Galileu, que
+    apostou na parábola em 1638. A diferença está em como o peso se distribui. Se a carga
+    acompanha o <em>arco</em>, como no próprio peso de um cabo, a forma é a catenária
+    \(y=C\cosh(x/C)\); se a carga se distribui uniformemente na <strong>horizontal</strong>,
+    como o tabuleiro de uma ponte pênsil pendurado no cabo, a forma é a parábola. Um cabo de
+    transmissão entre duas torres é catenária; o cabo principal da ponte Hercílio Luz é, com
+    boa aproximação, parábola.</p>
+  </div>
+
+  <h3>A superfície mínima de revolução</h3>
+
+  <p>Gire uma curva \(y(x)\) em torno do eixo \(x\) e a superfície gerada tem área</p>
+
+  <p>\[A[y]=2\pi\int_{x_1}^{x_2}y\sqrt{1+y'^2}\;dx,\]</p>
+
+  <p>que é, a menos do fator \(2\pi\varrho g\), o mesmo funcional da catenária. A resposta,
+  portanto, é a mesma curva, e a superfície que ela gera chama-se <strong>catenoide</strong>.
+  Vale a pena ver a conta também pela via direta, sem Beltrami. Com</p>
+
+  <p>\[\pder{f}{y}=\sqrt{1+y'^2},\qquad
+  \pder{f}{y'}=\frac{y\,y'}{\sqrt{1+y'^2}},\]</p>
+
+  <p>a equação de Euler-Lagrange, depois de derivar o quociente e multiplicar por
+  \(\left(1+y'^2\right)^{3/2}\), fica</p>
+
+  <p>\[\left(1+y'^2\right)^2=y'^2\left(1+y'^2\right)+y\,y''
+  \quad\Longrightarrow\quad y\,y''=1+y'^2,\]</p>
+
+  <p>equação de segunda ordem cuja solução é a mesma catenária. A via de Beltrami produz
+  \(y/\sqrt{1+y'^2}=C\) em três linhas, e é por isso que vale a pena verificar, antes de
+  derivar qualquer coisa, se o integrando contém \(x\).</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A película de sabão entre dois anéis</span>
+    <p>Mergulhe dois anéis coaxiais em água com sabão e retire-os: a película que se forma
+    entre eles é uma catenoide, porque a tensão superficial torna a energia proporcional à
+    área e a película procura o mínimo. Afaste os anéis devagar e, passado certo limite, a
+    película estoura: além de uma separação crítica não existe mais catenoide ligando os dois
+    anéis, e o mínimo absoluto passa a ser a solução degenerada, dois discos separados. É um
+    exemplo concreto de que a equação de Euler-Lagrange dá condição necessária e não garante a
+    existência do extremo.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. Fermat e a lei de Snell</h2>
+
+  <p>A luz percorre, entre dois pontos, o caminho que torna estacionário o tempo de percurso.
+  Como \(v=c/n\), o tempo é proporcional ao <strong>caminho óptico</strong>
+  \(\Lambda=\int n\,ds\), e minimizar um é minimizar o outro.</p>
+
+  <p>No caso de dois meios homogêneos separados por um plano, o problema não precisa de
+  cálculo variacional. A trajetória é reta em cada meio, de modo que a única incógnita é a
+  abscissa \(x\) do ponto de cruzamento. Com \(A=(0,a)\) e \(B=(b,-c)\),</p>
+
+  <p>\[\Lambda(x)=n_1\sqrt{x^2+a^2}+n_2\sqrt{\left(b-x\right)^2+c^2},\]</p>
+
+  <p>e derivar em \(x\) é cálculo de uma variável:</p>
+
+  <p>\[\der{\Lambda}{x}=n_1\frac{x}{\sqrt{x^2+a^2}}
+  -n_2\frac{b-x}{\sqrt{\left(b-x\right)^2+c^2}}=0.\]</p>
+
+  <p>Os dois quocientes são, pela geometria da figura, os senos dos ângulos com a normal, de
+  modo que a condição de estacionariedade é</p>
+
+  <div class="destaque">
+    <span class="anuncio">Lei de Snell</span>
+    \[n_1\sen\theta_1=n_2\sen\theta_2.\]
+  </div>
+
+  <div data-widget="snell"></div>
+
+  <p>Para a reflexão num espelho basta pôr \(n_1=n_2\), e a mesma condição dá
+  \(\theta_1=\theta_2\): o ângulo de incidência é o de reflexão.</p>
+
+  <h3>Meios estratificados</h3>
+
+  <p>Quando o índice varia continuamente com a altura, \(n=n(y)\), não há ponto de cruzamento
+  a determinar e a curva inteira é a incógnita. Aí o problema é variacional de verdade, com
+  integrando</p>
+
+  <p>\[f\left(y,y'\right)=n(y)\sqrt{1+y'^2},\]</p>
+
+  <p>que não depende de \(x\). Beltrami devolve</p>
+
+  <p>\[f-y'\pder{f}{y'}
+  =n(y)\sqrt{1+y'^2}-n(y)\frac{y'^2}{\sqrt{1+y'^2}}
+  =\frac{n(y)}{\sqrt{1+y'^2}}=\text{constante},\]</p>
+
+  <p>e reconhecendo \(1/\sqrt{1+y'^2}=dx/ds=\sen\theta\), com \(\theta\) medido a partir da
+  vertical,</p>
+
+  <div class="destaque">
+    <span class="anuncio">Invariante de Snell</span>
+    \[n(y)\,\sen\theta=\text{constante ao longo de todo o raio}.\]
+  </div>
+
+  <p>É a lei de Snell em forma contínua, e dela saem as miragens. Perto do asfalto quente o ar
+  é menos denso e \(n\) cai; para manter \(n\sen\theta\) constante, \(\sen\theta\) tem de
+  crescer, o raio vai ficando mais horizontal até rasar o chão e voltar a subir. O observador
+  recebe luz do céu vinda de baixo e vê uma poça que não existe.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. Resumo dos três problemas</h2>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Problema</th><th>Funcional</th><th>Ferramenta</th><th>Solução</th></tr></thead>
+    <tbody>
+      <tr><td>menor distância</td><td>\(\int\sqrt{1+y'^2}\,dx\)</td><td>primeira integral</td><td>reta \(y=mx+b\)</td></tr>
+      <tr><td>braquistócrona</td><td>\(\int\sqrt{\dfrac{1+y'^2}{y}}\,dx\)</td><td>Beltrami</td><td>ciclóide</td></tr>
+      <tr><td>catenária e catenoide</td><td>\(\int y\sqrt{1+y'^2}\,dx\)</td><td>Beltrami</td><td>\(y=C\cosh(x/C)\)</td></tr>
+      <tr><td>Fermat, dois meios</td><td>\(n_1d_1+n_2d_2\)</td><td>cálculo ordinário</td><td>\(n_1\sen\theta_1=n_2\sen\theta_2\)</td></tr>
+      <tr><td>Fermat, meio estratificado</td><td>\(\int n(y)\sqrt{1+y'^2}\,dx\)</td><td>Beltrami</td><td>\(n\sen\theta\) constante</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Três das cinco linhas foram resolvidas pela mesma observação: o integrando não continha a
+  variável independente. Vale fazer disso um hábito, porque em mecânica a variável
+  independente é o tempo, e um sistema cuja lagrangiana não depende explicitamente do tempo é
+  precisamente um sistema que conserva energia.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. O princípio de Hamilton</h2>
+
+  <p>Toda a maquinaria construída até aqui trata de curvas \(y(x)\). Troque \(x\) pelo tempo
+  \(t\), troque \(y\) pela coordenada \(q\) do sistema e troque o integrando pela diferença
+  entre as energias cinética e potencial. O funcional que aparece é a <strong>ação</strong>:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Princípio de Hamilton</span>
+    \[\Acao[q]=\int_{t_1}^{t_2}\Lag\left(q,\dot q,t\right)dt,\qquad
+    \Lag=T-V,\qquad\delta\Acao=0.\]
+    Entre todas as histórias possíveis ligando dois estados em tempos dados, o sistema percorre
+    aquela que torna a ação estacionária.
+  </div>
+
+  <p>A equação de Euler-Lagrange, aplicada a essa ação, não muda de forma: só muda o nome das
+  letras. Ela passa a ser</p>
+
+  <p>\[\der{}{t}\left(\pder{\Lag}{\dot q}\right)-\pder{\Lag}{q}=0.\]</p>
+
+  <p>Vale testar no caso mais simples possível. Uma partícula em queda tem
+  \(\Lag=\tfrac{1}{2}m\dot y^2-mgy\), de modo que</p>
+
+  <p>\[\pder{\Lag}{\dot y}=m\dot y,\qquad\pder{\Lag}{y}=-mg,\]</p>
+
+  <p>e a equação devolve \(\frac{d}{dt}\left(m\dot y\right)+mg=0\), isto é \(m\ddot y=-mg\). A
+  segunda lei de Newton saiu de um princípio que não menciona forças em momento algum.</p>
+
+  <div data-widget="acao"></div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que \(T-V\) e não \(T+V\)</span>
+    <p>A pergunta é natural e a resposta é instrutiva. A energia total \(T+V\) é constante ao
+    longo do movimento real, e um funcional construído com ela daria o mesmo número para uma
+    família inteira de caminhos: não serviria para distinguir nenhum. A diferença \(T-V\), ao
+    contrário, varia de caminho para caminho, e varia do jeito certo: ela penaliza demorar-se
+    onde \(V\) é grande e penaliza correr à toa onde \(V\) é pequeno. O movimento real é o
+    compromisso entre as duas penalidades.</p>
+  </div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O que se ganha</span>
+    <p>A formulação variacional parece, a esta altura, um rodeio para chegar onde Newton já
+    estava. A vantagem aparece quando o sistema tem vínculos, que é o assunto do módulo 9. A
+    ação é um <em>escalar</em>, e escalares não se importam com a escolha de coordenadas: a
+    mesma equação funciona em cartesianas, polares, esféricas ou em qualquer conjunto de
+    parâmetros que descreva a configuração. Forças de vínculo, que em Newton exigem decompor
+    normais e trações desconhecidas, simplesmente não aparecem. Além disso, o formalismo se
+    estende sem mudanças a campos, à relatividade e à mecânica quântica, enquanto a noção de
+    força não.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. Estacionária, não mínima</h2>
+
+  <p>O nome popular do princípio, "mínima ação", promete mais do que o teorema entrega. A
+  condição \(\delta\Acao=0\) diz que a ação é <strong>estacionária</strong>, e isso inclui
+  mínimos, máximos e pontos de sela, exatamente como \(f'(x)=0\) inclui os três casos no
+  cálculo de uma variável.</p>
+
+  <p>Em alguns sistemas a ação é mínima sempre. A queda livre é um deles: com
+  \(\Lag=\tfrac{1}{2}m\dot y^2-mgy\), uma deformação \(\eta(t)\) que se anule nas
+  pontas muda a ação em</p>
+
+  <p>\[\delta^2\Acao=\frac{m}{2}\int_{t_1}^{t_2}\dot\eta^2\,dt>0,\]</p>
+
+  <p>porque o potencial é linear em \(y\) e não contribui para a segunda variação. Por mais
+  longo que seja o percurso, o caminho real é mínimo.</p>
+
+  <p>Basta o potencial ser quadrático para a conclusão mudar. No oscilador harmônico,
+  \(\Lag=\tfrac{1}{2}m\dot y^2-\tfrac{1}{2}m\omega^2y^2\), a segunda variação ganha um
+  termo negativo,</p>
+
+  <p>\[\delta^2\Acao=\frac{m}{2}\int_{t_1}^{t_2}
+  \left(\dot\eta^2-\omega^2\eta^2\right)dt,\]</p>
+
+  <p>e basta escolher uma deformação lenta para torná-la negativa. Com
+  \(\eta=\sen\left(\pi t/T\right)\) sobre um percurso de duração \(T\), as duas
+  integrais valem \(T/2\) vezes \(\left(\pi/T\right)^2\) e \(\omega^2\), de modo
+  que</p>
+
+  <div class="destaque">
+    <span class="anuncio">Onde o mínimo deixa de ser mínimo</span>
+    \[\delta^2\Acao=\frac{mT}{4}\left[\left(\frac{\pi}{T}\right)^2-\omega^2\right],
+    \qquad\text{negativa para}\qquad T>\frac{\pi}{\omega}.\]
+  </div>
+
+  <p>Meio período é o limite. Passado ele, o caminho real continua estacionário e deixa de ser
+  mínimo, e o instante em que isso acontece tem nome próprio: <strong>ponto
+  conjugado</strong>. A interpretação geométrica é bonita: meio período depois de passar pela
+  origem, <em>todas</em> as trajetórias do oscilador que partiram de lá se reencontram no
+  mesmo ponto, independentemente da amplitude. Famílias de extremantes que se cruzam são
+  exatamente o sintoma da perda de minimalidade.</p>
+
+  <p>O mesmo fenômeno aparece na esfera. Entre dois pontos próximos, o arco de círculo máximo
+  que os liga é o caminho mais curto; entre dois pontos separados por mais de meia volta, o
+  arco complementar continua sendo geodésica e não é mínimo de nada. Os polos de uma esfera
+  são pontos conjugados um do outro, e por eles passam infinitas geodésicas.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Verifique no simulador</span>
+    <p>No widget da seção 9, troque o potencial de queda livre para oscilador harmônico e
+    aumente a duração do percurso. Com \(\omega=2\) rad/s a troca acontece em
+    \(T=\pi/2=1{,}57\) s: abaixo disso o ponto \(a=0\) é fundo de vale, acima dele é topo
+    de morro ao longo dessa deformação. O cartão da natureza do extremo acusa a mudança.
+    Nenhuma física mudou no caminho real, apenas o adjetivo.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. Exercícios resolvidos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 8.1 · A parábola</span>
+    <p>Mostre que \(y=x^2\) é extremante do funcional
+    \(J[y]=\displaystyle\int_0^1\left[\left(y'\right)^2+4y\right]dx\), com \(y(0)=0\)
+    e \(y(1)=1\).</p>
+    <p><strong>Solução.</strong> O integrando é \(f=\left(y'\right)^2+4y\), e</p>
+    \[\pder{f}{y}=4,\qquad\pder{f}{y'}=2y'.\]
+    <p>A equação de Euler-Lagrange fica</p>
+    \[4-\der{}{x}\left(2y'\right)=0\quad\Longrightarrow\quad y''=2,\]
+    <p>cuja solução geral é \(y=x^2+Ax+B\). As condições de contorno dão \(B=0\) e
+    \(1=1+A\), portanto \(A=0\) e \(y=x^2\), como se queria.</p>
+    <p>Vale notar o que o termo linear em \(y\) faz. Ele age como uma fonte constante, e a
+    equação \(y''=2\) é a mesma de uma partícula sob aceleração uniforme, com \(x\) no
+    papel do tempo. Trocando a fonte por \(-4xy\) o lado direito vira \(-2x\) e a
+    extremante passa a ser cúbica: a forma do termo em \(y\) determina a ordem do
+    polinômio.</p>
+    <span class="rotulo">Exercício resolvido 8.2 · O oscilador harmônico</span>
+    <p>Encontre a equação de Euler-Lagrange do funcional
+    \(J[y]=\displaystyle\int_0^{T}\left[\tfrac{1}{2}\left(\dot y\right)^2
+    -\tfrac{k}{2}y^2\right]dt\) e identifique o resultado.</p>
+    <p><strong>Solução.</strong> Com \(f=\tfrac{1}{2}\dot y^2-\tfrac{k}{2}y^2\),</p>
+    \[\pder{f}{y}=-ky,\qquad\pder{f}{\dot y}=\dot y,\]
+    <p>de modo que a equação é</p>
+    \[\der{}{t}\left(\dot y\right)+ky=0\quad\Longrightarrow\quad\ddot y+ky=0.\]
+    <p>É o oscilador harmônico de frequência \(\omega=\sqrt{k}\), com solução
+    \(y=A\cos\left(\omega t+\varphi\right)\). Note que o integrando é exatamente a lagrangiana
+    \(\Lag=T-V\) de uma massa unitária presa a uma mola de constante \(k\): a equação de
+    Euler-Lagrange aplicada a ela reproduz a lei de Hooke sem nunca escrever
+    \(\vet{F}=-k\vet{x}\).</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 8.3 · A catenária de 12 m</span>
+    <p>Uma corrente de 12,0 m é pendurada entre dois postes separados de 10,0 m e de mesma
+    altura. Determine \(C\) e a flecha.</p>
+    <p><strong>Solução.</strong> Com \(a=5{,}00\) m e \(L=12{,}0\) m, resolve-se</p>
+    \[12{,}0=2C\,\mathrm{senh}\frac{5{,}00}{C}.\]
+    <p>A equação é transcendental, e o lado direito decresce monotonamente com \(C\): basta
+    uma bisseção. Testando, \(C=6{,}0\) dá
+    \(12{,}0\cdot\mathrm{senh}\left(0{,}833\right)=11{,}1\) m, pouco;
+    \(C=4{,}5\) dá \(9{,}0\cdot\mathrm{senh}\left(1{,}111\right)=12{,}4\) m, demais.
+    Refinando entre os dois,</p>
+    \[C=4{,}695\ \text{m}.\]
+    <p>A flecha é a diferença entre a altura dos apoios e a do ponto mais baixo,</p>
+    \[\Delta=C\cosh\frac{a}{C}-C
+    =4{,}695\left[\cosh\left(1{,}065\right)-1\right]=2{,}92\ \text{m}.\]
+    <p>Uma folga de 2,0 m no comprimento, sobre um vão de 10 m, produz quase 3 m de
+    barrigão. A sensibilidade é alta, e é por isso que linhas de transmissão são tensionadas
+    com cuidado: o vão varia com a temperatura, e a flecha varia muito mais do que o
+    comprimento.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 8.4 · Snell numérico</span>
+    <p>Luz vai de \(A=(0;\,1{,}20)\) m no ar até \(B=(3{,}00;\,-1{,}60)\) m dentro d'água
+    (\(n_1=1{,}00\), \(n_2=1{,}33\)). Determine o ponto de cruzamento e verifique a lei de
+    Snell.</p>
+    <p><strong>Solução.</strong> O caminho óptico em função da abscissa do cruzamento é</p>
+    \[\Lambda(x)=\sqrt{x^2+1{,}44}
+    +1{,}33\sqrt{\left(3{,}00-x\right)^2+2{,}56},\]
+    <p>e a condição de estacionariedade é</p>
+    \[\frac{x}{\sqrt{x^2+1{,}44}}
+    =1{,}33\,\frac{3{,}00-x}{\sqrt{\left(3{,}00-x\right)^2+2{,}56}}.\]
+    <p>Resolvendo numericamente, \(x=1{,}739\) m, com \(\Lambda=4{,}822\) m. Nesse
+    ponto</p>
+    \[\sen\theta_1=\frac{1{,}739}{\sqrt{1{,}739^2+1{,}20^2}}=0{,}8231,\qquad
+    \sen\theta_2=\frac{1{,}261}{\sqrt{1{,}261^2+1{,}60^2}}=0{,}6189,\]
+    <p>isto é \(\theta_1=55{,}4^\circ\) e \(\theta_2=38{,}2^\circ\). A verificação
+    fecha:</p>
+    \[n_1\sen\theta_1=0{,}8231,\qquad
+    n_2\sen\theta_2=1{,}33\cdot0{,}6189=0{,}8231.\]
+    <p>Duas conferências de bom senso valem sempre. Primeira: o ângulo maior fica no meio de
+    <em>menor</em> índice, e aqui \(\theta_1\) é maior que \(\theta_2\) com \(n_1\) menor que \(n_2\), como
+    deve ser.
+    Segunda: o ponto de cruzamento fica deslocado em direção a B em relação ao que a reta
+    \(AB\) daria, porque a luz "prefere" encurtar o trecho dentro da água, onde anda mais
+    devagar. A reta \(AB\) cruzaria o plano em \(x=1{,}29\) m, e o caminho real cruza em
+    1,74 m.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s12">12. Exercícios propostos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Para resolver</span>
+    <ol>
+      <li><b>8.1</b> Para \(J[y]=\int_0^1\left(y'\right)^2dx\) com \(y(0)=y(1)=0\), obtenha a
+      equação de Euler-Lagrange e mostre que a única extremante é \(y\equiv0\). Interprete o
+      resultado em termos da corda esticada.</li>
+
+      <li><b>8.2</b> Mostre, aplicando a integral de Beltrami ao funcional comprimento, que a
+      reta é recuperada sem resolver equação diferencial nenhuma. Compare o trabalho com o da
+      via direta feita na seção 3.</li>
+
+      <li><b>8.3</b> Obtenha a equação diferencial da superfície mínima de revolução pelas duas
+      vias (Euler-Lagrange direta e Beltrami) e mostre que \(y\,y''=1+y'^2\) e
+      \(y/\sqrt{1+y'^2}=C\) são equivalentes. Verifique que \(y=C\cosh\left[(x-x_0)/C\right]\)
+      satisfaz as duas.</li>
+
+      <li><b>8.4</b> Braquistócrona numérica: para A na origem e B em \((1;1)\) m, determine o
+      ângulo final \(\theta_1\) e o parâmetro \(a\) da ciclóide. Calcule o tempo de descida com
+      \(g=10\) m/s² e compare com o da reta.</li>
+
+      <li><b>8.5</b> Mostre que, para a ciclóide da braquistócrona, a combinação
+      \(y\left(1+y'^2\right)\) vale \(2a\) em todo ponto. Sugestão: calcule \(y'\) a partir das
+      equações paramétricas usando \(dy/dx=\left(dy/d\theta\right)/\left(dx/d\theta\right)\).</li>
+
+      <li><b>8.6</b> Uma corrente de comprimento \(L\) pende entre \(x=-a\) e \(x=+a\) à mesma
+      altura. Mostre que \(L=2C\,\mathrm{senh}(a/C)\) e discuta os dois limites: \(L\to2a\) e
+      \(L\gg2a\). O que acontece com \(C\) em cada caso?</li>
+
+      <li><b>8.7</b> Fibra óptica de índice \(n(r)=n_0\left(1-\alpha r^2\right)\). Usando o
+      invariante \(n\sen\theta\), mostre que, para raios próximos ao eixo, as trajetórias são
+      senoidais, e determine o período espacial em função de \(\alpha\).</li>
+
+      <li><b>8.8</b> Meio estratificado com \(n(y)=n_0\left(1-\beta y\right)\), modelo grosseiro
+      do ar quente sobre o asfalto. Obtenha a trajetória do raio e determine a que distância
+      um observador de 1,70 m de altura vê a miragem, com
+      \(\beta=2{,}0\cruz10^{-6}\) m⁻¹.</li>
+
+      <li><b>8.9</b> Discuta em meia página por que o princípio de Hamilton usa \(T-V\) e não
+      \(T+V\), e construa um exemplo numérico que mostre que a ação de dois caminhos distintos
+      com os mesmos extremos pode ser igual se o integrando for a energia total.</li>
+
+      <li><b>8.10</b> Ponto conjugado: para o oscilador harmônico de frequência \(\omega\),
+      mostre que a ação deixa de ser mínima quando o intervalo de tempo excede meio período, e
+      relacione isso com o fato de que todas as trajetórias que partem de um ponto se
+      reencontram ali depois de meio período.</li>
+    </ol>
+  </div>
+
+  <nav class="nav-aulas">
+    <a href="aula07.html"><small>Módulo anterior</small>← 7. Cálculo variacional</a>
+    <span class="em-breve"><small>Em preparação</small>9. Equações de Lagrange</span>
+  </nav>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+<script src="assets/js/widgets.js?v=202611082024"></script>
+</body>
+</html>
