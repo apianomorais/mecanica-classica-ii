@@ -3817,15 +3817,16 @@
 
   /* =================================================================
      23. Os dois tubos: a altura da maré por equilíbrio
-     A derivação alternativa da altura da maré, que dispensa resolver
-     hidrodinâmica: um tubo vertical na maré alta e um horizontal ao
-     longo da superfície, e a condição de que a água não escoe de um
-     para o outro. A figura mostra de onde vem cada termo da conta.
+     Redesenhado sobre a figura do autor (deck de Referenciais
+     Não-Inerciais, slides 34 a 36): um tubo radial de altura h e um
+     tubo tangencial de comprimento L, encaixados em L no mesmo ponto
+     da superfície, com f_r e f_theta no vértice. À esquerda o globo
+     com a protuberância; à direita o detalhe ampliado.
      ================================================================= */
   REGISTRO.tubos = function (raiz) {
-    var GN = 6.67430e-11, RT = 6.371e6, g0 = 9.81;
+    var GN = 6.67430e-11, RT = 6.371e6, g0 = 9.81, RHO = 1025;
     var LUA = { M: 7.342e22, D: 3.844e8 };
-    var est = { th: 45, exa: 1 };
+    var est = { th: 45 };
 
     var corpo = moldura(raiz, 'Os dois tubos: de onde sai a altura da maré');
 
@@ -3834,154 +3835,236 @@
 
     var ctr = el('div', { class: 'controles' });
     corpo.appendChild(ctr);
-    deslizante(ctr, 'posição do tubo vertical', 2, 88, 1, 45,
+    deslizante(ctr, 'posição do par de tubos', 2, 88, 1, 45,
       function (v) { est.th = v; desenhar(); }, function (v) { return v + '°'; });
 
     var mostrar = cartoes(corpo, [
-      { rot: 'força tangencial aqui', k: 'ft' },
-      { rot: 'onde ela é máxima', k: 'max' },
-      { rot: 'integral de 0 a 90°', k: 'int' },
-      { rot: 'altura de equilíbrio h', k: 'h' },
-      { rot: 'pressão na base ρgh', k: 'pr' },
-      { rot: 'comprimento do arco', k: 'arco' }
+      { rot: 'f_r aqui (radial)', k: 'fr' },
+      { rot: 'f_θ aqui (tangencial)', k: 'ft' },
+      { rot: 'f_r / g', k: 'raz' },
+      { rot: 'h para L = 1000 km', k: 'hl' },
+      { rot: 'desnível total h_dif', k: 'h' },
+      { rot: 'pressão na base ρ g h', k: 'pr' }
     ]);
     var nota = el('div', { class: 'saida' });
     corpo.appendChild(nota);
 
-    var A0 = GN * LUA.M * RT / Math.pow(LUA.D, 3);     // amplitude de maré
-    function tang(thg) {
-      return 1.5 * A0 * Math.sin(2 * thg * Math.PI / 180);
+    var A0 = GN * LUA.M * RT / Math.pow(LUA.D, 3);   /* GM R / D³ */
+    function fr(g) { return A0 * (3 * Math.pow(Math.cos(g * Math.PI / 180), 2) - 1); }
+    function ft(g) { return 1.5 * A0 * Math.sin(2 * g * Math.PI / 180); }
+    var HDIF = 1.5 * GN * LUA.M * RT * RT / (g0 * Math.pow(LUA.D, 3));
+
+    /* um tubo é desenhado como duas paredes paralelas, à maneira da
+       figura do deck: a lista pt dá a linha média, e lar a largura */
+    function tubo(ct, pts, lar, cor) {
+      /* um tubo é apenas um par de paredes paralelas, sem preenchimento:
+         o que estiver atrás aparece por dentro dele, de modo que o trecho
+         mergulhado no oceano fica cheio e o resto fica vazio */
+      var i, lados = [[], []];
+      for (i = 0; i < pts.length; i++) {
+        var a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)];
+        var dx = b[0] - a[0], dy = b[1] - a[1], n = Math.hypot(dx, dy) || 1;
+        var nx = -dy / n * lar / 2, ny = dx / n * lar / 2;
+        lados[0].push([pts[i][0] + nx, pts[i][1] + ny]);
+        lados[1].push([pts[i][0] - nx, pts[i][1] - ny]);
+      }
+      ct.strokeStyle = cor; ct.lineWidth = 2.2; ct.lineCap = 'round';
+      lados.forEach(function (lado) {
+        ct.beginPath();
+        lado.forEach(function (q, k) { (k ? ct.lineTo : ct.moveTo).call(ct, q[0], q[1]); });
+        ct.stroke();
+      });
     }
-    var H = 1.5 * GN * LUA.M * RT * RT / (g0 * Math.pow(LUA.D, 3));
+
+    /* cota de duas pontas, à maneira das figuras do deck */
+    function cota(ct, a, b, desl, texto, cor) {
+      var dx = b[0] - a[0], dy = b[1] - a[1], n = Math.hypot(dx, dy) || 1;
+      var px = -dy / n * desl, py = dx / n * desl;
+      var A = [a[0] + px, a[1] + py], B = [b[0] + px, b[1] + py];
+      seta(ct, A[0], A[1], B[0], B[1], cor, 1.6);
+      seta(ct, B[0], B[1], A[0], A[1], cor, 1.6);
+      rotulo(ct, texto, (A[0] + B[0]) / 2 + px * 0.55, (A[1] + B[1]) / 2 + py * 0.55, cor);
+    }
 
     function desenhar() {
-      var alt = 330;
+      var alt = 380;
       var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
       ct.clearRect(0, 0, Lp, alt);
 
-      /* um quadrante da Terra, do ponto sublunar (0°) à maré baixa (90°).
-         O centro fica fora do quadro, embaixo à direita. */
-      var R = Math.min(alt * 1.55, Lp * 0.78);
-      var cx = Lp * 0.86, cy = alt + R * 0.34;
-      var th0 = -Math.PI / 2, th9 = -Math.PI / 2 - Math.PI / 2 * 0.62;
-      function sup(f) {               // f de 0 (maré alta) a 1 (maré baixa)
-        var a = th0 + (th9 - th0) * f;
-        return [cx + R * Math.cos(a), cy + R * Math.sin(a), a];
-      }
+      var th = est.th * Math.PI / 180;
 
-      /* a superfície sem maré */
+      /* ---------- painel da esquerda: o globo ---------- */
+      var cx = Lp * 0.24, cy = alt * 0.47;
+      var Re = Math.min(alt * 0.30, Lp * 0.17);
+      var amp = Re * 0.22;
+      function raio(g) { return Re + amp * (3 * Math.pow(Math.cos(g), 2) - 1) / 2; }
+      function sup(g) { return [cx + raio(g) * Math.cos(g), cy - raio(g) * Math.sin(g)]; }
+
+      /* a protuberância, preenchida, e a superfície deformada em tracejado */
       ct.beginPath();
-      for (var i = 0; i <= 120; i++) {
-        var q = sup(i / 120);
+      for (var i = 0; i <= 240; i++) {
+        var g = i / 240 * 2 * Math.PI, q = sup(g);
         (i ? ct.lineTo : ct.moveTo).call(ct, q[0], q[1]);
       }
-      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2.4; ct.stroke();
-      ct.fillStyle = 'rgba(23,107,93,.07)';
-      ct.lineTo(cx, cy); ct.closePath(); ct.fill();
-
-      /* o tubo horizontal, colado à superfície */
-      ct.beginPath();
-      for (var i2 = 0; i2 <= 120; i2++) {
-        var q2 = sup(i2 / 120), d = 13;
-        ct.lineTo(q2[0] - d * Math.cos(q2[2]), q2[1] - d * Math.sin(q2[2]));
-      }
-      for (var i3 = 120; i3 >= 0; i3--) {
-        var q3 = sup(i3 / 120);
-        ct.lineTo(q3[0], q3[1]);
-      }
       ct.closePath();
-      ct.fillStyle = 'rgba(44,95,141,.16)'; ct.fill();
-      ct.strokeStyle = G.COR.azul; ct.lineWidth = 1.4;
-      ct.setLineDash([5, 4]); ct.stroke(); ct.setLineDash([]);
+      ct.fillStyle = 'rgba(123,184,171,.38)'; ct.fill();
+      ct.strokeStyle = G.COR.clara; ct.lineWidth = 1.6;
+      ct.setLineDash([6, 4]); ct.stroke(); ct.setLineDash([]);
 
-      /* a força tangencial ao longo do arco, apontando para a maré alta */
-      for (var k = 1; k <= 11; k++) {
-        var f = k / 12, q4 = sup(f);
-        var thg = f * 90;
-        var m = tang(thg) / (1.5 * A0);
-        var tx = Math.sin(q4[2]), ty = -Math.cos(q4[2]);  // sentido de f decrescente
-        var L2 = 10 + 30 * m;
-        seta(ct, q4[0] - 6 * Math.cos(q4[2]), q4[1] - 6 * Math.sin(q4[2]),
-          q4[0] - 6 * Math.cos(q4[2]) + tx * L2, q4[1] - 6 * Math.sin(q4[2]) + ty * L2,
-          G.COR.vinho, 1.8);
+      /* a Terra sem maré */
+      ct.beginPath(); ct.arc(cx, cy, Re, 0, 2 * Math.PI);
+      ct.fillStyle = '#fff'; ct.fill();
+      ct.strokeStyle = G.COR.tinta; ct.lineWidth = 2.2; ct.stroke();
+
+      function desenhaPar(ct2, ox, oy, RR, g, hpx, arco, lar, cor) {
+        var nx = Math.cos(g), ny = -Math.sin(g);
+        var base = [ox + RR * nx, oy + RR * ny];
+        function radial(f) { return [base[0] + nx * hpx * f, base[1] + ny * hpx * f]; }
+        function arcoPts(de, ate) {
+          var pts = [];
+          for (var k = 0; k <= 24; k++) {
+            var gg = g - (de + (ate - de) * k / 24);
+            pts.push([ox + RR * Math.cos(gg), oy - RR * Math.sin(gg)]);
+          }
+          return pts;
+        }
+        tubo(ct2, [radial(-0.15), radial(1.8)], lar, cor);
+        tubo(ct2, arcoPts(-0.04 * arco, arco * 1.5), lar, cor);
       }
 
-      /* o tubo vertical, na posição escolhida */
-      var fv = est.th / 90, qv = sup(fv);
-      var hpx = 74, larg = 17;
-      var nx = Math.cos(qv[2]), ny = Math.sin(qv[2]);     // para fora
-      var ux = -ny, uy = nx;                              // ao longo da superfície
+      /* o ângulo θ, medido a partir da direção da Lua */
+      ct.strokeStyle = G.COR.suave; ct.lineWidth = 1.2;
+      ct.setLineDash([4, 4]);
+      ct.beginPath(); ct.moveTo(cx, cy); ct.lineTo(cx + Re + amp + 6, cy); ct.stroke();
       ct.beginPath();
-      ct.moveTo(qv[0] - ux * larg / 2, qv[1] - uy * larg / 2);
-      ct.lineTo(qv[0] - ux * larg / 2 + nx * hpx, qv[1] - uy * larg / 2 + ny * hpx);
-      ct.lineTo(qv[0] + ux * larg / 2 + nx * hpx, qv[1] + uy * larg / 2 + ny * hpx);
-      ct.lineTo(qv[0] + ux * larg / 2, qv[1] + uy * larg / 2);
-      ct.closePath();
-      ct.fillStyle = 'rgba(44,95,141,.3)'; ct.fill();
-      ct.strokeStyle = G.COR.azul; ct.lineWidth = 2; ct.stroke();
+      ct.moveTo(cx, cy);
+      ct.lineTo(cx + (Re + 26) * Math.cos(th), cy - (Re + 26) * Math.sin(th));
+      ct.stroke();
+      ct.setLineDash([]);
+      ct.beginPath(); ct.arc(cx, cy, Re * 0.42, -th, 0); ct.stroke();
+      rotulo(ct, 'θ = ' + est.th + '°',
+        cx + Re * 0.56 * Math.cos(th / 2), cy - Re * 0.56 * Math.sin(th / 2),
+        G.COR.suave);
 
-      /* o peso da coluna e a pressão que ele estabelece na base */
-      seta(ct, qv[0] + nx * hpx * 0.78, qv[1] + ny * hpx * 0.78,
-        qv[0] + nx * hpx * 0.18, qv[1] + ny * hpx * 0.18, G.COR.tinta, 2.4);
-      rotulo(ct, 'peso ρgh', qv[0] + nx * hpx * 0.55 + ux * 30,
-        qv[1] + ny * hpx * 0.55 + uy * 30, G.COR.tinta);
-      rotulo(ct, 'h', qv[0] + nx * hpx * 0.5 - ux * 26,
-        qv[1] + ny * hpx * 0.5 - uy * 26, G.COR.azul);
+      desenhaPar(ct, cx, cy, Re, th, 26, 0.36, 7, G.COR.tinta);
 
-      /* rótulos dos extremos */
-      var qa = sup(0), qb = sup(1);
-      rotulo(ct, 'maré alta', qa[0] + 2, qa[1] - 58, G.COR.mestra);
-      rotulo(ct, '(aponta para a Lua)', qa[0] + 2, qa[1] - 42, G.COR.suave,
-        'center', 'middle', '600 10px system-ui, sans-serif');
-      rotulo(ct, 'maré baixa', qb[0] + 54, qb[1] + 6, G.COR.mestra, 'left');
-      rotulo(ct, 'tubo horizontal, ao longo da superfície', 12, alt - 34,
-        G.COR.azul, 'left');
-      rotulo(ct, 'força de maré tangencial, que empurra a água', 12, alt - 16,
-        G.COR.vinho, 'left');
+      seta(ct, cx + Re + amp + 14, cy, Lp * 0.455, cy, G.COR.bronze, 2);
+      rotulo(ct, 'para a Lua', Lp * 0.455, cy - 15, G.COR.bronze, 'right');
+      rotulo(ct, 'maré alta', cx + Re + amp - 6, cy + 34, G.COR.mestra, 'right',
+        'middle', '600 11px system-ui, sans-serif');
+      rotulo(ct, 'Terra sem maré · superfície deformada em tracejado',
+        cx, cy + Re + amp + 24, G.COR.suave);
 
+      /* ---------- painel da direita: o detalhe ampliado ---------- */
+      var dxc = Lp * 0.71, Rd = Lp * 0.40, dyc = alt * 0.80 + Rd;
+      function pSup(a, dr) {
+        return [dxc + (Rd + dr) * Math.sin(a), dyc - (Rd + dr) * Math.cos(a)];
+      }
+      /* o oceano é uma faixa de espessura variável, mais grossa do lado da
+         maré alta, e a sua borda externa é a superfície deformada */
+      var fx = 0.30;
+      /* a faixa engrossa no sentido para onde f_θ empurra a água, isto é
+         em direção ao ponto de maré alta */
+      function espes(a) { return 18 + 22 * (a + fx) / (2 * fx); }
+      var dentro = [], forav = [];
+      for (var k2 = 0; k2 <= 60; k2++) {
+        var a2 = -fx + 2 * fx * k2 / 60;
+        dentro.push(pSup(a2, 0)); forav.push(pSup(a2, espes(a2)));
+      }
+      ct.beginPath();
+      dentro.forEach(function (q, k) { (k ? ct.lineTo : ct.moveTo).call(ct, q[0], q[1]); });
+      for (var k3 = forav.length - 1; k3 >= 0; k3--) ct.lineTo(forav[k3][0], forav[k3][1]);
+      ct.closePath(); ct.fillStyle = 'rgba(123,184,171,.55)'; ct.fill();
+
+      ct.beginPath();
+      dentro.forEach(function (q, k) { (k ? ct.lineTo : ct.moveTo).call(ct, q[0], q[1]); });
+      ct.strokeStyle = G.COR.tinta; ct.lineWidth = 2.6; ct.stroke();
+      ct.beginPath();
+      forav.forEach(function (q, k) { (k ? ct.lineTo : ct.moveTo).call(ct, q[0], q[1]); });
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2;
+      ct.setLineDash([9, 6]); ct.stroke(); ct.setLineDash([]);
+
+      /* o vértice dos dois tubos, pousado no fundo */
+      var aV = -0.055;
+      var V = pSup(aV, 5);
+      var r1 = pSup(aV, 105), nrm = [(r1[0] - V[0]) / 100, (r1[1] - V[1]) / 100];
+      var tgt = [-nrm[1], nrm[0]];
+      function gira(v, gr) {
+        var c = Math.cos(gr), s = Math.sin(gr);
+        return [v[0] * c - v[1] * s, v[0] * s + v[1] * c];
+      }
+      /* um tubo quase radial, curto, e outro quase tangencial, longo */
+      var dirH = gira(nrm, -0.30), dirL = gira(tgt, -0.26);
+      var hv = 58, lL = 150;
+      function ao(d, v) { return [V[0] + v[0] * d, V[1] + v[1] * d]; }
+
+      tubo(ct, [V, ao(hv * 1.95, dirH)], 15, G.COR.tinta);
+      tubo(ct, [V, ao(lL * 1.34, dirL)], 15, G.COR.tinta);
+      ct.beginPath(); ct.arc(V[0], V[1], 4, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.tinta; ct.fill();
+
+      cota(ct, V, ao(hv, dirH), -26, 'h', G.COR.azul);
+      cota(ct, V, ao(lL, dirL), -34, 'L', G.COR.azul);
+      rotulo(ct, 'a água é empurrada para a maré alta →', Lp - 12, alt - 14,
+        G.COR.mestra, 'right');
+
+      /* as duas componentes da maré, em V, paralelas aos respectivos tubos */
+      var O = ao(132, gira(nrm, -0.16)), Lf = 62;
+      seta(ct, O[0], O[1], O[0] + dirH[0] * Lf, O[1] + dirH[1] * Lf, G.COR.vinho, 2.4);
+      rotulo(ct, 'f_r', O[0] + dirH[0] * Lf * 0.6 - 16,
+        O[1] + dirH[1] * Lf * 0.6 + 10, G.COR.vinho, 'right');
+      seta(ct, O[0], O[1], O[0] + dirL[0] * Lf, O[1] + dirL[1] * Lf, G.COR.vinho, 2.4);
+      rotulo(ct, 'f_θ', O[0] + dirL[0] * Lf * 0.6 + 12,
+        O[1] + dirL[1] * Lf * 0.6 + 16, G.COR.vinho, 'left');
+
+      rotulo(ct, 'detalhe: tubo radial de altura h e tubo tangencial de comprimento L',
+        Lp * 0.71, 18, G.COR.suave);
+
+      var f1 = fr(est.th), f2 = ft(est.th), hL = 1e6 * f2 / g0;
       mostrar({
-        ft: F.fmt(tang(est.th) * 1e6, 3) + ' μm/s²',
-        max: '45°, com ' + F.fmt(1.5 * A0 * 1e6, 3) + ' μm/s²',
-        int: F.fmt(1.5 * A0 * RT, 3) + ' J/kg',
-        h: F.fmt(H * 100, 1) + ' cm',
-        pr: F.fmt(1025 * g0 * H, 0) + ' Pa',
-        arco: F.fmt(Math.PI * RT / 2 / 1e3, 0) + ' km'
+        fr: F.fmt(f1 * 1e6, 3) + ' μm/s²',
+        ft: F.fmt(f2 * 1e6, 3) + ' μm/s²',
+        raz: '1 para ' + F.fmt(g0 / Math.abs(f1 || 1e-30) / 1e6, 2) + ' milhões',
+        hl: F.fmt(hL * 100, 2) + ' cm',
+        h: F.fmt(HDIF * 100, 1) + ' cm',
+        pr: F.fmt(RHO * g0 * HDIF, 0) + ' Pa'
       });
 
       nota.innerHTML =
-        '<p>Imagine dois tubos sem paredes, cheios de água. Um é <strong>vertical</strong>, '
-        + 'de altura \\(h\\), e o outro é <strong>horizontal</strong>, acompanhando a '
-        + 'superfície do ponto de maré baixa até o de maré alta. Nenhum dos dois é real: são '
-        + 'recortes imaginários do próprio oceano, e a pergunta é que altura \\(h\\) deixa a '
-        + 'água em repouso nos dois.</p>'
-        + '<p>A coluna vertical tem peso, e na sua base estabelece uma pressão excedente</p>'
-        + '\\[\\Delta p=\\varrho\\,g\\,h.\\]'
-        + '<p>Essa pressão empurra a água de volta para dentro do tubo horizontal. Para que '
-        + 'nada escoe, alguém tem de empurrar a água no sentido contrário, e esse alguém é a '
-        + '<strong>componente tangencial</strong> da força de maré, desenhada em vinho. Ela é '
-        + 'nula nos dois extremos, máxima a 45°, e aponta sempre para o ponto de maré '
-        + 'alta.</p>'
-        + '<p>O trabalho dessa força por unidade de massa, ao longo do arco de quadrante, '
-        + 'tem de igualar \\(gh\\):</p>'
-        + '\\[g\\,h=\\int_0^{\\pi/2}a_\\theta\\,R\\,d\\theta'
-        + '=\\int_0^{\\pi/2}\\frac{3}{2}\\frac{GM_LR}{D^3}\\sen2\\theta\\;R\\,d\\theta'
-        + '=\\frac{3}{2}\\frac{GM_LR^2}{D^3},\\]'
-        + '<p>de onde sai, sem resolver equação de movimento nenhuma,</p>'
-        + '\\[h=\\frac{3}{2}\\,\\frac{GM_LR^2}{g\\,D^3}=' + F.fmt(H * 100, 1)
-        + '\\ \\text{cm}.\\]'
-        + '<p>Repare no que o argumento dispensa. Não houve dinâmica, nem equação de onda, '
-        + 'nem atrito: só a exigência de que, no estado final, a água não tenha para onde '
+        '<p>Dois tubos imaginários, sem paredes e de seção \\(S\\): um <strong>radial</strong>, '
+        + 'de altura \\(h\\), e um <strong>ao longo da superfície</strong>, de comprimento '
+        + '\\(L\\), encaixados em L no mesmo ponto. As massas de água que eles contêm são '
+        + '\\(m=\\varrho Sh\\) e \\(m\'=\\varrho SL\\).</p>'
+        + '<p>A água do tubo radial sofre o próprio peso \\(mg\\) e a componente normal da '
+        + 'maré, \\(F_r=mf_r\\). O balanço na base é</p>'
+        + '\\[mg-F_r=\\varrho Sh\\left(g-\\frac{F_r}{m}\\right)=\\varrho Sh\\left(g-f_r\\right),\\]'
+        + '<p>e essa diferença estabelece ali uma pressão excedente que empurra a água para '
+        + 'dentro do tubo horizontal. Para que o tubo horizontal também fique estático, alguém '
+        + 'tem de empurrar no sentido contrário, e esse alguém é a componente '
+        + '<strong>tangencial</strong> \\(f_\\theta\\), desenhada em vinho. A condição de '
+        + 'equilíbrio geral é</p>'
+        + '\\[\\varrho h\\left(g-f_r\\right)=\\varrho L f_\\theta'
+        + '\\qquad\\Longrightarrow\\qquad h=L\\,\\frac{f_\\theta}{g-f_r}.\\]'
+        + '<p>Na Terra \\(f_r\\) é irrisória diante de \\(g\\): no ponto escolhido a razão é de '
+        + 'uma parte em ' + F.fmt(g0 / Math.max(Math.abs(f1), 1e-30) / 1e6, 2) + ' milhões. '
+        + 'Vale portanto \\(h\\simeq Lf_\\theta/g\\). Tomando o tubo horizontal como um arco '
+        + 'infinitesimal, \\(L=R\\,d\\theta\\), o desnível acumulado ao longo da superfície é</p>'
+        + '\\[dh\\simeq\\frac{Rf_\\theta}{g}\\,d\\theta'
+        + '\\qquad\\Longrightarrow\\qquad '
+        + 'h_{\\rm dif}=\\frac{R}{g}\\int_0^{\\pi/2}f_\\theta\\,d\\theta'
+        + '=\\frac{3}{2}\\,\\frac{GM_LR^2}{g\\,D^3}=' + F.fmt(HDIF * 100, 1) + '\\ \\text{cm}.\\]'
+        + '<p>Repare no que o argumento dispensa. Não houve dinâmica, nem equação de onda, nem '
+        + 'atrito: só a exigência de que, no estado final, a água não tenha para onde '
         + 'escorrer. É um argumento de <strong>equilíbrio</strong>, e por isso o resultado se '
-        + 'chama maré de equilíbrio. Os ' + F.fmt(1025 * g0 * H, 0) + ' Pa de pressão '
-        + 'excedente na base correspondem a meio metro de coluna de água do mar sobre uma '
-        + 'distância de ' + F.fmt(Math.PI * RT / 2 / 1e3, 0) + ' km de arco: uma rampa de uma '
-        + 'parte em vinte milhões, que é o quanto a maré realmente inclina o oceano.</p>';
+        + 'chama maré de equilíbrio. Os ' + F.fmt(RHO * g0 * HDIF, 0) + ' Pa de excesso na base '
+        + 'correspondem a meio metro de coluna d\'água espalhado sobre '
+        + F.fmt(Math.PI * RT / 2 / 1e3, 0) + ' km de arco: uma rampa de uma parte em vinte '
+        + 'milhões, que é o quanto a maré realmente inclina o oceano.</p>';
       tipografar(corpo);
     }
 
     registrarRedesenho(desenhar);
   };
-
 
   /* =================================================================
      20. O que é um funcional
@@ -4070,12 +4153,18 @@
       return s / N;
     }
     function minimiza(k) {
+      /* o passo é contado por índice, e não acumulado, porque somar 0,005
+         setenta vezes não devolve zero exatamente e o cartão acabaria
+         exibindo o mínimo da reta como 2,7e-16 */
       var melhor = -0.35, vm = Infinity;
-      for (var a = -0.35; a <= 0.701; a += 0.005) {
+      for (var i = 0; i <= 210; i++) {
+        var a = -0.35 + i * 0.005;
         var v = valor(k, a);
         if (v < vm) { vm = v; melhor = a; }
       }
-      return melhor;
+      /* arredonda ao passo da varredura: sem isso o mínimo da reta sai como
+         5,6e-17 em vez de zero */
+      return Math.round(melhor * 1000) / 1000;
     }
 
     function desenhaCurva() {
@@ -4145,7 +4234,8 @@
       var ct = gr.ct;
       ct.beginPath(); ct.arc(gr.X(am), gr.Y(vm), 5.5, 0, 2 * Math.PI);
       ct.fillStyle = G.COR.bronze; ct.fill();
-      rotulo(ct, 'mínimo em a = ' + F.fmt(am, 2), gr.X(am), gr.Y(vm) - 16, G.COR.bronze);
+      rotulo(ct, 'mínimo em a = ' + am.toFixed(2).replace('.', ',').replace('-0,00', '0,00'),
+        gr.X(am), gr.Y(vm) - 16, G.COR.bronze);
       ct.beginPath(); ct.arc(gr.X(est.a), gr.Y(valor(k, est.a)), 5, 0, 2 * Math.PI);
       ct.fillStyle = G.COR.roxo; ct.fill();
       rotulo(ct, 'no fundo da curva, δJ = 0', gr.x1 - 8, gr.y0 + 14, G.COR.suave, 'right');
@@ -4251,46 +4341,25 @@
       return (lo + hi) / 2;
     }
 
-    /* cada caminho devolve y(x) e, por integração, o tempo acumulado */
-    function caminhos() {
-      var th1 = thetaFinal(), R = YB / (1 - Math.cos(th1));
-      return [
-        { n: 'reta', cor: G.COR.suave,
-          pt: function (u) { return [est.xb * u, YB * u]; } },
-        { n: 'arco de círculo', cor: G.COR.bronze,
-          pt: function (u) {
-            /* arco que passa por A e B com tangente vertical em A */
-            var r = (est.xb * est.xb + YB * YB) / (2 * est.xb);
-            var fi = u * Math.atan2(est.xb - 0, r - 0) * 0 + u * Math.acos(
-              Math.max(-1, Math.min(1, (r - est.xb) / r * 0 + 1 - est.xb * est.xb /
-                (2 * r * r) * 0)));
-            return null;
-          } },
-        { n: 'ciclóide', cor: G.COR.mestra,
-          pt: function (u) {
-            var th = th1 * u;
-            return [R * (th - Math.sin(th)), R * (1 - Math.cos(th))];
-          } }
-      ];
-    }
-
     /* o arco de círculo de Galileu: circunferência por A e B com
-       tangente vertical em A, parametrizada pelo ângulo central */
+       tangente vertical em A, parametrizada pelo ângulo central.
+       Centro em (c, 0), sobre a horizontal que passa por A, de modo que o
+       raio em A é horizontal e a tangente é vertical. Impor que B pertença
+       à circunferência dá (xB − c)² + yB² = c², isto é c = (xB² + yB²)/2xB. */
     function arco() {
-      var r = (est.xb * est.xb + YB * YB) / (2 * YB);
-      /* centro em (0, r); A = (0,0); B tem de estar na circunferência */
-      var fiB = Math.atan2(est.xb, r - YB);
-      return { r: r, fiB: fiB,
+      var c = (est.xb * est.xb + YB * YB) / (2 * est.xb);
+      var fiB = Math.atan2(YB, c - est.xb);
+      return { r: c, fiB: fiB,
         pt: function (u) {
           var fi = fiB * u;
-          return [r * Math.sin(fi), r * (1 - Math.cos(fi))];
+          return [c * (1 - Math.cos(fi)), c * Math.sin(fi)];
         } };
     }
 
     /* tabela tempo → posição ao longo de um caminho, por quadratura
        de dt = ds/√(2gy) com o ponto médio, que evita a singularidade */
     function tabela(pt) {
-      var N = 600, tt = [0], acc = 0, ant = pt(0);
+      var N = 4000, tt = [0], acc = 0, ant = pt(0);
       for (var i = 1; i <= N; i++) {
         var u = i / N, q = pt(u);
         var dx = q[0] - ant[0], dy = q[1] - ant[1];
@@ -4323,9 +4392,14 @@
       return s;
     }
 
+    var guardado = { xb: null, ps: null };
+
     function pistas() {
+      /* as tabelas de tempo são caras e só mudam com xB, de modo que vale
+         guardá-las entre quadros da animação */
+      if (guardado.xb === est.xb) return guardado.ps;
       var th1 = thetaFinal(), R = YB / (1 - Math.cos(th1)), A = arco();
-      return [
+      var ps = [
         { n: 'reta', cor: G.COR.vinho,
           pt: function (u) { return [est.xb * u, YB * u]; } },
         { n: 'arco de círculo', cor: G.COR.bronze, pt: A.pt },
@@ -4335,6 +4409,9 @@
             return [R * (th - Math.sin(th)), R * (1 - Math.cos(th))];
           } }
       ];
+      ps.forEach(function (q) { q.tt = tabela(q.pt); q.T = q.tt[q.tt.length - 1]; });
+      guardado = { xb: est.xb, ps: ps };
+      return ps;
     }
 
     function desenhar() {
@@ -4357,14 +4434,13 @@
       var Y = function (u) { return y0 + u * esc; };
 
       ps.forEach(function (q) {
-        var tt = tabela(q.pt);
+        var tt = q.tt;
         ct.beginPath();
         for (var i = 0; i <= 200; i++) {
           var r = q.pt(i / 200);
           (i ? ct.lineTo : ct.moveTo).call(ct, X(r[0]), Y(r[1]));
         }
         ct.strokeStyle = q.cor; ct.lineWidth = 2.2; ct.stroke();
-        q.T = tt[tt.length - 1];
         var b = posicao(q.pt, tt, est.t);
         ct.beginPath(); ct.arc(X(b[0]), Y(b[1]), 7, 0, 2 * Math.PI);
         ct.fillStyle = q.cor; ct.fill();
@@ -4448,7 +4524,7 @@
      ================================================================= */
   REGISTRO.isoperimetrico = function (raiz) {
     var P = 1;                        // perímetro fixo
-    var est = { n: 5, e: 1 };
+    var est = { n: 5, e: 0.55 };
 
     var corpo = moldura(raiz, 'O problema de Dido: perímetro fixo, área máxima');
 
@@ -4460,7 +4536,7 @@
     deslizante(ctr, 'lados do polígono regular', 3, 24, 1, 5,
       function (v) { est.n = v; desenhar(); },
       function (v) { return v >= 24 ? 'círculo' : v + ' lados'; });
-    deslizante(ctr, 'achatamento da elipse', 0.15, 1, 0.01, 1,
+    deslizante(ctr, 'razão entre os eixos da elipse', 0.15, 1, 0.01, 0.55,
       function (v) { est.e = v; desenhar(); },
       function (v) { return v >= 0.995 ? 'círculo' : F.fmt(v, 2); });
 
@@ -4470,7 +4546,7 @@
       { rot: 'área do círculo', k: 'ac' },
       { rot: 'polígono / círculo', k: 'rp' },
       { rot: 'elipse / círculo', k: 're' },
-      { rot: 'razão isoperimétrica 4πA/P²', k: 'iso' }
+      { rot: '4πA/P² da melhor das duas', k: 'iso' }
     ]);
     var nota = el('div', { class: 'saida' });
     corpo.appendChild(nota);
