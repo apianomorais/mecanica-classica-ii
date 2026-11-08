@@ -2129,6 +2129,454 @@
     registrarRedesenho(desenhar);
   };
 
+
+  /* =================================================================
+     10. Conservação do momento angular: a patinadora
+     O ponto que o aluno sempre estranha não é ω crescer, e sim a
+     energia crescer junto, aparentemente do nada. O gráfico de T(r)
+     ao lado de ω(r) resolve isso: T = L²/2I cresce porque alguém
+     puxou os braços contra uma força, e o trabalho dessa força é
+     exatamente a diferença.
+     ================================================================= */
+  REGISTRO.patinadora = function (raiz) {
+    var I0 = 1.2, M = 3, RMAX = 0.9, RMIN = 0.15;
+    var L0 = (I0 + 2 * M * RMAX * RMAX) * 1.5;   // momento angular fixo
+    var est = { vista: 'gira', r: RMAX, th: 0, rodando: true };
+
+    var corpo = moldura(raiz, 'A patinadora: L se conserva, ω e T não');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, [
+      { rot: 'Encolhendo os braços', v: 'gira' },
+      { rot: 'ω e T contra o raio', v: 'curva' }
+    ], 0, function (v) { est.vista = v; });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'distância das mãos ao eixo', RMIN, RMAX, 0.01, RMAX,
+      function (v) { est.r = v; }, function (v) { return F.fmt(v, 2) + ' m'; });
+    var bt = el('button', { type: 'button', texto: 'pausar' });
+    bt.addEventListener('click', function () {
+      est.rodando = !est.rodando;
+      bt.textContent = est.rodando ? 'pausar' : 'continuar';
+    });
+    ctr.appendChild(bt);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'L (constante)', k: 'l' },
+      { rot: 'I no instante', k: 'i' },
+      { rot: 'ω = L / I', k: 'w' },
+      { rot: 'T = L² / 2I', k: 't' },
+      { rot: 'força em cada mão', k: 'f' },
+      { rot: 'trabalho feito pelos braços', k: 'wt' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function inercia(r) { return I0 + 2 * M * r * r; }
+    function dados(r) {
+      var I = inercia(r), w = L0 / I;
+      return { I: I, w: w, T: L0 * L0 / (2 * I), Fm: M * w * w * r,
+               W: L0 * L0 / 2 * (1 / I - 1 / inercia(RMAX)) };
+    }
+
+    function desenhaGira() {
+      var alt = 300;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+      var D = dados(est.r);
+      var esc = Math.min((alt - 60) / 2.1, (Lp - 60) / 2.4) / RMAX * 0.9;
+      var cx = Lp / 2, cy = alt / 2 - 4;
+
+      /* plataforma */
+      ct.beginPath(); ct.arc(cx, cy, 0.42 * esc, 0, 2 * Math.PI);
+      ct.fillStyle = 'rgba(23,107,93,.12)'; ct.fill();
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2; ct.stroke();
+
+      /* rastro circular das mãos */
+      ct.beginPath(); ct.arc(cx, cy, est.r * esc, 0, 2 * Math.PI);
+      ct.strokeStyle = G.COR.grade; ct.lineWidth = 1.4;
+      ct.setLineDash([4, 4]); ct.stroke(); ct.setLineDash([]);
+
+      [0, Math.PI].forEach(function (off) {
+        var a = est.th + off;
+        var mx = cx + est.r * esc * Math.cos(a), my = cy - est.r * esc * Math.sin(a);
+        ct.beginPath(); ct.moveTo(cx, cy); ct.lineTo(mx, my);
+        ct.strokeStyle = G.COR.mestra; ct.lineWidth = 3; ct.stroke();
+        ct.beginPath(); ct.arc(mx, my, 9, 0, 2 * Math.PI);
+        ct.fillStyle = G.COR.bronze; ct.fill();
+        /* a força que os braços fazem, apontando para o eixo */
+        var comp = Math.min(46, D.Fm * 1.9);
+        seta(ct, mx, my, mx - comp * Math.cos(a), my + comp * Math.sin(a),
+          G.COR.vinho, 2.2);
+      });
+
+      ct.beginPath(); ct.arc(cx, cy, 4, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.tinta; ct.fill();
+
+      rotulo(ct, 'ω = ' + F.fmt(D.w, 2) + ' rad/s', 10, 16, G.COR.mestra, 'left');
+      rotulo(ct, 'força dos braços', 10, 32, G.COR.vinho, 'left');
+      rotulo(ct, F.fmt(D.w * 60 / (2 * Math.PI), 0) + ' rpm',
+        Lp - 10, 16, G.COR.suave, 'right');
+    }
+
+    function desenhaCurva() {
+      var gr = G.eixos(cv, {
+        altura: 300, xmin: RMIN, xmax: RMAX, ymin: 0,
+        ymax: Math.max(dados(RMIN).T, dados(RMIN).w) * 1.12,
+        rotX: 'distância das mãos ao eixo (m)',
+        rotY: 'ω (rad/s)   e   T (J)',
+        marcasX: G.marcasLineares(RMIN, RMAX, 5, 2),
+        formataY: function (v) { return F.fmt(v, 0); }
+      });
+      G.curva(gr, function (r) { return dados(r).T; }, G.COR.bronze, 2.6);
+      G.curva(gr, function (r) { return dados(r).w; }, G.COR.mestra, 2.6);
+      G.vertical(gr, est.r, G.COR.suave, '', true);
+      var ct = gr.ct;
+      rotulo(ct, 'T = L²/2I   (energia cinética)', gr.X(0.45),
+        gr.Y(dados(0.45).T) - 14, G.COR.bronze);
+      rotulo(ct, 'ω = L/I', gr.X(0.6), gr.Y(dados(0.6).w) - 14, G.COR.mestra);
+      rotulo(ct, 'L é constante nas duas curvas', gr.x1 - 8, gr.y0 + 14,
+        G.COR.suave, 'right');
+    }
+
+    function desenhar() {
+      var D = dados(est.r);
+      if (est.vista === 'gira') desenhaGira();
+      else desenhaCurva();
+      mostrar({
+        l: F.fmt(L0, 2) + ' kg·m²/s',
+        i: F.fmt(D.I, 3) + ' kg·m²',
+        w: F.fmt(D.w, 2) + ' rad/s',
+        t: F.fmt(D.T, 2) + ' J',
+        f: F.fmt(D.Fm, 1) + ' N',
+        wt: F.fmt(D.W, 2) + ' J'
+      });
+    }
+
+    function texto() {
+      var D = dados(est.r), A = dados(RMAX);
+      nota.innerHTML =
+        '<p>A plataforma gira sem atrito, de modo que nenhum torque externo age em torno do '
+        + 'eixo vertical. Os braços puxam as massas para dentro, mas essa força aponta '
+        + '<em>para o eixo</em> e tem braço nulo: ela não exerce torque. Com '
+        + '\\(\\tau_z=0\\),</p>'
+        + '\\[L_z=I\\omega=\\text{constante}\\quad\\Longrightarrow\\quad '
+        + '\\frac{\\omega_2}{\\omega_1}=\\frac{I_1}{I_2}.\\]'
+        + '<p>Encolhendo os braços de ' + F.fmt(RMAX, 2) + ' m para '
+        + F.fmt(est.r, 2) + ' m, o momento de inércia cai de ' + F.fmt(A.I, 2) + ' para '
+        + F.fmt(D.I, 2) + ' kg·m² e a rotação sobe de ' + F.fmt(A.w, 2) + ' para '
+        + F.fmt(D.w, 2) + ' rad/s.</p>'
+        + '<p>Agora o que costuma incomodar. Escrevendo a energia cinética em termos do que '
+        + 'se conserva,</p>'
+        + '\\[T=\\tfrac12I\\omega^2=\\frac{L^2}{2I},\\]'
+        + '<p>vê-se que ela <strong>cresce</strong> quando \\(I\\) diminui: de '
+        + F.fmt(A.T, 2) + ' para ' + F.fmt(D.T, 2) + ' J. Energia não aparece do nada, e '
+        + 'aqui ela não apareceu: as mãos giram num círculo e, para puxá-las para dentro, é '
+        + 'preciso vencer a força de ' + F.fmt(D.Fm, 1) + ' N que cada uma exige para '
+        + 'descrever a curva. O trabalho dos braços ao longo do percurso vale '
+        + F.fmt(D.W, 2) + ' J, exatamente a diferença de energia cinética.</p>'
+        + '<p>Conservar o momento angular, portanto, não é conservar energia. São duas '
+        + 'contabilidades independentes, e é só por acaso que num torque nulo a primeira '
+        + 'fecha sozinha enquanto a segunda precisa de quem pague a conta.</p>';
+      tipografar(corpo);
+    }
+
+    var chaveAnt = '';
+    function quadro() {
+      if (est.rodando) est.th += 0.016 * dados(est.r).w;
+      desenhar();
+      var chave = F.fmt(est.r, 2) + '|' + est.vista;
+      if (chave !== chaveAnt) { chaveAnt = chave; texto(); }
+      requestAnimationFrame(quadro);
+    }
+
+    texto();
+    requestAnimationFrame(quadro);
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     11. A escada apoiada na parede
+     O problema de estática que mais aparece em prova, e o que melhor
+     mostra que a escolha do ponto é livre: tomando os torques no pé da
+     escada, duas das três incógnitas somem da equação.
+     ================================================================= */
+  REGISTRO.escada = function (raiz) {
+    var G0 = 9.80665, Lesc = 5;
+    var est = { ang: 60, mu: 0.4, Mp: 15, mg: 70, d: 0.5 };
+
+    var corpo = moldura(raiz, 'A escada: quando ela escorrega');
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'inclinação', 25, 85, 1, 60,
+      function (v) { est.ang = v; desenhar(); }, function (v) { return v + '°'; });
+    deslizante(ctr, 'atrito no chão μ', 0.05, 0.8, 0.01, 0.4,
+      function (v) { est.mu = v; desenhar(); }, function (v) { return F.fmt(v, 2); });
+    deslizante(ctr, 'pessoa na escada', 0, 1, 0.02, 0.5,
+      function (v) { est.d = v; desenhar(); },
+      function (v) { return F.fmt(v * Lesc, 1) + ' m do pé'; });
+    deslizante(ctr, 'massa da pessoa', 0, 110, 5, 70,
+      function (v) { est.mg = v; desenhar(); },
+      function (v) { return v ? F.fmt(v, 0) + ' kg' : 'ninguém'; });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'normal do chão N (N)', k: 'n' },
+      { rot: 'empurrão da parede P (N)', k: 'p' },
+      { rot: 'atrito disponível μN (N)', k: 'fmax' },
+      { rot: 'inclinação mínima', k: 'amin' },
+      { rot: 'margem de segurança', k: 'marg' },
+      { rot: 'situação', k: 'sit' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function dados() {
+      var th = est.ang * Math.PI / 180;
+      var N = (est.Mp + est.mg) * G0;
+      /* torque no pé: P·L senθ = Mg(L/2)cosθ + mg·d·L·cosθ */
+      var P = (est.Mp * 0.5 + est.mg * est.d) * G0 / Math.tan(th);
+      var fmax = est.mu * N;
+      var tgmin = (est.Mp * 0.5 + est.mg * est.d) / (est.mu * (est.Mp + est.mg));
+      return { th: th, N: N, P: P, fmax: fmax,
+               amin: Math.atan(tgmin) * 180 / Math.PI, seguro: P <= fmax };
+    }
+
+    function desenhar() {
+      var D = dados(), alt = 320;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var esc = Math.min((alt - 56) / Lesc, (Lp - 150) / (Lesc * 0.95));
+      /* centra a escada mais uma faixa de parede, senão a figura fica
+         encostada à direita e sobra meia tela vazia à esquerda */
+      var vao = Lesc * Math.cos(D.th) * esc;
+      var xp = Math.max(60, (Lp - vao - 90) / 2);
+      var ych = alt - 34;
+      var xw = xp + Lesc * Math.cos(D.th) * esc;
+      var yw = ych - Lesc * Math.sin(D.th) * esc;
+
+      /* chão e parede */
+      ct.strokeStyle = G.COR.suave; ct.lineWidth = 2.5;
+      ct.beginPath(); ct.moveTo(20, ych); ct.lineTo(Lp - 20, ych); ct.stroke();
+      ct.beginPath(); ct.moveTo(xw, ych); ct.lineTo(xw, 14); ct.stroke();
+      ct.fillStyle = 'rgba(91,103,115,.09)';
+      ct.fillRect(20, ych, Lp - 40, alt - ych);
+      ct.fillRect(xw, 14, Lp - 20 - xw, ych - 14);
+
+      /* escada */
+      ct.strokeStyle = D.seguro ? G.COR.mestra : G.COR.vinho;
+      ct.lineWidth = 5; ct.lineCap = 'round';
+      ct.beginPath(); ct.moveTo(xp, ych); ct.lineTo(xw, yw); ct.stroke();
+
+      function sobre(u) {
+        return [xp + u * Lesc * Math.cos(D.th) * esc, ych - u * Lesc * Math.sin(D.th) * esc];
+      }
+      /* centro de massa da escada e a pessoa */
+      var pc = sobre(0.5);
+      ct.beginPath(); ct.arc(pc[0], pc[1], 4.5, 0, 2 * Math.PI);
+      ct.fillStyle = '#fff'; ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2; ct.stroke();
+      ct.fill();
+      if (est.mg > 0) {
+        var pp = sobre(est.d);
+        ct.beginPath(); ct.arc(pp[0], pp[1] - 7, 7, 0, 2 * Math.PI);
+        ct.fillStyle = G.COR.bronze; ct.fill();
+      }
+
+      /* forças */
+      var ev = 0.09;
+      seta(ct, xp, ych, xp, ych - D.N * ev, G.COR.azul, 2.4);
+      rotulo(ct, 'N', xp - 12, ych - D.N * ev / 2, G.COR.azul, 'right');
+      seta(ct, xw, yw, xw - D.P * ev, yw, G.COR.roxo, 2.4);
+      rotulo(ct, 'P', xw - D.P * ev - 10, yw - 12, G.COR.roxo, 'right');
+      seta(ct, xp, ych, xp + D.P * ev, ych, G.COR.vinho, 2.4);
+      rotulo(ct, 'atrito', xp + D.P * ev + 8, ych - 12, G.COR.vinho, 'left');
+      seta(ct, pc[0], pc[1], pc[0], pc[1] + est.Mp * G0 * ev, G.COR.mestra, 2);
+      if (est.mg > 0) {
+        var pp2 = sobre(est.d);
+        seta(ct, pp2[0], pp2[1], pp2[0], pp2[1] + est.mg * G0 * ev, G.COR.bronze, 2);
+      }
+
+      rotulo(ct, D.seguro ? 'a escada fica' : 'a escada escorrega',
+        Lp / 2, 16, D.seguro ? G.COR.mestra : G.COR.vinho);
+
+      mostrar({
+        n: F.fmt(D.N, 0), p: F.fmt(D.P, 0), fmax: F.fmt(D.fmax, 0),
+        amin: F.fmt(D.amin, 1) + '°',
+        marg: D.seguro ? F.fmt(D.fmax - D.P, 0) + ' N de folga'
+                       : 'falta ' + F.fmt(D.P - D.fmax, 0) + ' N',
+        sit: D.seguro ? 'em equilíbrio' : 'escorrega'
+      });
+
+      nota.innerHTML =
+        '<p>São três incógnitas, a normal do chão, o atrito e o empurrão da parede, e três '
+        + 'equações. As duas de força saem de imediato: na vertical, \\(N=(M+m)g\\), e na '
+        + 'horizontal, o atrito tem de igualar \\(P\\), já que a parede é lisa.</p>'
+        + '<p>Para a terceira, tome os torques <strong>no pé da escada</strong>. Ali a normal '
+        + 'e o atrito têm braço nulo e desaparecem da equação, deixando só o peso e o '
+        + 'empurrão da parede:</p>'
+        + '\\[P\\,\\ell\\sen\\theta=Mg\\,\\frac{\\ell}{2}\\cos\\theta+mg\\,d\\cos\\theta'
+        + '\\quad\\Longrightarrow\\quad '
+        + 'P=\\left(\\frac{M}{2}+\\frac{md}{\\ell}\\right)g\\cotg\\theta.\\]'
+        + '<p>A condição de não escorregar é \\(P\\leq\\mu N\\), o que dá</p>'
+        + '\\[\\tg\\theta\\geq\\frac{M/2+md/\\ell}{\\mu\\left(M+m\\right)}.\\]'
+        + '<p>Com os valores atuais, a inclinação mínima é ' + F.fmt(D.amin, 1) + '°, e a '
+        + 'escada está a ' + est.ang + '°. Suba a pessoa pela escada e repare que o limite '
+        + 'piora à medida que ela se aproxima do topo: o numerador cresce com \\(d\\) '
+        + 'enquanto o denominador não muda. É por isso que escadas escorregam quando se está '
+        + 'quase chegando, e não no começo da subida.</p>'
+        + '<p>Com a escada sozinha, \\(m=0\\), a condição vira \\(\\tg\\theta\\geq1/2\\mu\\), '
+        + 'sem nenhuma dependência da massa: uma escada pesada não é mais segura que uma '
+        + 'leve.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     12. Tombar ou escorregar
+     Duas condições independentes competem, e qual delas vence depende
+     só da geometria: se a largura da base dividida pela altura for
+     menor que o coeficiente de atrito, o corpo tomba antes de
+     escorregar. Mexer nos deslizantes troca o vencedor.
+     ================================================================= */
+  REGISTRO.tombamento = function (raiz) {
+    var est = { ang: 15, mu: 0.5, larg: 0.5, alt: 1.2 };
+
+    var corpo = moldura(raiz, 'Tombar ou escorregar: quem vence primeiro');
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'inclinação da rampa', 0, 45, 1, 15,
+      function (v) { est.ang = v; desenhar(); }, function (v) { return v + '°'; });
+    deslizante(ctr, 'atrito μ', 0.05, 1.2, 0.05, 0.5,
+      function (v) { est.mu = v; desenhar(); }, function (v) { return F.fmt(v, 2); });
+    deslizante(ctr, 'largura da base', 0.2, 1.4, 0.05, 0.5,
+      function (v) { est.larg = v; desenhar(); },
+      function (v) { return F.fmt(v, 2) + ' m'; });
+    deslizante(ctr, 'altura do corpo', 0.4, 2, 0.05, 1.2,
+      function (v) { est.alt = v; desenhar(); },
+      function (v) { return F.fmt(v, 2) + ' m'; });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'tg da inclinação', k: 'tg' },
+      { rot: 'escorrega acima de', k: 'ae' },
+      { rot: 'tomba acima de', k: 'at' },
+      { rot: 'quem vence', k: 'quem' },
+      { rot: 'base / altura', k: 'ba' },
+      { rot: 'situação', k: 'sit' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function dados() {
+      var th = est.ang * Math.PI / 180, tg = Math.tan(th);
+      var tgE = est.mu, tgT = est.larg / est.alt;
+      return { th: th, tg: tg, tgE: tgE, tgT: tgT,
+               aE: Math.atan(tgE) * 180 / Math.PI,
+               aT: Math.atan(tgT) * 180 / Math.PI,
+               escorrega: tg > tgE, tomba: tg > tgT };
+    }
+
+    function desenhar() {
+      var D = dados(), alt = 310;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var esc = Math.min(110, (alt - 90) / 2.1, (Lp - 120) / 3.2);
+      var x0 = Lp / 2 - 1.4 * esc, y0 = alt - 56;
+
+      /* rampa */
+      ct.save();
+      ct.translate(x0, y0);
+      ct.rotate(-D.th);
+      ct.strokeStyle = G.COR.suave; ct.lineWidth = 3;
+      ct.beginPath(); ct.moveTo(-0.2 * esc, 0); ct.lineTo(3.0 * esc, 0); ct.stroke();
+      ct.fillStyle = 'rgba(91,103,115,.10)';
+      ct.fillRect(-0.2 * esc, 0, 3.2 * esc, 26);
+
+      /* o bloco, assentado na rampa */
+      var w = est.larg * esc, h = est.alt * esc, xb = 1.5 * esc;
+      var cor = D.tomba && D.tg > D.tgT ? G.COR.vinho
+        : D.escorrega ? G.COR.bronze : G.COR.mestra;
+      ct.fillStyle = cor + '28';
+      ct.fillRect(xb - w / 2, -h, w, h);
+      ct.strokeStyle = cor; ct.lineWidth = 2.4;
+      ct.strokeRect(xb - w / 2, -h, w, h);
+
+      /* centro de massa e a vertical por ele */
+      var cmx = xb, cmy = -h / 2;
+      ct.beginPath(); ct.arc(cmx, cmy, 4, 0, 2 * Math.PI);
+      ct.fillStyle = cor; ct.fill();
+      /* a vertical verdadeira, que na rampa girada aparece inclinada */
+      var dx = Math.tan(D.th) * (h / 2 + 4);
+      ct.beginPath();
+      ct.moveTo(cmx, cmy); ct.lineTo(cmx + dx, 4);
+      ct.strokeStyle = G.COR.roxo; ct.lineWidth = 1.8;
+      ct.setLineDash([4, 3]); ct.stroke(); ct.setLineDash([]);
+      ct.beginPath(); ct.arc(cmx + dx, 0, 3.5, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.roxo; ct.fill();
+      /* as duas quinas da base */
+      [-1, 1].forEach(function (s) {
+        ct.beginPath(); ct.arc(xb + s * w / 2, 0, 3, 0, 2 * Math.PI);
+        ct.fillStyle = G.COR.tinta; ct.fill();
+      });
+      ct.restore();
+
+      var sit = D.tomba && D.tg > D.tgE
+        ? (D.tgT < D.tgE ? 'tomba' : 'escorrega')
+        : D.tomba ? 'tomba' : D.escorrega ? 'escorrega' : 'fica parado';
+      rotulo(ct, 'a vertical pelo centro de massa ' +
+        (D.tomba ? 'saiu da base: tomba' : 'cai dentro da base'),
+        Lp / 2, 18, D.tomba ? G.COR.vinho : G.COR.roxo);
+      rotulo(ct, sit === 'fica parado' ? 'em repouso' : sit,
+        Lp / 2, alt - 14, sit === 'fica parado' ? G.COR.mestra : G.COR.vinho);
+
+      mostrar({
+        tg: F.fmt(D.tg, 3), ae: F.fmt(D.aE, 1) + '°', at: F.fmt(D.aT, 1) + '°',
+        quem: D.tgT < D.tgE ? 'tomba primeiro' : 'escorrega primeiro',
+        ba: F.fmt(D.tgT, 3), sit: sit
+      });
+
+      nota.innerHTML =
+        '<p>Um corpo apoiado numa rampa pode falhar de duas maneiras independentes, e cada '
+        + 'uma tem a sua condição.</p>'
+        + '<p><strong>Escorregar</strong> depende do atrito. Decompondo o peso, a componente '
+        + 'ao longo da rampa vale \\(Mg\\sen\\theta\\) e a normal vale \\(Mg\\cos\\theta\\), '
+        + 'de modo que o deslizamento começa quando</p>'
+        + '\\[\\tg\\theta>\\mu.\\]'
+        + '<p><strong>Tombar</strong> depende da geometria. O corpo gira em torno da quina de '
+        + 'baixo assim que a vertical traçada pelo centro de massa deixa de cair dentro da '
+        + 'base de apoio, o que acontece quando</p>'
+        + '\\[\\tg\\theta>\\frac{b}{h},\\]'
+        + '<p>com \\(b\\) a largura da base e \\(h\\) a altura do corpo, já que o centro de '
+        + 'massa está a meia altura e a meia largura. Note que a massa não aparece em '
+        + 'nenhuma das duas condições: nem escorregar nem tombar dependem de quanto o corpo '
+        + 'pesa.</p>'
+        + '<p>Qual das duas acontece primeiro é uma comparação direta entre \\(\\mu\\) e '
+        + '\\(b/h\\). Aqui \\(b/h=' + F.fmt(D.tgT, 3) + '\\) e \\(\\mu=' + F.fmt(est.mu, 2)
+        + '\\), de modo que o corpo ' + (D.tgT < D.tgE ? 'tomba' : 'escorrega')
+        + ' primeiro. Estreite a base ou levante o corpo e o tombamento passa à frente; é '
+        + 'por isso que caminhões altos tombam em curvas onde carros baixos apenas derrapam, '
+        + 'e é por isso que se carrega carga pesada no fundo do porta-malas.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 4: Conservação e equilíbrio estático | Mecânica Clássica II</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611081904">
+<script src="assets/js/comum.js?v=202611081904"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Mecânica Clássica II <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html">Início</a>
+      <span class="grupo">Corpos rígidos</span>
+      <a href="aula01.html" class="num" title="Módulo 1: Cinemática dos corpos rígidos">1</a>
+      <a href="aula02.html" class="num" title="Módulo 2: Centro de massa e momentos de inércia">2</a>
+      <a href="aula03.html" class="num" title="Módulo 3: Momento angular, torque e equações de movimento">3</a>
+      <a href="aula04.html" class="num ativo" title="Módulo 4: Conservação e equilíbrio estático">4</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+<aside class="lateral">
+  <h4>Neste módulo</h4>
+  <ol>
+    <li><a href="#s1">1. Quando o momento angular se conserva</a></li>
+    <li><a href="#s2">2. Conservação componente a componente</a></li>
+    <li><a href="#s3">3. A patinadora e a energia que aparece</a></li>
+    <li><a href="#s4">4. Forças centrais e a lei das áreas</a></li>
+    <li><a href="#s5">5. Choques com rotação</a></li>
+    <li><a href="#s6">6. As duas condições de equilíbrio</a></li>
+    <li><a href="#s7">7. No equilíbrio, o ponto não importa</a></li>
+    <li><a href="#s8">8. Base de apoio e tombamento</a></li>
+    <li><a href="#s9">9. A escada, a viga e a alavanca</a></li>
+    <li><a href="#s10">10. Exercícios resolvidos</a></li>
+    <li><a href="#s11">11. Exercícios propostos</a></li>
+  </ol>
+</aside>
+
+<main class="conteudo">
+
+  <p class="chapeu">Módulo 4 · Corpos rígidos</p>
+  <h1>Conservação e equilíbrio estático</h1>
+  <p class="subtitulo">As duas equações do módulo 3 governam qualquer corpo rígido. Este
+  módulo explora os dois casos extremos em que elas são mais úteis: quando o lado direito se
+  anula e alguma coisa se conserva, e quando os dois lados se anulam e nada se move. Um deles
+  explica a patinadora e a segunda lei de Kepler; o outro é a engenharia de estruturas
+  inteira.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Objetivos</span>
+    <ul>
+      <li>Identificar quando \(\vet{L}\) se conserva, inteiro ou só numa componente;</li>
+      <li>Explicar por que \(T\) cresce quando \(I\) diminui, com \(L\) fixo;</li>
+      <li>Deduzir a lei das áreas de Kepler da conservação do momento angular;</li>
+      <li>Usar o momento angular em choques com corpos vinculados;</li>
+      <li>Escrever as condições de equilíbrio e provar que o ponto é livre;</li>
+      <li>Decidir se um corpo tomba ou escorrega a partir da geometria.</li>
+    </ul>
+  </div>
+
+  <hr class="linha">
+
+  <!-- ================================================== -->
+  <h2 id="s1">1. Quando o momento angular se conserva</h2>
+
+  <p>A equação \(\der{\vet{L}}{t}=\vet{\tau}^{\rm ext}\) do módulo 3 tem uma leitura imediata
+  quando o lado direito se anula:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Conservação do momento angular</span>
+    \[\vet{\tau}^{\rm ext}=\vet 0\quad\Longrightarrow\quad\vet{L}=\text{constante}.\]
+  </div>
+
+  <p>Repare no que é exigido e no que não é. Não se pede que as forças externas sejam nulas,
+  apenas que o <em>torque</em> resultante o seja. Um corpo em queda livre tem força externa
+  enorme e torque nulo em torno do centro de massa, e por isso um gato que cai gira livremente
+  enquanto o seu momento angular permanece o mesmo. Tampouco se pede que o corpo seja rígido:
+  a demonstração do módulo 3 vale para qualquer sistema de partículas com forças internas
+  centrais, o que será essencial na próxima seção.</p>
+
+  <p>Três situações cobrem quase todos os casos práticos. Um corpo isolado, longe de tudo.
+  Um corpo sujeito apenas a forças que passam por um ponto fixo, que é o caso das forças
+  centrais. E um corpo cujo eixo é livre de atrito, em que o vínculo não exerce torque na
+  direção do eixo.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s2">2. Conservação componente a componente</h2>
+
+  <p>A igualdade vetorial vale componente a componente, e as três componentes são
+  independentes. Pode acontecer, portanto, que uma delas se conserve enquanto as outras duas
+  variam livremente:</p>
+
+  <p>\[\tau_z=0\quad\Longrightarrow\quad L_z=\text{constante},\]</p>
+
+  <p>sem que nada se possa dizer sobre \(L_x\) e \(L_y\). Esse caso parcial é o mais comum na
+  prática, e não um refinamento acadêmico. Uma plataforma giratória de eixo vertical sem
+  atrito oferece exatamente isso: o mancal segura o eixo e pode exercer torques horizontais à
+  vontade, mas não tem como exercer torque em torno da própria direção. Um pêndulo esférico,
+  uma conta num arame circular e um pião apoiado num ponto estão todos na mesma situação.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Como reconhecer um torque nulo</span>
+    <p>Uma força não exerce torque em torno de um ponto quando a sua linha de ação passa por
+    ele, porque aí o braço é nulo. Daí vêm os três atalhos que se usam o tempo todo:</p>
+    <ul>
+      <li>uma força <strong>central</strong>, dirigida para um ponto fixo, não exerce torque
+      em torno desse ponto;</li>
+      <li>a <strong>normal e o atrito</strong> num apoio não exercem torque em torno do
+      próprio apoio;</li>
+      <li>uma força aplicada <strong>ao longo do eixo</strong>, ou que o corte, não exerce
+      torque na direção dele.</li>
+    </ul>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. A patinadora e a energia que aparece</h2>
+
+  <p>Uma pessoa gira numa plataforma sem atrito segurando pesos com os braços abertos e, a
+  certa altura, encolhe os braços. A força que ela faz aponta para o eixo, e por isso não
+  exerce torque em torno dele. Com \(\tau_z=0\), o produto \(I\omega\) permanece o mesmo, e
+  como \(I\) diminuiu, \(\omega\) tem de crescer na mesma proporção:</p>
+
+  <p>\[I_1\omega_1=I_2\omega_2.\]</p>
+
+  <div data-widget="patinadora"></div>
+
+  <p>Até aqui nada é surpreendente. O incômodo começa ao escrever a energia cinética em
+  termos da grandeza que se conserva:</p>
+
+  <p>\[T=\frac12I\omega^2=\frac{L^2}{2I}.\]</p>
+
+  <p>Diminuir \(I\) com \(L\) fixo faz \(T\) <em>aumentar</em>, e no simulador acima a energia
+  mais que quadruplica. Energia cinética não aparece do nada, e aqui não apareceu: as mãos
+  descrevem um círculo e exigem uma força dirigida ao centro para continuar nele. Puxá-las
+  para dentro significa deslocá-las no sentido dessa força, o que é trabalho positivo, e o
+  trabalho realizado pelos braços é exatamente a diferença de energia cinética. Conservar o
+  momento angular, portanto, não é conservar energia: são duas contabilidades
+  independentes.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. Forças centrais e a lei das áreas</h2>
+
+  <p>Considere uma partícula sujeita a uma força sempre dirigida a um ponto fixo, como a
+  atração gravitacional do Sol sobre um planeta. O torque em torno desse ponto é
+  \(\vet{r}\cruz\vet{F}\) com \(\vet{F}\) paralelo a \(\vet{r}\), e portanto nulo. O momento
+  angular se conserva, e duas consequências saem disso sem conta nenhuma.</p>
+
+  <p>A primeira é geométrica. Como \(\vet{L}=\vet{r}\cruz\vet{p}\) é perpendicular a
+  \(\vet{r}\), e \(\vet{L}\) não muda de direção, o vetor posição fica preso ao plano
+  perpendicular a \(\vet{L}\). <strong>O movimento sob força central é plano</strong>, e isso
+  reduz o problema de três dimensões para duas antes de qualquer cálculo.</p>
+
+  <p>A segunda é quantitativa. Em coordenadas polares no plano do movimento, a área varrida
+  pelo raio vetor num intervalo \(dt\) é \(dA=\tfrac12r^2d\varphi\), enquanto o módulo do
+  momento angular vale \(L=mr^2\dot\varphi\). Comparando as duas expressões,</p>
+
+  <div class="destaque">
+    <span class="anuncio">Segunda lei de Kepler</span>
+    \[\der{A}{t}=\frac{r^2\dot\varphi}{2}=\frac{L}{2m}=\text{constante}.\]
+    O raio vetor varre áreas iguais em tempos iguais.
+  </div>
+
+  <p>Kepler extraiu essa lei dos dados de Tycho Brahe em 1609, por tentativa e ajuste, e
+  passou anos acreditando que ela era uma particularidade do movimento planetário. Ela é
+  consequência da conservação do momento angular e vale para <em>qualquer</em> força central,
+  atrativa ou repulsiva, proporcional a \(1/r^2\) ou não. A lei das áreas não diz nada sobre
+  a gravidade: diz apenas que a força aponta para o Sol. O estudo completo do problema de
+  dois corpos é assunto de Mecânica Clássica III.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. Choques com rotação</h2>
+
+  <p>Durante um choque, as forças são enormes e duram muito pouco. Comparadas a elas, o peso
+  e as forças ordinárias são desprezíveis, e o que sobra na conta são os impulsos. Se o corpo
+  atingido estiver preso a um eixo, a reação do eixo pode ser grande, mas o seu braço em
+  torno do próprio eixo é nulo, de modo que o momento angular em torno dele se conserva
+  durante o impacto.</p>
+
+  <div class="destaque">
+    <span class="anuncio">Regra prática para choques com vínculo</span>
+    O momento angular em torno do <strong>eixo ou ponto fixo</strong> se conserva durante o
+    impacto, ainda que o momento linear não se conserve, porque o vínculo absorve impulso
+    linear mas não fornece torque.
+  </div>
+
+  <p>Um projétil de massa \(m\) e velocidade \(v\) que se aloja a uma distância \(b\) do eixo
+  de uma porta de momento de inércia \(I\) ilustra o caso. Antes do choque o momento angular
+  é \(mvb\); depois, o conjunto gira como um corpo só, com \(\left(I+mb^2\right)\omega\).
+  Igualando,</p>
+
+  <p>\[\omega=\frac{mvb}{I+mb^2}.\]</p>
+
+  <p>A energia cinética, essa, não se conserva: o choque é perfeitamente inelástico e boa
+  parte da energia vira deformação e calor. Tentar resolver o problema por conservação de
+  energia daria um resultado errado, e a única grandeza que atravessa o impacto intacta é o
+  momento angular em torno do eixo.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. As duas condições de equilíbrio</h2>
+
+  <p>Um corpo está em equilíbrio quando o centro de massa não acelera e a rotação não muda.
+  Impondo isso às duas equações do módulo 3:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Equilíbrio estático</span>
+    \[\sum\vet{F}^{\rm ext}=\vet 0,\qquad \sum\vet{\tau}^{\rm ext}=\vet 0.\]
+    São seis equações escalares no espaço e três no plano, uma de torque e duas de força.
+  </div>
+
+  <p>As duas condições são independentes, e esquecer a segunda é o erro mais comum. Um
+  binário, formado por duas forças iguais e opostas de linhas de ação distintas, tem
+  resultante nula e torque não nulo: o corpo não acelera, mas gira. Em sentido contrário, um
+  corpo pendurado por um fio fora do centro de massa tem torque não nulo com resultante nula
+  apenas enquanto não começa a girar.</p>
+
+  <p>Note que o equilíbrio aqui definido é o de um corpo em repouso <em>ou</em> em movimento
+  uniforme com rotação constante. Uma roda que gira a velocidade constante satisfaz as duas
+  condições, apesar de não estar parada.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. No equilíbrio, o ponto não importa</h2>
+
+  <p>O módulo 3 insistiu que torque sem ponto de referência declarado não significa nada. No
+  equilíbrio, porém, há uma liberdade que vale ouro na hora de resolver problemas. Compare o
+  torque em torno de dois pontos \(O\) e \(Q\):</p>
+
+  <p>\[\sum\vet{\tau}_Q=\sum\left(\vet{r}_i-\vet{r}_Q\right)\cruz\vet{F}_i
+  =\sum\vet{\tau}_O-\vet{r}_Q\cruz\sum\vet{F}_i.\]</p>
+
+  <p>Com a primeira condição de equilíbrio, a última soma é nula e o segundo termo
+  desaparece:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Liberdade na escolha do ponto</span>
+    Se \(\sum\vet{F}=\vet 0\), então \(\sum\vet{\tau}\) é o mesmo em torno de qualquer ponto.
+    Em equilíbrio, pode-se tomar torques onde for mais conveniente, inclusive em pontos que
+    não pertencem ao corpo.
+  </div>
+
+  <p>A conveniência costuma estar em escolher um ponto por onde passem forças desconhecidas,
+  que assim saem da equação. Numa escada apoiada na parede são três incógnitas, e tomando os
+  torques no pé da escada duas delas desaparecem de imediato. É a mesma estratégia do módulo
+  3, agora com uma licença mais ampla, porque em equilíbrio qualquer ponto é legítimo.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. Base de apoio e tombamento</h2>
+
+  <p>Num campo gravitacional uniforme, o torque do peso sobre um corpo extenso é o mesmo que
+  o de uma única força \(M\vet{g}\) aplicada no centro de massa, porque
+  \(\sum_i\vet{r}_i\cruz m_i\vet{g}=\left(\sum_i m_i\vet{r}_i\right)\cruz\vet{g}
+  =M\vet{R}\cruz\vet{g}\). Por isso o <strong>centro de gravidade</strong> coincide com o
+  centro de massa sempre que \(g\) for o mesmo em todo o corpo, o que vale para qualquer
+  objeto de tamanho humano.</p>
+
+  <p>Um corpo apoiado numa superfície recebe dela uma normal distribuída por toda a área de
+  contato. Essa distribuição pode se concentrar onde for necessário dentro da região de
+  apoio, mas não pode sair dela, porque o chão empurra e não puxa. O equilíbrio de torques
+  exige que a normal resultante esteja na mesma vertical do peso, e daí sai o critério:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Condição de não tombar</span>
+    O corpo permanece apoiado enquanto a <strong>vertical traçada pelo centro de massa cai
+    dentro da base de apoio</strong>. No instante em que ela sai, não há mais como equilibrar
+    o torque do peso, e o corpo gira em torno da quina.
+  </div>
+
+  <div data-widget="tombamento"></div>
+
+  <p>Numa rampa de inclinação \(\theta\), a vertical pelo centro de massa deixa a base quando
+  \(\tg\theta>b/h\), com \(b\) a largura da base e \(h\) a altura do corpo, enquanto o
+  escorregamento começa quando \(\tg\theta>\mu\). As duas falhas competem, e vence a de
+  limiar menor. Comparar \(b/h\) com \(\mu\) decide a questão, e a massa não entra em nenhuma
+  das duas. Um caminhão alto e estreito tomba em curvas onde um carro baixo apenas derrapa, e
+  carga pesada vai no fundo do porta-malas para baixar o centro de massa.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. A escada, a viga e a alavanca</h2>
+
+  <p>Os três problemas clássicos de estática usam exatamente o que foi construído acima, e
+  vale percorrê-los porque cada um exercita uma escolha diferente de ponto.</p>
+
+  <div data-widget="escada"></div>
+
+  <p>Na <strong>viga apoiada em dois pontos</strong>, com uma carga \(W\) a uma distância
+  \(a\) do apoio esquerdo e \(b\) do direito, tomar torques num apoio elimina a reação dele e
+  deixa a outra sozinha:</p>
+
+  <p>\[N_{\rm esq}=W\frac{b}{a+b},\qquad N_{\rm dir}=W\frac{a}{a+b}.\]</p>
+
+  <p>A carga se reparte na razão inversa das distâncias, resultado que qualquer pessoa que já
+  carregou um móvel a dois conhece sem ter feito a conta: quem está mais perto segura
+  mais.</p>
+
+  <p>Na <strong>alavanca</strong>, o equilíbrio de torques em torno do apoio dá
+  \(F_1d_1=F_2d_2\), e a razão \(d_2/d_1\) é a vantagem mecânica. Arquimedes resumiu o
+  princípio numa frase que ficou, e a conta que a sustenta cabe numa linha. O que ela não
+  dispensa é a primeira condição: o apoio precisa suportar \(F_1+F_2\), e é por isso que
+  alavancas longas quebram no ponto de apoio e não na extremidade.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. Exercícios resolvidos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 4.1 · A plataforma giratória</span>
+    <p>Uma pessoa de \(I_0=1{,}2\) kg·m² gira a 1,5 rad/s numa plataforma sem atrito,
+    segurando duas massas de 3,0 kg com os braços estendidos a 0,90 m do eixo. Ela encolhe os
+    braços até 0,15 m. Determine a nova velocidade angular, a variação de energia cinética e
+    o trabalho realizado.</p>
+    <p><strong>Solução.</strong> Os momentos de inércia inicial e final são</p>
+    \[I_1=1{,}2+2\cruz3{,}0\cruz0{,}90^2=6{,}06\ {\rm kg\,m^2},\qquad
+    I_2=1{,}2+2\cruz3{,}0\cruz0{,}15^2=1{,}335\ {\rm kg\,m^2}.\]
+    <p>De \(I_1\omega_1=I_2\omega_2\) vem \(\omega_2=1{,}5\cruz6{,}06/1{,}335=6{,}81\) rad/s,
+    um aumento de 4,5 vezes. As energias cinéticas são</p>
+    \[T_1=\tfrac12\cruz6{,}06\cruz1{,}5^2=6{,}82\ {\rm J},\qquad
+    T_2=\tfrac12\cruz1{,}335\cruz6{,}81^2=30{,}9\ {\rm J}.\]
+    <p>A diferença, 24,1 J, é o trabalho que os braços realizaram puxando as massas contra a
+    força de \(m\omega^2r\) que cada uma exige para manter a curva. No fim do percurso essa
+    força vale \(3{,}0\cruz6{,}81^2\cruz0{,}15=20{,}9\) N em cada mão.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 4.2 · A bala na porta</span>
+    <p>Uma porta de 25 kg e 0,80 m de largura, livre para girar nas dobradiças, é atingida por
+    uma bala de 12 g a 320 m/s que se aloja a 0,60 m do eixo. Determine a velocidade angular
+    da porta logo após o impacto e a fração da energia perdida.</p>
+    <p><strong>Solução.</strong> A porta gira em torno de uma borda, de modo que
+    \(I=\tfrac13ML^2=\tfrac13\cruz25\cruz0{,}80^2=5{,}333\) kg·m². Conservando o momento
+    angular em torno das dobradiças,</p>
+    \[\omega=\frac{mvb}{I+mb^2}
+    =\frac{0{,}012\cruz320\cruz0{,}60}{5{,}333+0{,}012\cruz0{,}36}=0{,}4317\ {\rm rad/s}.\]
+    <p>A energia antes do choque é \(\tfrac12\cruz0{,}012\cruz320^2=614{,}4\) J; depois,
+    \(\tfrac12\cruz5{,}337\cruz0{,}4317^2=0{,}497\) J. Restam <strong>0,08%</strong> da
+    energia inicial, e todo o resto virou deformação e calor. O momento angular, esse,
+    atravessou o impacto sem perda.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 4.3 · A escada e o pintor</span>
+    <p>Uma escada de 15 kg e 5,0 m está apoiada numa parede lisa, a 60° do chão, cujo
+    coeficiente de atrito estático vale 0,40. Até que ponto um pintor de 70 kg pode subir
+    antes que ela escorregue?</p>
+    <p><strong>Solução.</strong> Na vertical, \(N=(15+70)\cruz9{,}807=833{,}6\) N, e o atrito
+    disponível é \(\mu N=333{,}4\) N. Tomando torques no pé da escada, onde a normal e o
+    atrito têm braço nulo,</p>
+    \[P=\left(\frac{M}{2}+\frac{md}{\ell}\right)g\cotg\theta
+    =\left(7{,}5+\frac{70\,d}{5{,}0}\right)\cruz9{,}807\cruz0{,}5774.\]
+    <p>Igualando \(P\) ao atrito máximo, \(7{,}5+14d=333{,}4/(9{,}807\cruz0{,}5774)=58{,}87\),
+    de onde \(d=3{,}67\) m. O pintor pode subir até cerca de três quartos da escada. Confira
+    no simulador da seção 9 pondo \(\mu=0{,}40\) e a inclinação em 60°.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 4.4 · Tombar ou escorregar</span>
+    <p>Um armário de 0,60 m de largura e 1,80 m de altura, homogêneo, está sobre um piso com
+    \(\mu_s=0{,}45\). A rampa de uma mudança é inclinada lentamente. O que acontece
+    primeiro?</p>
+    <p><strong>Solução.</strong> As duas condições dão</p>
+    \[\tg\theta_{\rm escorrega}=\mu=0{,}45\ \Rightarrow\ \theta=24{,}2^\circ,\qquad
+    \tg\theta_{\rm tomba}=\frac{b}{h}=\frac{0{,}60}{1{,}80}=0{,}333\ \Rightarrow\
+    \theta=18{,}4^\circ.\]
+    <p>O armário <strong>tomba primeiro</strong>, a 18,4°, porque \(b/h<\mu\). Deitá-lo de
+    lado, trocando a base pela altura, levaria o limite de tombamento para 71,6° e o
+    escorregamento passaria à frente. É o que se faz ao transportar móveis altos, e a conta
+    não depende da massa do armário.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. Exercícios propostos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Para resolver</span>
+    <ol>
+      <li><b>4.1</b> Um disco de \(I=0{,}40\) kg·m² gira a 20 rad/s. Um segundo disco de
+      \(I=0{,}25\) kg·m², em repouso, é largado sobre ele e os dois passam a girar juntos.
+      Determine a velocidade final e a energia perdida. Por que o momento angular se conserva
+      e a energia não?</li>
+
+      <li><b>4.2</b> Mostre que a lei das áreas vale para uma força central repulsiva e para
+      uma força central que cresce com a distância. Em que exatamente da demonstração entrou a
+      forma da força?</li>
+
+      <li><b>4.3</b> Um cometa tem velocidade de 54 km/s no periélio, a 0,59 UA do Sol.
+      Determine a velocidade no afélio, a 35 UA, usando apenas a conservação do momento
+      angular. Qual das duas velocidades é mais fácil de medir, e por quê?</li>
+
+      <li><b>4.4</b> Uma barra homogênea de massa \(M\) e comprimento \(L\), livre para girar
+      em torno de uma ponta, está na horizontal e é solta. Determine a velocidade angular ao
+      passar pela vertical, por energia, e em seguida a reação na dobradiça naquele
+      instante.</li>
+
+      <li><b>4.5</b> Uma placa de sinalização de 12 kg é presa a um poste por uma haste
+      horizontal de 1,2 m e sustentada por um cabo que vai do poste à ponta da haste, fazendo
+      35° com ela. Determine a tração no cabo e as componentes da força no ponto em que a
+      haste encontra o poste.</li>
+
+      <li><b>4.6</b> Demonstre que, num corpo sujeito a exatamente três forças não paralelas
+      em equilíbrio, as três linhas de ação necessariamente se encontram num mesmo ponto.
+      Use o resultado da seção 7.</li>
+
+      <li><b>4.7</b> Uma caixa cúbica é empurrada horizontalmente por uma força aplicada a uma
+      altura \(y\) acima do chão. Mostre que ela tomba antes de escorregar se
+      \(y>b/2\mu\), com \(b\) o lado do cubo. Onde empurrar para que ela deslize sem
+      tombar?</li>
+
+      <li><b>4.8</b> Uma bicicleta em curva de raio \(R\) a velocidade \(v\) se inclina de um
+      ângulo \(\varphi\) com a vertical. Mostre que \(\tg\varphi=v^2/gR\) analisando o
+      equilíbrio de torques em torno do ponto de contato no referencial que acompanha a
+      bicicleta. Por que o resultado não depende da massa?</li>
+
+      <li><b>4.9</b> Discuta em meia página: um gato solto de cabeça para baixo cai de pé sem
+      que nenhum torque externo atue sobre ele. Isso viola a conservação do momento angular?
+      Explique o que o gato faz e por que a conservação continua valendo.</li>
+    </ol>
+  </div>
+
+  <nav class="nav-aulas">
+    <a href="aula03.html"><small>Módulo anterior</small>← 3. Momento angular e torque</a>
+    <span class="em-breve"><small>Em preparação</small>5. Matrizes de rotação</span>
+  </nav>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+<script src="assets/js/widgets.js?v=202611081904"></script>
+</body>
+</html>

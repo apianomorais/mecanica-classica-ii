@@ -99,6 +99,19 @@ if os.path.exists(js):
                      'engole antes do MathJax (use barra dupla)'
                      % (linha, m.group(0)))
 
+# 12. nos widgets, uma macro de LaTeX no fim de um pedaco de string que e
+#     concatenado com outro comecando por letra. O "+" some na juncao e
+#     \quad + 'P=...' vira \quadP, que o MathJax nao conhece e exibe cru.
+#     Basta um espaco antes da aspa de fechamento.
+COLADA = re.compile(r"\\\\[a-zA-Z]+'\s*\+\s*'[a-zA-Z]")
+if os.path.exists(js):
+    tj = open(js, encoding='utf-8').read()
+    for m in COLADA.finditer(tj):
+        linha = tj[:m.start()].count('\n') + 1
+        erros.append('widgets.js:%d: "%s" gruda na string seguinte; '
+                     'ponha um espaco antes da aspa'
+                     % (linha, m.group(0).split("'")[0]))
+
 if avisos:
     print('avisos (não reprovam):')
     for v in avisos:
