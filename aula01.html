@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 1: Cinemática dos corpos rígidos | Mecânica Clássica II</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611081847">
-<script src="assets/js/comum.js?v=202611081847"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611081853">
+<script src="assets/js/comum.js?v=202611081853"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -92,11 +92,12 @@
 
   <div class="bloco fisica">
     <span class="rotulo">Por que começar por aqui</span>
-    <p>O corpo rígido é o <strong>sistema vinculado mais simples que existe</strong>, e por
-    isso é o lugar certo para sentir o problema que o formalismo lagrangiano vai resolver.
-    As forças internas que mantêm as distâncias fixas são desconhecidas, incontáveis, e no
-    fim não realizam trabalho nenhum. Carregá-las até o fim da conta para então descartá-las
-    é um desperdício, e os módulos 7 a 12 existem para eliminar esse desperdício.</p>
+    <p>As forças internas que mantêm fixas as distâncias de um corpo rígido são
+    desconhecidas, incontáveis, e no fim não realizam trabalho nenhum. Carregá-las até o fim
+    da conta para então descartá-las é um desperdício, e eliminar esse desperdício é o que os
+    módulos 7 a 12 fazem. Como o corpo rígido é o <strong>sistema vinculado mais simples que
+    existe</strong>, ele é o lugar certo para sentir de perto o problema que o formalismo
+    lagrangiano vai resolver.</p>
     <p>Mas antes disso é preciso ver o que o método newtoniano consegue. Toda a cinemática deste módulo sai de álgebra vetorial elementar aplicada ao vínculo
     acima.</p>
   </div>
@@ -179,9 +180,10 @@
   <!-- ================================================== -->
   <h2 id="s4">4. De onde vem a velocidade angular</h2>
 
-  <p>A velocidade angular costuma ser apresentada como uma definição, o que é uma pena,
-  porque ela na verdade é um <em>teorema</em>: ela existe, e é um vetor, como consequência
-  direta do vínculo de rigidez. A demonstração é curta.</p>
+  <p>A velocidade angular costuma ser apresentada como uma definição, o que é uma pena. A
+  demonstração a seguir é curta e mostra que ela não precisa ser postulada: a existência de
+  \(\vet{\omega}\), e o fato de ser um vetor, saem como <em>teorema</em>, por consequência
+  direta do vínculo de rigidez.</p>
 
   <p>Prenda ao corpo um sistema de eixos \(\vers{e}_1,\vers{e}_2,\vers{e}_3\), que giram com
   ele. Como o corpo é rígido, esses três vetores permanecem ortonormais em todo instante:</p>
@@ -196,9 +198,9 @@
 
   <p>\[A_{ij}=-A_{ji}:\qquad\text{a matriz }\Ten{A}\text{ é antissimétrica.}\]</p>
 
-  <p>Aqui está o passo decisivo. Uma matriz antissimétrica \(3\cruz3\) tem a diagonal nula e
-  apenas <strong>três</strong> componentes independentes, que podemos batizar como quisermos.
-  Batizemos assim:</p>
+  <p>Uma matriz antissimétrica \(3\cruz3\) tem a diagonal nula e apenas <strong>três</strong>
+  componentes independentes, que podemos batizar como quisermos. Nesse detalhe de contagem
+  está o passo decisivo, e o batismo certo é este:</p>
 
   <p>\[\omega_1\equiv A_{23},\qquad \omega_2\equiv A_{31},\qquad \omega_3\equiv A_{12},
   \qquad\text{ou seja}\qquad A_{ij}=\varepsilon_{ijk}\,\omega_k.\]</p>
@@ -224,9 +226,9 @@
     impôs.
   </div>
 
-  <p>O resto é consequência. Seja \(P\) um ponto qualquer do corpo e \(\vet{s}\) o vetor que
-  vai de \(O\) até \(P\). Como ambos pertencem ao corpo, as componentes de \(\vet{s}\) na base
-  presa ao corpo são <em>constantes</em>: é exatamente isso que a rigidez significa. Então</p>
+  <p>Seja agora \(P\) um ponto qualquer do corpo e \(\vet{s}\) o vetor que vai de \(O\)
+  até \(P\). Como ambos pertencem ao corpo, as componentes de \(\vet{s}\) na base presa a
+  ele são <em>constantes</em>, que é exatamente o que a rigidez significa. Derivando,</p>
 
   <p>\[\dot{\vet{s}}=\frac{d}{dt}\sum_i s_i\vers{e}_i=\sum_i s_i\dot{\vers{e}}_i
   =\vet{\omega}\cruz\sum_i s_i\vers{e}_i=\vet{\omega}\cruz\vet{s},\]</p>
@@ -238,10 +240,10 @@
     \[\boxed{\;\vet{v}_P=\vet{v}_O+\vet{\omega}\cruz\vet{s}\;}\]
   </div>
 
-  <p>Toda a cinemática deste módulo está nessa linha. Note onde a rigidez entrou: no fato de
-  os \(s_i\) serem constantes. Se o corpo se deformasse, apareceria um termo
-  \(\sum_i\dot s_i\vers{e}_i\), que é precisamente a velocidade de deformação estudada em
-  meios contínuos.</p>
+  <p>Repare onde a rigidez entrou: apenas no fato de os \(s_i\) serem constantes. Se o corpo
+  se deformasse, apareceria um termo \(\sum_i\dot s_i\vers{e}_i\), que é precisamente a
+  velocidade de deformação estudada em meios contínuos. Tirada essa hipótese única, toda a
+  cinemática deste módulo está contida naquela linha.</p>
 
   <div class="bloco fisica">
     <span class="rotulo">O mesmo resultado, dito em matrizes</span>
@@ -336,9 +338,9 @@
 
   <div data-widget="comutam"></div>
 
-  <p>A reconciliação está na ordem do infinitésimo. Escreva uma rotação pequena como um
-  desvio da identidade, \(\Ten{R}=\Ten{1}+\Ten{A}\), com \(\Ten{A}\) antissimétrica e da
-  ordem do ângulo \(\varphi\). Então</p>
+  <p>Escreva uma rotação pequena como um desvio da identidade,
+  \(\Ten{R}=\Ten{1}+\Ten{A}\), com \(\Ten{A}\) antissimétrica e da ordem do ângulo
+  \(\varphi\). Multiplicando duas delas nas duas ordens,</p>
 
   <p>\[\Ten{R}_1\Ten{R}_2=\Ten{1}+\Ten{A}_1+\Ten{A}_2+\Ten{A}_1\Ten{A}_2,\qquad
   \Ten{R}_2\Ten{R}_1=\Ten{1}+\Ten{A}_1+\Ten{A}_2+\Ten{A}_2\Ten{A}_1,\]</p>
@@ -411,20 +413,20 @@
 
   <p>O movimento geral é, portanto, um <strong>parafuso</strong>: rotação em torno do eixo
   instantâneo mais deslizamento ao longo dele. O passo do parafuso, isto é, o avanço por
-  radianto de giro, é \(h=(\vet{\omega}\cdot\vet{v}_O)/\omega^2\).</p>
+  radiano de giro, é \(h=(\vet{\omega}\cdot\vet{v}_O)/\omega^2\).</p>
 
-  <p>Há um caso particular importante e comum. Quando \(\vet{v}_O\perp\vet{\omega}\), o
-  deslizamento é nulo e o eixo instantâneo é um eixo de pontos <strong>em
-  repouso</strong>. Todo movimento plano é desse tipo, e aí fala-se em <em>centro
-  instantâneo de rotação</em>: naquele instante o corpo gira em torno dele como se estivesse
-  espetado ali por um prego. O prego, porém, muda de lugar a cada instante.</p>
+  <p>Quando \(\vet{v}_O\perp\vet{\omega}\), o passo se anula e o eixo instantâneo passa a
+  ser um eixo de pontos <strong>em repouso</strong>. Todo movimento plano é desse tipo, e
+  nele fala-se em <em>centro instantâneo de rotação</em>: naquele instante o corpo gira em
+  torno dele como se estivesse espetado ali por um prego, com a ressalva de que o prego muda
+  de lugar a cada instante. É o caso particular mais comum e o mais útil.</p>
 
   <!-- ================================================== -->
   <h2 id="s9">9. Rolamento sem deslizamento</h2>
 
-  <p>A aplicação mais útil do eixo instantâneo é o rolamento. Uma roda de raio \(R\) avança
-  com o centro a velocidade \(v\) girando com velocidade angular \(\omega\). A velocidade do
-  ponto do pneu que toca o chão é, pela equação fundamental,</p>
+  <p>Uma roda de raio \(R\) avança com o centro a velocidade \(v\) enquanto gira com
+  velocidade angular \(\omega\). A velocidade do ponto do pneu que toca o chão é, pela
+  equação fundamental,</p>
 
   <p>\[v_{\text{contato}}=v-\omega R.\]</p>
 
@@ -443,14 +445,14 @@
 
   <div class="bloco fisica">
     <span class="rotulo">Velocidade nula, aceleração não</span>
-    <p>O ponto de contato tem velocidade zero, mas sua aceleração não é zero. Com \(\omega\)
-    constante, a equação da seção 7 dá, para o ponto de contato, \(\vet{s}=-R\vers{y}\) e
-    \(\vet{a}_C=0\), de modo que</p>
+    <p>Aplique a equação da seção 7 ao ponto de contato, com \(\omega\) constante,
+    \(\vet{s}=-R\vers{y}\) e \(\vet{a}_C=0\):</p>
     \[\vet{a}_{\text{contato}}=-\omega^2\vet{s}=+\omega^2R\,\vers{y},\]
-    <p>apontando para cima, na direção do centro. Está certo e é necessário: a velocidade do
-    ponto de contato é nula <em>naquele instante</em>, mas um instante depois aquele pedaço
-    de pneu já subiu, e para isso precisa ser acelerado. É por isso que a trajetória de um
-    ponto da borda faz um <strong>bico</strong> ao tocar o chão, e não uma curva suave.</p>
+    <p>O resultado aponta para cima, na direção do centro, e é necessário que seja assim: a
+    velocidade do ponto de contato é nula <em>naquele instante</em>, mas um instante depois
+    aquele pedaço de pneu já subiu, e para isso precisou ser acelerado. Daí a trajetória de
+    um ponto da borda fazer um <strong>bico</strong> ao tocar o chão, e não uma curva
+    suave.</p>
   </div>
 
   <p>A trajetória de um ponto da borda é a <strong>cicloide</strong>, e seus bicos no chão
@@ -608,6 +610,6 @@
   Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
 </footer>
 
-<script src="assets/js/widgets.js?v=202611081847"></script>
+<script src="assets/js/widgets.js?v=202611081853"></script>
 </body>
 </html>

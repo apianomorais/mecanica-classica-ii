@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 2: Centro de massa e momentos de inércia | Mecânica Clássica II</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611081847">
-<script src="assets/js/comum.js?v=202611081847"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611081853">
+<script src="assets/js/comum.js?v=202611081853"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -89,8 +89,8 @@
   o ponto físico apontado é sempre o mesmo; mudar \(O\) muda as coordenadas de \(\vet{R}\)
   exatamente como muda as de qualquer outro ponto.</p>
 
-  <p>A propriedade que faz todo o trabalho é esta: se medirmos as posições <em>a partir do
-  próprio centro de massa</em>, escrevendo \(\vet{r}_i=\vet{R}+\vet{r}\,'_i\), então</p>
+  <p>Meça agora as posições <em>a partir do próprio centro de massa</em>, escrevendo
+  \(\vet{r}_i=\vet{R}+\vet{r}\,'_i\). Somando as novas posições com peso de massa,</p>
 
   <p>\[\sum_i m_i\vet{r}\,'_i=\sum_i m_i\vet{r}_i-\vet{R}\sum_i m_i=M\vet{R}-M\vet{R}=\vet 0.\]</p>
 
@@ -183,9 +183,8 @@
   <!-- ================================================== -->
   <h2 id="s5">5. A energia potencial interna é constante</h2>
 
-  <p>Um detalhe que costuma passar batido e que simplifica tudo o que vem depois. Se todas as
-  forças, externas e internas, forem conservativas, a energia potencial total de um sistema
-  de partículas se escreve</p>
+  <p>Suponha que todas as forças, externas e internas, sejam conservativas. A energia
+  potencial total de um sistema de partículas se escreve então</p>
 
   <p>\[U=U^{\rm ext}+\frac12\sum_i\sum_{j\neq i}U_{ij}\left(r_{ij}\right),\]</p>
 
@@ -233,11 +232,12 @@
   </table>
   </div>
 
-  <p>Mas a analogia tem um limite importante, e ele não é um detalhe técnico: a massa é uma
+  <p>Há um ponto, porém, em que a analogia se rompe. O mesmo disco tem
+  \(I=\tfrac12MR^2\) girando como um pião e \(I=\tfrac14MR^2\) girando em torno de um
+  diâmetro: trocar o eixo troca o número, sem que nada no corpo mude. A massa é uma
   propriedade do corpo, enquanto <strong>o momento de inércia é uma propriedade do corpo
-  <em>e</em> do eixo</strong>. O mesmo disco tem \(I=\tfrac12MR^2\) girando como um pião e
-  \(I=\tfrac14MR^2\) girando em torno de um diâmetro. Trocar o eixo troca o número. A seção
-  10 mostra até onde isso vai.</p>
+  <em>e</em> do eixo</strong>, e isso está longe de ser um detalhe técnico. A seção 10
+  mostra até onde a diferença vai.</p>
 
   <!-- ================================================== -->
   <h2 id="s7">7. O catálogo e o que ele ensina</h2>
@@ -263,12 +263,12 @@
 
   <div data-widget="inercia"></div>
 
-  <p>A ordenação da tabela não é acidente de álgebra. Com a mesma massa e o mesmo raio, o que
-  decide \(I\) é só uma coisa: <strong>quão longe do eixo a massa foi posta</strong>. O aro
-  põe tudo em \(R\) e chega ao máximo possível, \(k=1\). A casca esférica também põe tudo na
+  <p>Compare as barras do simulador, todas com a mesma massa e o mesmo raio. O aro põe toda
+  a massa em \(R\) e chega ao máximo possível, \(k=1\). A casca esférica também põe tudo na
   superfície, mas parte dela perto dos polos, onde \(\rho\) é pequeno, e cai para \(2/3\). A
   esfera maciça enche ainda o miolo e cai para \(2/5\). Nenhum desses números depende do
-  material.</p>
+  material, e a ordenação da tabela não é acidente de álgebra: o que decide \(I\) é só uma
+  coisa, <strong>quão longe do eixo a massa foi posta</strong>.</p>
 
   <div class="bloco fisica">
     <span class="rotulo">A conta da esfera maciça</span>
@@ -303,11 +303,12 @@
     \[I=I_{\rm cm}+Md^2.\]
   </div>
 
-  <p>Duas consequências que o simulador exibe de uma vez. Como \(Md^2\geq0\), <strong>o eixo
-  pelo centro de massa é sempre o de menor momento de inércia</strong> entre todos os eixos
-  paralelos a ele. E como a parcela acrescentada não sabe nada sobre a forma do corpo, para
-  \(d\) grande todos os corpos convergem: a alguns raios de distância, qualquer coisa gira
-  como uma massa pontual na ponta de um fio.</p>
+  <p>Como \(Md^2\) nunca é negativo, a parábola tem o seu mínimo em \(d=0\): <strong>o
+  eixo pelo centro de massa é sempre o de menor momento de inércia</strong> entre todos os
+  eixos paralelos a ele. E como a parcela acrescentada não sabe nada sobre a forma do corpo,
+  para \(d\) grande todos os corpos convergem, de modo que a alguns raios de distância
+  qualquer coisa gira como uma massa pontual na ponta de um fio. São as duas leituras que o
+  simulador exibe de uma vez.</p>
 
   <p>Atenção ao enunciado: o teorema só vale quando <em>um</em> dos dois eixos passa pelo
   centro de massa. Relacionar dois eixos paralelos quaisquer exige aplicá-lo duas vezes.</p>
@@ -338,10 +339,9 @@
   <!-- ================================================== -->
   <h2 id="s9">9. A corrida no plano inclinado</h2>
 
-  <p>Agora o momento de inércia é posto para trabalhar no problema que melhor mostra o que
-  ele significa. Um corpo de massa \(M\), raio \(R\) e \(I=kMR^2\) rola sem deslizar por uma
-  rampa, descendo uma altura \(h\). Conservando a energia e usando o vínculo \(v=\omega R\)
-  do módulo 1,</p>
+  <p>Um corpo de massa \(M\), raio \(R\) e \(I=kMR^2\) rola sem deslizar por uma rampa,
+  descendo uma altura \(h\). Conservando a energia e usando o vínculo \(v=\omega R\) do
+  módulo 1,</p>
 
   <p>\[Mgh=\frac12MV^2+\frac12I\omega^2=\frac12MV^2\left(1+k\right),\]</p>
 
@@ -534,6 +534,6 @@
   Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
 </footer>
 
-<script src="assets/js/widgets.js?v=202611081847"></script>
+<script src="assets/js/widgets.js?v=202611081853"></script>
 </body>
 </html>

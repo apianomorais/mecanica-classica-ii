@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mecânica Clássica II | LFCA/URCA</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611081847">
-<script src="assets/js/comum.js?v=202611081847"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611081853">
+<script src="assets/js/comum.js?v=202611081853"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -57,21 +57,22 @@
 
   <div class="bloco fisica">
     <span class="rotulo">O que esta disciplina faz</span>
-    <p>A mecânica newtoniana é um método de forças. Para resolver um problema, desenha-se o
-    diagrama de corpo livre, identificam-se todas as forças, inclusive as que não se conhece,
-    e escreve-se \(\vet{F}=m\vet{a}\) para cada componente. Funciona, e funciona muito bem,
-    enquanto as forças são conhecidas e o corpo é livre.</p>
+    <p>Para resolver um problema de mecânica pelo caminho de sempre, desenha-se o diagrama
+    de corpo livre, identificam-se todas as forças, inclusive as que não se conhece, e
+    escreve-se \(\vet{F}=m\vet{a}\) para cada componente. O método funciona, e funciona
+    muito bem, enquanto as forças são conhecidas e o corpo é livre. A mecânica newtoniana é,
+    em essência, um método de forças.</p>
     <p>O problema aparece com os <strong>vínculos</strong>. Uma conta num arame, um pêndulo
     duplo, um disco que rola sem deslizar, um corpo rígido com \(10^{23}\) átomos e apenas
     seis graus de liberdade. Em todos esses casos existem forças que não se conhece de
     antemão: as forças que o arame exerce sobre a conta, as que mantêm os átomos à distância
     fixa. Elas precisam ser carregadas pela conta inteira para, no fim, serem descartadas,
     porque não realizam trabalho algum.</p>
-    <p>Esta disciplina percorre o caminho que resolve esse incômodo. Começa levando o método
-    newtoniano ao seu limite natural, que são os corpos rígidos e os referenciais em
-    movimento. Depois troca o ponto de partida: em vez de forças e vetores, uma única função
-    escalar e uma condição de extremo. O resultado é que os vínculos deixam de ser um
-    problema e passam a ser a própria linguagem.</p>
+    <p>Os quatro primeiros módulos levam o método newtoniano ao seu limite natural, que são
+    os corpos rígidos e os referenciais em movimento. Os oito seguintes trocam o ponto de
+    partida: em vez de forças e vetores, uma única função escalar e uma condição de extremo.
+    Com essa troca os vínculos deixam de ser um problema e passam a ser a própria linguagem,
+    e é esse o caminho que a disciplina percorre.</p>
   </div>
 
   <p>A troca é radical. Em 1788, <strong><a href="https://pt.wikipedia.org/wiki/Joseph-Louis_Lagrange">Joseph-Louis Lagrange</a></strong>
@@ -93,13 +94,13 @@
 
   <h3>Por que começar pelos corpos rígidos</h3>
 
-  <p>A ementa poderia ir direto ao cálculo variacional, e vários livros vão. O caminho
-  escolhido aqui é outro, e tem uma razão didática: <strong>um corpo rígido é o sistema
-  vinculado mais simples que existe</strong>. Ele tem um número gigantesco de coordenadas e
-  apenas seis graus de liberdade, porque todas as distâncias internas estão travadas. Quem
-  resolve o corpo rígido pelo método newtoniano sente na mão exatamente o desconforto que o
-  formalismo lagrangiano vai eliminar, e chega ao capítulo seguinte sabendo <em>de que</em> o
-  método novo o está livrando.</p>
+  <p>A ementa poderia ir direto ao cálculo variacional, e vários livros vão. Um corpo
+  rígido, porém, tem um número gigantesco de coordenadas e apenas seis graus de liberdade,
+  porque todas as distâncias internas estão travadas: ele é <strong>o sistema vinculado mais
+  simples que existe</strong>. Quem o resolve pelo método newtoniano sente na mão exatamente
+  o desconforto que o formalismo lagrangiano vai eliminar, e chega ao capítulo seguinte
+  sabendo <em>de que</em> o método novo o está livrando. É essa a razão didática de começar
+  por aqui.</p>
 
   <p>Pelo caminho aparecem coisas que não são apenas exercício. O momento angular que não
   aponta na direção da velocidade angular. A roda que resiste a ser virada. A
@@ -110,9 +111,9 @@
 
   <h3>O fio que amarra tudo</h3>
 
-  <p>No fim da disciplina, uma única linha resume o que foi construído. A trajetória que um
-  sistema de fato percorre entre dois instantes é aquela que torna estacionária a
-  integral</p>
+  <p>Entre todos os caminhos que um sistema poderia seguir de um instante a outro, apenas um
+  é percorrido de fato. O critério que o seleciona, e que vale para qualquer sistema
+  mecânico, é tornar estacionária a integral</p>
 
   <p style="text-align:center">\(\Acao=\displaystyle\int_{t_1}^{t_2}\Lag\,dt\),</p>
 
