@@ -402,86 +402,11 @@
     var nota = el('div', { class: 'saida' });
     corpo.appendChild(nota);
 
-    /* ---- álgebra de matrizes 3×3 ---- */
-    function mul(A, B) {
-      var C = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], i, j, k;
-      for (i = 0; i < 3; i++) for (j = 0; j < 3; j++) {
-        var s = 0;
-        for (k = 0; k < 3; k++) s += A[i][k] * B[k][j];
-        C[i][j] = s;
-      }
-      return C;
-    }
-    function apl(A, v) {
-      return [A[0][0] * v[0] + A[0][1] * v[1] + A[0][2] * v[2],
-              A[1][0] * v[0] + A[1][1] * v[1] + A[1][2] * v[2],
-              A[2][0] * v[0] + A[2][1] * v[1] + A[2][2] * v[2]];
-    }
-    function transp(A) {
-      return [[A[0][0], A[1][0], A[2][0]],
-              [A[0][1], A[1][1], A[2][1]],
-              [A[0][2], A[1][2], A[2][2]]];
-    }
-    function Rx(a) {
-      var c = Math.cos(a), s = Math.sin(a);
-      return [[1, 0, 0], [0, c, -s], [0, s, c]];
-    }
-    function Ry(a) {
-      var c = Math.cos(a), s = Math.sin(a);
-      return [[c, 0, s], [0, 1, 0], [-s, 0, c]];
-    }
-    function Rz(a) {
-      var c = Math.cos(a), s = Math.sin(a);
-      return [[c, -s, 0], [s, c, 0], [0, 0, 1]];
-    }
-    /* ângulo e eixo de uma rotação, pelo traço e pela parte antissimétrica */
-    function anguloEixo(A) {
-      var tr = A[0][0] + A[1][1] + A[2][2];
-      var c = Math.max(-1, Math.min(1, (tr - 1) / 2));
-      var ang = Math.acos(c);
-      var e = [A[2][1] - A[1][2], A[0][2] - A[2][0], A[1][0] - A[0][1]];
-      var n = Math.sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
-      if (n < 1e-9) return { ang: ang, eixo: null };
-      return { ang: ang, eixo: [e[0] / n, e[1] / n, e[2] / n] };
-    }
-
-    /* ---- o cubo e a sua projeção ---- */
-    var VIS = mul(Rz(-0.62), Rx(-1.14));   // ponto de vista fixo
-    var FACES = [
-      { v: [[1, -1, -1], [1, 1, -1], [1, 1, 1], [1, -1, 1]], c: '#c9e2dc', r: 'D' },
-      { v: [[-1, -1, -1], [-1, 1, -1], [-1, 1, 1], [-1, -1, 1]], c: '#e9e2cf', r: 'E' },
-      { v: [[-1, 1, -1], [1, 1, -1], [1, 1, 1], [-1, 1, 1]], c: '#f0d9d6', r: 'T' },
-      { v: [[-1, -1, -1], [1, -1, -1], [1, -1, 1], [-1, -1, 1]], c: '#d9d6ea', r: 'F' },
-      { v: [[-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]], c: '#ffffff', r: 'C' },
-      { v: [[-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1]], c: '#dfe4e2', r: 'B' }
-    ];
-
-    function cubo(ct, cx, cy, s, R) {
-      var faces = FACES.map(function (f) {
-        var pts = f.v.map(function (v) { return apl(mul(VIS, R), v); });
-        var prof = pts.reduce(function (a, p) { return a + p[1]; }, 0) / 4;
-        return { pts: pts, prof: prof, c: f.c, r: f.r };
-      });
-      faces.sort(function (a, b) { return b.prof - a.prof; });
-      faces.forEach(function (f) {
-        ct.beginPath();
-        f.pts.forEach(function (p, i) {
-          var x = cx + p[0] * s, y = cy - p[2] * s;
-          (i ? ct.lineTo : ct.moveTo).call(ct, x, y);
-        });
-        ct.closePath();
-        ct.fillStyle = f.c; ct.fill();
-        ct.strokeStyle = '#2f3b38'; ct.lineWidth = 1.2; ct.stroke();
-        if (f.prof < 0) {
-          var mx = 0, my = 0;
-          f.pts.forEach(function (p) { mx += cx + p[0] * s; my += cy - p[2] * s; });
-          ct.fillStyle = '#2f3b38';
-          ct.font = '700 ' + Math.round(s * 0.5) + 'px system-ui, sans-serif';
-          ct.textAlign = 'center'; ct.textBaseline = 'middle';
-          ct.fillText(f.r, mx / 4, my / 4);
-        }
-      });
-    }
+    /* a álgebra de matrizes e o desenho do cubo são compartilhados com
+       os widgets de rotação do módulo 5, em M3 e desenhaCubo */
+    var mul = M3.mul, transp = M3.transp,
+        Rx = M3.Rx, Rz = M3.Rz, anguloEixo = M3.anguloEixo;
+    var cubo = desenhaCubo;
 
     function desenharCaminhos() {
       var fi = est.fi * Math.PI / 180;
@@ -2571,6 +2496,572 @@
         + ' primeiro. Estreite a base ou levante o corpo e o tombamento passa à frente; é '
         + 'por isso que caminhões altos tombam em curvas onde carros baixos apenas derrapam, '
         + 'e é por isso que se carrega carga pesada no fundo do porta-malas.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
+
+  /* Álgebra de matrizes 3×3, usada pelos widgets de rotação. */
+  var M3 = (function () {
+    function mul(A, B) {
+      var C = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], i, j, k;
+      for (i = 0; i < 3; i++) for (j = 0; j < 3; j++) {
+        var s = 0;
+        for (k = 0; k < 3; k++) s += A[i][k] * B[k][j];
+        C[i][j] = s;
+      }
+      return C;
+    }
+    function apl(A, v) {
+      return [A[0][0] * v[0] + A[0][1] * v[1] + A[0][2] * v[2],
+              A[1][0] * v[0] + A[1][1] * v[1] + A[1][2] * v[2],
+              A[2][0] * v[0] + A[2][1] * v[1] + A[2][2] * v[2]];
+    }
+    function transp(A) {
+      return [[A[0][0], A[1][0], A[2][0]],
+              [A[0][1], A[1][1], A[2][1]],
+              [A[0][2], A[1][2], A[2][2]]];
+    }
+    function Rx(a) {
+      var c = Math.cos(a), s = Math.sin(a);
+      return [[1, 0, 0], [0, c, -s], [0, s, c]];
+    }
+    function Ry(a) {
+      var c = Math.cos(a), s = Math.sin(a);
+      return [[c, 0, s], [0, 1, 0], [-s, 0, c]];
+    }
+    function Rz(a) {
+      var c = Math.cos(a), s = Math.sin(a);
+      return [[c, -s, 0], [s, c, 0], [0, 0, 1]];
+    }
+    function det(A) {
+      return A[0][0] * (A[1][1] * A[2][2] - A[1][2] * A[2][1])
+           - A[0][1] * (A[1][0] * A[2][2] - A[1][2] * A[2][0])
+           + A[0][2] * (A[1][0] * A[2][1] - A[1][1] * A[2][0]);
+    }
+    function traco(A) { return A[0][0] + A[1][1] + A[2][2]; }
+    /* ângulo e eixo de uma rotação própria, pelo traço e pela parte
+       antissimétrica. Em φ = π a parte antissimétrica se anula e o eixo
+       sai da diagonal de R + 1. */
+    function anguloEixo(A) {
+      var c = Math.max(-1, Math.min(1, (traco(A) - 1) / 2));
+      var ang = Math.acos(c);
+      var e = [A[2][1] - A[1][2], A[0][2] - A[2][0], A[1][0] - A[0][1]];
+      var n = Math.sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
+      if (n > 1e-7) return { ang: ang, eixo: [e[0] / n, e[1] / n, e[2] / n] };
+      if (ang < 1e-5) return { ang: 0, eixo: null };
+      /* em φ = π vale R = 2nn^T - 1: tira-se a maior componente da
+         diagonal e as outras das linhas correspondentes, o que fixa os
+         sinais relativos (o sinal global é livre, como deve ser) */
+      var k = 0, i2;
+      for (i2 = 1; i2 < 3; i2++) if (A[i2][i2] > A[k][k]) k = i2;
+      var nk = Math.sqrt(Math.max(1e-12, (A[k][k] + 1) / 2));
+      var d = [0, 0, 0];
+      d[k] = nk;
+      for (i2 = 0; i2 < 3; i2++) if (i2 !== k) d[i2] = A[k][i2] / (2 * nk);
+      return { ang: ang, eixo: d };
+    }
+    /* rotação de ângulo a em torno do versor n, por Rodrigues */
+    function eixoPara(n, a) {
+      var c = Math.cos(a), s = Math.sin(a), u = 1 - c;
+      var x = n[0], y = n[1], z = n[2];
+      return [[c + x * x * u, x * y * u - z * s, x * z * u + y * s],
+              [y * x * u + z * s, c + y * y * u, y * z * u - x * s],
+              [z * x * u - y * s, z * y * u + x * s, c + z * z * u]];
+    }
+    return { mul: mul, apl: apl, transp: transp, Rx: Rx, Ry: Ry, Rz: Rz,
+             det: det, traco: traco, anguloEixo: anguloEixo, eixoPara: eixoPara };
+  })();
+
+  /* Desenha um cubo rotulado, visto de um ponto fixo. Compartilhado
+     pelos widgets que precisam mostrar uma orientação no espaço. */
+  var CUBO_FACES = [
+    { v: [[1, -1, -1], [1, 1, -1], [1, 1, 1], [1, -1, 1]], c: '#c9e2dc', r: 'D' },
+    { v: [[-1, -1, -1], [-1, 1, -1], [-1, 1, 1], [-1, -1, 1]], c: '#e9e2cf', r: 'E' },
+    { v: [[-1, 1, -1], [1, 1, -1], [1, 1, 1], [-1, 1, 1]], c: '#f0d9d6', r: 'T' },
+    { v: [[-1, -1, -1], [1, -1, -1], [1, -1, 1], [-1, -1, 1]], c: '#d9d6ea', r: 'F' },
+    { v: [[-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]], c: '#ffffff', r: 'C' },
+    { v: [[-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1]], c: '#dfe4e2', r: 'B' }
+  ];
+  var VISTA = M3.mul(M3.Rz(-0.62), M3.Rx(-1.14));
+
+  function desenhaCubo(ct, cx, cy, s, R) {
+    var faces = CUBO_FACES.map(function (f) {
+      var pts = f.v.map(function (v) { return M3.apl(M3.mul(VISTA, R), v); });
+      var prof = pts.reduce(function (a, p) { return a + p[1]; }, 0) / 4;
+      return { pts: pts, prof: prof, c: f.c, r: f.r };
+    });
+    faces.sort(function (a, b) { return b.prof - a.prof; });
+    faces.forEach(function (f) {
+      ct.beginPath();
+      f.pts.forEach(function (p, i) {
+        (i ? ct.lineTo : ct.moveTo).call(ct, cx + p[0] * s, cy - p[2] * s);
+      });
+      ct.closePath();
+      ct.fillStyle = f.c; ct.fill();
+      ct.strokeStyle = '#2f3b38'; ct.lineWidth = 1.2; ct.stroke();
+      if (f.prof < 0) {
+        var mx = 0, my = 0;
+        f.pts.forEach(function (p) { mx += cx + p[0] * s; my += cy - p[2] * s; });
+        ct.fillStyle = '#2f3b38';
+        ct.font = '700 ' + Math.round(s * 0.5) + 'px system-ui, sans-serif';
+        ct.textAlign = 'center'; ct.textBaseline = 'middle';
+        ct.fillText(f.r, mx / 4, my / 4);
+      }
+    });
+  }
+
+  /* =================================================================
+     13. A matriz de rotação no plano
+     Mostrar a matriz ao lado da figura que ela move, com o determinante
+     e o produto por sua transposta calculados ao vivo, transforma três
+     definições abstratas em três números que o aluno vê mudar (ou não
+     mudar) enquanto arrasta o deslizante. A vista da reflexão existe
+     para que o determinante -1 seja visto, e não apenas afirmado.
+     ================================================================= */
+  REGISTRO.matrizrot = function (raiz) {
+    /* uma letra F, porque numa figura simétrica a reflexão não se nota */
+    var FIG = [[0, 0], [0, 2.2], [1.5, 2.2], [1.5, 1.75], [0.5, 1.75],
+               [0.5, 1.25], [1.25, 1.25], [1.25, 0.8], [0.5, 0.8], [0.5, 0]];
+    var est = { vista: 'rot', th: 35 };
+
+    var corpo = moldura(raiz, 'A matriz de rotação, vista por dentro');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, [
+      { rot: 'Rotação (det = +1)', v: 'rot' },
+      { rot: 'Com reflexão (det = −1)', v: 'ref' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'ângulo θ', 0, 360, 1, 35,
+      function (v) { est.th = v; desenhar(); }, function (v) { return v + '°'; });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'primeira coluna', k: 'c1' },
+      { rot: 'segunda coluna', k: 'c2' },
+      { rot: 'produto escalar das colunas', k: 'dot' },
+      { rot: 'comprimento de cada coluna', k: 'norm' },
+      { rot: 'determinante', k: 'det' },
+      { rot: 'o que isso é', k: 'tipo' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function matriz() {
+      var a = est.th * Math.PI / 180, c = Math.cos(a), s = Math.sin(a);
+      /* a reflexão no eixo x entra depois da rotação e troca o sinal
+         da segunda coluna, levando o determinante a -1 */
+      return est.vista === 'rot' ? [[c, -s], [s, c]] : [[c, s], [s, -c]];
+    }
+
+    function desenhar() {
+      var R = matriz(), alt = 330;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var esc = Math.min((alt - 60) / 5.2, 56);
+      var cx = Lp * (Lp > 620 ? 0.36 : 0.5), cy = alt / 2 + 4;
+      var X = function (u) { return cx + u * esc; };
+      var Y = function (u) { return cy - u * esc; };
+
+      /* grade e eixos */
+      ct.strokeStyle = G.COR.grade; ct.lineWidth = 1;
+      for (var g = -3; g <= 3; g++) {
+        ct.beginPath(); ct.moveTo(X(g), Y(-2.4)); ct.lineTo(X(g), Y(2.6)); ct.stroke();
+        ct.beginPath(); ct.moveTo(X(-2.6), Y(g)); ct.lineTo(X(2.8), Y(g)); ct.stroke();
+      }
+      ct.strokeStyle = G.COR.suave; ct.lineWidth = 1.6;
+      ct.beginPath(); ct.moveTo(X(-2.6), Y(0)); ct.lineTo(X(2.8), Y(0)); ct.stroke();
+      ct.beginPath(); ct.moveTo(X(0), Y(-2.4)); ct.lineTo(X(0), Y(2.6)); ct.stroke();
+
+      /* figura original e transformada */
+      function poli(pts, traco, preenche, larg) {
+        ct.beginPath();
+        pts.forEach(function (q, i) { (i ? ct.lineTo : ct.moveTo).call(ct, X(q[0]), Y(q[1])); });
+        ct.closePath();
+        if (preenche) { ct.fillStyle = preenche; ct.fill(); }
+        ct.strokeStyle = traco; ct.lineWidth = larg || 2; ct.stroke();
+      }
+      poli(FIG, G.COR.grade, 'rgba(91,103,115,.07)', 1.6);
+      poli(FIG.map(function (q) {
+        return [R[0][0] * q[0] + R[0][1] * q[1], R[1][0] * q[0] + R[1][1] * q[1]];
+      }), est.vista === 'rot' ? G.COR.mestra : G.COR.vinho,
+        est.vista === 'rot' ? 'rgba(23,107,93,.16)' : 'rgba(140,47,57,.14)', 2.4);
+
+      /* as colunas da matriz são as imagens dos versores da base */
+      seta(ct, X(0), Y(0), X(R[0][0]), Y(R[1][0]), G.COR.bronze, 2.6);
+      seta(ct, X(0), Y(0), X(R[0][1]), Y(R[1][1]), G.COR.roxo, 2.6);
+      rotulo(ct, 'imagem de x̂', X(R[0][0] * 1.22), Y(R[1][0] * 1.22), G.COR.bronze);
+      rotulo(ct, 'imagem de ŷ', X(R[0][1] * 1.3), Y(R[1][1] * 1.3), G.COR.roxo);
+
+      /* a matriz escrita ao lado */
+      if (Lp > 620) {
+        var mx = Lp * 0.76, my = cy - 22;
+        ct.font = '600 15px ui-monospace, Menlo, monospace';
+        ct.textAlign = 'right'; ct.textBaseline = 'middle';
+        ct.fillStyle = G.COR.tinta;
+        [[0, 0], [0, 1], [1, 0], [1, 1]].forEach(function (ij) {
+          ct.fillStyle = ij[1] === 0 ? G.COR.bronze : G.COR.roxo;
+          ct.fillText(F.fmt(R[ij[0]][ij[1]], 3),
+            mx + (ij[1] === 0 ? -18 : 48), my + (ij[0] === 0 ? -16 : 16));
+        });
+        ct.strokeStyle = G.COR.tinta; ct.lineWidth = 1.6;
+        [[-78, 1], [60, -1]].forEach(function (b) {
+          ct.beginPath();
+          ct.moveTo(mx + b[0] + b[1] * 7, my - 34); ct.lineTo(mx + b[0], my - 34);
+          ct.lineTo(mx + b[0], my + 34); ct.lineTo(mx + b[0] + b[1] * 7, my + 34);
+          ct.stroke();
+        });
+        rotulo(ct, est.vista === 'rot' ? 'det = +1' : 'det = −1',
+          mx - 10, my + 56, est.vista === 'rot' ? G.COR.mestra : G.COR.vinho);
+      }
+
+      var d = R[0][0] * R[0][1] + R[1][0] * R[1][1];
+      var n1 = Math.sqrt(R[0][0] * R[0][0] + R[1][0] * R[1][0]);
+      var det = R[0][0] * R[1][1] - R[0][1] * R[1][0];
+      mostrar({
+        c1: '(' + F.fmt(R[0][0], 3) + '; ' + F.fmt(R[1][0], 3) + ')',
+        c2: '(' + F.fmt(R[0][1], 3) + '; ' + F.fmt(R[1][1], 3) + ')',
+        dot: F.fmt(Math.abs(d) < 1e-12 ? 0 : d, 3),
+        norm: F.fmt(n1, 3),
+        det: F.fmt(det, 3),
+        tipo: est.vista === 'rot' ? 'rotação própria' : 'imprópria: inverte a mão'
+      });
+
+      var comum =
+        '<p>Uma transformação linear fica inteiramente determinada pelo que faz com os '
+        + 'versores da base, e as <strong>colunas da matriz são justamente as imagens '
+        + 'desses versores</strong>: a seta bronze é a primeira coluna e a roxa é a segunda. '
+        + 'Olhe para os dois primeiros cartões enquanto arrasta o deslizante e repare no que '
+        + 'não muda: cada coluna continua de comprimento 1 e o produto escalar entre elas '
+        + 'continua zero.</p>'
+        + '<p>Essas duas propriedades, escritas de uma vez só, são a condição de '
+        + '<strong>ortogonalidade</strong>:</p>'
+        + '\\[\\Ten{R}^{\\sf T}\\Ten{R}=\\Ten{1}\\qquad\\text{ou}\\qquad '
+        + 'R_{ki}R_{kj}=\\delta_{ij}.\\]'
+        + '<p>Guardar ângulos e comprimentos é exatamente o que se espera de uma mudança de '
+        + 'base entre sistemas cartesianos, e é por isso que toda matriz de rotação é '
+        + 'ortogonal.</p>';
+
+      if (est.vista === 'rot') {
+        nota.innerHTML = comum
+          + '<p>Tomando o determinante da condição de ortogonalidade, '
+          + '\\(\\det(\\Ten{R}^{\\sf T})\\det(\\Ten{R})=\\left[\\det\\Ten{R}\\right]^2=1\\), '
+          + 'sobram apenas dois valores possíveis, \\(+1\\) e \\(-1\\). Aqui o determinante '
+          + 'vale \\(+1\\) para qualquer \\(\\theta\\): a figura gira, mas o F nunca aparece '
+          + 'espelhado, e a base continua destra. Chamam-se <strong>próprias</strong> as '
+          + 'rotações desse tipo, e o conjunto delas é o grupo \\(SO(3)\\).</p>'
+          + '<p>Mexa o ângulo até 360° e repare que a matriz volta exatamente ao que era. No '
+          + 'plano, a composição é simplesmente a soma dos ângulos, '
+          + '\\(\\Ten{R}(\\theta_1)\\Ten{R}(\\theta_2)=\\Ten{R}(\\theta_1+\\theta_2)\\), e '
+          + 'por isso rotações planas <em>comutam</em>. No espaço isso deixa de valer, como o '
+          + 'módulo 1 mostrou.</p>';
+      } else {
+        nota.innerHTML = comum
+          + '<p>Esta matriz também é ortogonal: as colunas continuam unitárias e '
+          + 'perpendiculares, e os cartões confirmam. O determinante, porém, vale \\(-1\\), e '
+          + 'a consequência está à vista: o <strong>F aparece espelhado</strong>.</p>'
+          + '<p>Transformações assim são <strong>impróprias</strong>. Elas preservam ângulos '
+          + 'e distâncias, mas trocam a mão do sistema de coordenadas, levando uma base '
+          + 'destra numa canhota. Nenhuma sequência de rotações, por mais longa, produz esse '
+          + 'efeito: o determinante de um produto é o produto dos determinantes, e '
+          + '\\(+1\\) multiplicado por si mesmo nunca dá \\(-1\\).</p>'
+          + '<p>Fisicamente isso importa porque um corpo rígido real não pode ser levado à '
+          + 'sua imagem especular por movimento nenhum. A mão esquerda e a direita são '
+          + 'congruentes por reflexão e incongruentes por rotação, e é essa distinção que '
+          + 'separa \\(O(3)\\) de \\(SO(3)\\).</p>';
+      }
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     14. Teorema de Euler: toda rotação tem um eixo
+     O módulo 1 mostrou que duas rotações em ordem trocada dão
+     resultados diferentes. Falta a outra metade da história: cada um
+     desses resultados, por mais embaralhado que pareça, é ele próprio
+     uma única rotação em torno de um eixo. Aqui o eixo é calculado e
+     desenhado atravessando o cubo, e a terceira coluna mostra que
+     girar só em torno dele reproduz o resultado.
+     ================================================================= */
+  REGISTRO.eixoangulo = function (raiz) {
+    var est = { a1: 0, a2: 2, f1: 70, f2: 55 };
+    var EIXOS = [
+      { r: 'x', v: [1, 0, 0], m: M3.Rx },
+      { r: 'y', v: [0, 1, 0], m: M3.Ry },
+      { r: 'z', v: [0, 0, 1], m: M3.Rz }
+    ];
+
+    var corpo = moldura(raiz, 'Teorema de Euler: duas rotações valem por uma só');
+
+    var c1 = el('div', { class: 'controles' });
+    corpo.appendChild(c1);
+    c1.appendChild(el('span', { class: 'etiqueta', texto: 'primeiro eixo' }));
+    opcoes(c1, EIXOS.map(function (e, i) { return { rot: e.r, v: i }; }), 0,
+      function (v) { est.a1 = v; desenhar(); });
+    c1.appendChild(el('span', { class: 'etiqueta', texto: 'depois' }));
+    opcoes(c1, EIXOS.map(function (e, i) { return { rot: e.r, v: i }; }), 2,
+      function (v) { est.a2 = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'ângulo do primeiro giro', 0, 180, 1, 70,
+      function (v) { est.f1 = v; desenhar(); }, function (v) { return v + '°'; });
+    deslizante(ctr, 'ângulo do segundo giro', 0, 180, 1, 55,
+      function (v) { est.f2 = v; desenhar(); }, function (v) { return v + '°'; });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'traço de R', k: 'tr' },
+      { rot: 'ângulo equivalente φ', k: 'fi' },
+      { rot: 'confere 1 + 2cos φ', k: 'chk' },
+      { rot: 'eixo equivalente', k: 'eixo' },
+      { rot: 'determinante', k: 'det' },
+      { rot: 'erro entre as duas colunas', k: 'err' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function dados() {
+      var R1 = EIXOS[est.a1].m(est.f1 * Math.PI / 180);
+      var R2 = EIXOS[est.a2].m(est.f2 * Math.PI / 180);
+      var R = M3.mul(R2, R1);
+      var ae = M3.anguloEixo(R);
+      var Re = ae.eixo ? M3.eixoPara(ae.eixo, ae.ang) : R;
+      var err = 0, i, j;
+      for (i = 0; i < 3; i++) for (j = 0; j < 3; j++)
+        err = Math.max(err, Math.abs(R[i][j] - Re[i][j]));
+      return { R1: R1, R2: R2, R: R, ae: ae, Re: Re, err: err };
+    }
+
+    function desenhar() {
+      var D = dados(), alt = 300;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var cols = 3, lg = Lp / cols;
+      var s = Math.min(lg * 0.2, 40);
+      var cy = alt / 2 + 2;
+
+      var painel = [
+        { R: [[1, 0, 0], [0, 1, 0], [0, 0, 1]], rot: 'inicial', cor: G.COR.suave },
+        { R: D.R, rot: 'os dois giros, em sequência', cor: G.COR.mestra },
+        { R: D.Re, rot: 'um giro só, em torno do eixo', cor: G.COR.roxo }
+      ];
+      painel.forEach(function (q, i) {
+        var cx = lg * i + lg / 2;
+        /* o eixo equivalente atravessando o cubo, nos dois últimos */
+        if (i > 0 && D.ae.eixo) {
+          var e = M3.apl(VISTA, D.ae.eixo);
+          var L2 = s * 2.1;
+          ct.beginPath();
+          ct.moveTo(cx - e[0] * L2, cy + e[2] * L2);
+          ct.lineTo(cx + e[0] * L2, cy - e[2] * L2);
+          ct.strokeStyle = G.COR.roxo; ct.lineWidth = 2;
+          ct.setLineDash([5, 4]); ct.stroke(); ct.setLineDash([]);
+        }
+        desenhaCubo(ct, cx, cy, s, q.R);
+        if (i > 0 && D.ae.eixo) {
+          var e2 = M3.apl(VISTA, D.ae.eixo), L3 = s * 2.1;
+          seta(ct, cx, cy, cx + e2[0] * L3, cy - e2[2] * L3, G.COR.roxo, 2.4);
+        }
+        rotulo(ct, q.rot, cx, alt - 14, q.cor, 'center', 'middle',
+          '600 10px system-ui, sans-serif');
+      });
+
+      rotulo(ct, 'as duas colunas da direita têm de dar o mesmo cubo',
+        Lp / 2, 14, G.COR.suave);
+
+      var tr = M3.traco(D.R);
+      mostrar({
+        tr: F.fmt(tr, 4),
+        fi: F.fmt(D.ae.ang * 180 / Math.PI, 2) + '°',
+        chk: F.fmt(1 + 2 * Math.cos(D.ae.ang), 4),
+        eixo: D.ae.eixo
+          ? '(' + D.ae.eixo.map(function (c) { return F.fmt(c, 2); }).join('; ') + ')'
+          : 'nenhum: é a identidade',
+        det: F.fmt(M3.det(D.R), 4),
+        err: D.err < 1e-9 ? 'zero' : F.fmt(D.err, 9)
+      });
+
+      nota.innerHTML =
+        '<p>Compondo dois giros em torno de eixos diferentes, o resultado é uma matriz '
+        + 'ortogonal de determinante \\(+1\\), porque o produto de duas dessas é outra do '
+        + 'mesmo tipo. O <strong>teorema de Euler</strong> diz mais do que isso: toda matriz '
+        + 'assim é uma rotação em torno de <em>algum</em> eixo.</p>'
+        + '<p>A demonstração cabe em duas linhas. Procura-se um vetor que a rotação deixe '
+        + 'parado, isto é, um autovetor de autovalor 1, o que exige '
+        + '\\(\\det(\\Ten{R}-\\Ten{1})=0\\). Usando \\(\\det\\Ten{R}=1\\),</p>'
+        + '\\[\\det(\\Ten{R}-\\Ten{1})=\\det\\Ten{R}^{\\sf T}\\det(\\Ten{R}-\\Ten{1})'
+        + '=\\det(\\Ten{1}-\\Ten{R}^{\\sf T})=\\det(\\Ten{1}-\\Ten{R})'
+        + '=-\\det(\\Ten{R}-\\Ten{1}),\\]'
+        + '<p>de modo que o determinante é igual ao seu próprio negativo e portanto nulo. O '
+        + 'eixo existe, e existe porque a dimensão é ímpar: no plano, uma rotação não deixa '
+        + 'direção nenhuma parada.</p>'
+        + '<p>O ângulo sai do traço. Escrevendo a rotação numa base cujo terceiro vetor é o '
+        + 'próprio eixo, a matriz fica com um bloco \\(2\\cruz2\\) de rotação e um 1 no '
+        + 'canto, e o traço vale \\(1+2\\cos\\varphi\\). Como o traço não muda com a mudança '
+        + 'de base, isso vale em qualquer uma. Confira nos cartões: o traço é '
+        + F.fmt(tr, 4) + ' e \\(1+2\\cos\\varphi\\) dá '
+        + F.fmt(1 + 2 * Math.cos(D.ae.ang), 4) + '.</p>'
+        + '<p>A terceira coluna da figura é a prova visual. Ela aplica ao cubo inicial uma '
+        + 'única rotação de ' + F.fmt(D.ae.ang * 180 / Math.PI, 1) + '° em torno do eixo '
+        + 'roxo, e o resultado coincide com o da sequência de dois giros, elemento a '
+        + 'elemento, com erro ' + (D.err < 1e-9 ? 'nulo' : F.fmt(D.err, 9)) + '.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     15. Ativa ou passiva
+     A fonte mais comum de erro de sinal em todo o curso. As duas
+     operações usam a mesma matriz, uma delas transposta, e a figura
+     deixa claro que numa o vetor se move e na outra quem se move são
+     os eixos.
+     ================================================================= */
+  REGISTRO.ativapassiva = function (raiz) {
+    var est = { vista: 'passiva', th: 40, vx: 2.1, vy: 0.9 };
+
+    var corpo = moldura(raiz, 'Girar o vetor ou girar os eixos');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, [
+      { rot: 'Passiva: giram os eixos', v: 'passiva' },
+      { rot: 'Ativa: gira o vetor', v: 'ativa' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'ângulo θ', -180, 180, 1, 40,
+      function (v) { est.th = v; desenhar(); }, function (v) { return v + '°'; });
+    deslizante(ctr, 'componente x do vetor', -2.5, 2.5, 0.1, 2.1,
+      function (v) { est.vx = v; desenhar(); }, function (v) { return F.fmt(v, 1); });
+    deslizante(ctr, 'componente y do vetor', -2.5, 2.5, 0.1, 0.9,
+      function (v) { est.vy = v; desenhar(); }, function (v) { return F.fmt(v, 1); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'o vetor na base antiga', k: 'a' },
+      { rot: 'o vetor na base nova', k: 'b' },
+      { rot: 'módulo (não muda)', k: 'm' },
+      { rot: 'matriz usada', k: 'mat' },
+      { rot: 'o que girou', k: 'quem' },
+      { rot: 'o que ficou parado', k: 'parado' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function desenhar() {
+      var a = est.th * Math.PI / 180, c = Math.cos(a), s = Math.sin(a);
+      var alt = 320;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var esc = Math.min((alt - 56) / 5.6, (Lp - 60) / 6.4, 54);
+      var cx = Lp / 2, cy = alt / 2 + 2;
+      var X = function (u) { return cx + u * esc; };
+      var Y = function (u) { return cy - u * esc; };
+      var passiva = est.vista === 'passiva';
+
+      /* base antiga, sempre no lugar */
+      ct.strokeStyle = G.COR.grade; ct.lineWidth = 1.4;
+      ct.beginPath(); ct.moveTo(X(-2.8), Y(0)); ct.lineTo(X(2.8), Y(0)); ct.stroke();
+      ct.beginPath(); ct.moveTo(X(0), Y(-2.4)); ct.lineTo(X(0), Y(2.4)); ct.stroke();
+      seta(ct, X(0), Y(0), X(1), Y(0), G.COR.suave, 2);
+      seta(ct, X(0), Y(0), X(0), Y(1), G.COR.suave, 2);
+      rotulo(ct, 'x̂', X(1.16), Y(-0.16), G.COR.suave);
+      rotulo(ct, 'ŷ', X(-0.18), Y(1.16), G.COR.suave);
+
+      if (passiva) {
+        /* a base nova, girada de θ */
+        ct.strokeStyle = 'rgba(23,107,93,.3)'; ct.lineWidth = 1.2;
+        ct.beginPath();
+        ct.moveTo(X(-2.8 * c), Y(-2.8 * s)); ct.lineTo(X(2.8 * c), Y(2.8 * s)); ct.stroke();
+        ct.beginPath();
+        ct.moveTo(X(2.4 * s), Y(-2.4 * c)); ct.lineTo(X(-2.4 * s), Y(2.4 * c)); ct.stroke();
+        seta(ct, X(0), Y(0), X(c), Y(s), G.COR.mestra, 2.4);
+        seta(ct, X(0), Y(0), X(-s), Y(c), G.COR.mestra, 2.4);
+        rotulo(ct, "x̂'", X(1.2 * c), Y(1.2 * s), G.COR.mestra);
+        rotulo(ct, "ŷ'", X(-1.2 * s), Y(1.2 * c), G.COR.mestra);
+      }
+
+      /* o vetor */
+      var v = passiva ? [est.vx, est.vy]
+                      : [c * est.vx - s * est.vy, s * est.vx + c * est.vy];
+      if (!passiva) {
+        seta(ct, X(0), Y(0), X(est.vx), Y(est.vy), G.COR.grade, 2.4);
+        rotulo(ct, 'antes', X(est.vx * 1.1), Y(est.vy * 1.1) + 14, G.COR.suave);
+      }
+      seta(ct, X(0), Y(0), X(v[0]), Y(v[1]), G.COR.bronze, 3);
+      rotulo(ct, 'v', X(v[0] * 1.1), Y(v[1] * 1.1) - 12, G.COR.bronze);
+
+      /* as componentes do vetor na base que interessa */
+      var comp = passiva ? [c * est.vx + s * est.vy, -s * est.vx + c * est.vy]
+                         : [v[0], v[1]];
+      var e1 = passiva ? [c, s] : [1, 0], e2 = passiva ? [-s, c] : [0, 1];
+      ct.setLineDash([3, 3]); ct.strokeStyle = G.COR.roxo; ct.lineWidth = 1.4;
+      ct.beginPath();
+      ct.moveTo(X(v[0]), Y(v[1]));
+      ct.lineTo(X(comp[0] * e1[0]), Y(comp[0] * e1[1]));
+      ct.stroke();
+      ct.beginPath();
+      ct.moveTo(X(v[0]), Y(v[1]));
+      ct.lineTo(X(comp[1] * e2[0]), Y(comp[1] * e2[1]));
+      ct.stroke();
+      ct.setLineDash([]);
+
+      rotulo(ct, passiva ? 'o vetor não se mexe; os eixos é que giram'
+                         : 'os eixos não se mexem; o vetor é que gira',
+        Lp / 2, 16, passiva ? G.COR.mestra : G.COR.bronze);
+
+      mostrar({
+        a: '(' + F.fmt(est.vx, 2) + '; ' + F.fmt(est.vy, 2) + ')',
+        b: '(' + F.fmt(comp[0], 2) + '; ' + F.fmt(comp[1], 2) + ')',
+        m: F.fmt(Math.sqrt(est.vx * est.vx + est.vy * est.vy), 3),
+        mat: passiva ? 'Rᵀ(θ) nas componentes' : 'R(θ) no vetor',
+        quem: passiva ? 'a base' : 'o vetor',
+        parado: passiva ? 'o vetor' : 'a base'
+      });
+
+      nota.innerHTML =
+        '<p>A mesma matriz \\(\\Ten{R}(\\theta)\\) serve a duas operações que são quase '
+        + 'opostas, e trocar uma pela outra é a origem de metade dos erros de sinal deste '
+        + 'curso.</p>'
+        + '<p>Na transformação <strong>passiva</strong>, que é a do módulo 6, o vetor é um '
+        + 'objeto físico e não se mexe: uma velocidade continua sendo a mesma velocidade. O '
+        + 'que gira é o sistema de eixos de quem observa, e o que muda são as '
+        + '<em>componentes</em>:</p>'
+        + '\\[v\\,\'_i=\\left(\\Ten{R}^{\\sf T}\\right)_{ij}v_j,'
+        + '\\qquad\\text{isto é}\\qquad v\\,\'_i=\\vers{e}\\,\'_i\\cdot\\vet{v}.\\]'
+        + '<p>Na transformação <strong>ativa</strong>, que é a do módulo 1, os eixos ficam '
+        + 'parados e quem gira é o corpo. Aí \\(\\vet{v}\\,\'=\\Ten{R}\\vet{v}\\) é um vetor '
+        + 'diferente do original, apontando para outro lado.</p>'
+        + '<p>Troque entre as duas vistas com o mesmo \\(\\theta\\) e compare os números: as '
+        + 'componentes resultantes diferem exatamente pela troca do sinal de \\(\\theta\\), '
+        + 'porque \\(\\Ten{R}^{\\sf T}(\\theta)=\\Ten{R}(-\\theta)\\). Girar os eixos de '
+        + '\\(+\\theta\\) é indistinguível, nas contas, de girar o mundo de '
+        + '\\(-\\theta\\).</p>'
+        + '<p>O módulo do vetor, em ambos os casos, não muda: ' + F.fmt(
+          Math.sqrt(est.vx * est.vx + est.vy * est.vy), 3) + '. É a ortogonalidade da matriz '
+        + 'garantindo que comprimentos sobrevivem à transformação, seja qual for a leitura '
+        + 'que se dê a ela.</p>';
       tipografar(corpo);
     }
 

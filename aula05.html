@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 5: Matrizes de rotação e transformações de coordenadas | Mecânica Clássica II</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611081913">
+<script src="assets/js/comum.js?v=202611081913"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Mecânica Clássica II <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html">Início</a>
+      <span class="grupo">Corpos rígidos</span>
+      <a href="aula01.html" class="num" title="Módulo 1: Cinemática dos corpos rígidos">1</a>
+      <a href="aula02.html" class="num" title="Módulo 2: Centro de massa e momentos de inércia">2</a>
+      <a href="aula03.html" class="num" title="Módulo 3: Momento angular, torque e equações de movimento">3</a>
+      <a href="aula04.html" class="num" title="Módulo 4: Conservação e equilíbrio estático">4</a>
+      <span class="grupo">Referenciais</span>
+      <a href="aula05.html" class="num ativo" title="Módulo 5: Matrizes de rotação e transformações de coordenadas">5</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+<aside class="lateral">
+  <h4>Neste módulo</h4>
+  <ol>
+    <li><a href="#s1">1. Trocar de base</a></li>
+    <li><a href="#s2">2. Ortogonalidade</a></li>
+    <li><a href="#s3">3. Próprias e impróprias</a></li>
+    <li><a href="#s4">4. Rotações no plano</a></li>
+    <li><a href="#s5">5. O teorema de Euler</a></li>
+    <li><a href="#s6">6. A fórmula de Rodrigues</a></li>
+    <li><a href="#s7">7. Rotações infinitesimais</a></li>
+    <li><a href="#s8">8. Ativa ou passiva</a></li>
+    <li><a href="#s9">9. Vetores e pseudovetores</a></li>
+    <li><a href="#s10">10. Exercícios resolvidos</a></li>
+    <li><a href="#s11">11. Exercícios propostos</a></li>
+  </ol>
+</aside>
+
+<main class="conteudo">
+
+  <p class="chapeu">Módulo 5 · Sistemas de coordenadas em movimento</p>
+  <h1>Matrizes de rotação e transformações de coordenadas</h1>
+  <p class="subtitulo">Os quatro primeiros módulos usaram rotações o tempo todo sem olhar para
+  elas de frente. Aqui elas viram o objeto de estudo: o que é, exatamente, uma rotação; por
+  que uma reflexão não é uma; por que três ângulos bastam e por que nunca comutam. É o
+  ferramental de que o módulo 6 precisa para pôr um observador a girar.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Objetivos</span>
+    <ul>
+      <li>Escrever a matriz de mudança de base com cossenos diretores;</li>
+      <li>Reconhecer a ortogonalidade e o que ela preserva;</li>
+      <li>Separar rotações próprias de impróprias pelo determinante;</li>
+      <li>Demonstrar que toda rotação do espaço tem um eixo;</li>
+      <li>Extrair ângulo e eixo pelo traço e pela parte antissimétrica;</li>
+      <li>Distinguir transformação ativa de passiva e vetor de pseudovetor.</li>
+    </ul>
+  </div>
+
+  <hr class="linha">
+
+  <!-- ================================================== -->
+  <h2 id="s1">1. Trocar de base</h2>
+
+  <p>Um mesmo ponto do espaço pode ser descrito em dois sistemas cartesianos diferentes que
+  compartilham a origem. Sejam \(\vers{e}_1,\vers{e}_2,\vers{e}_3\) os versores do primeiro e
+  \(\vers{e}\,'_1,\vers{e}\,'_2,\vers{e}\,'_3\) os do segundo. Qualquer vetor \(\vet{v}\) tem
+  componentes nas duas bases, e para passar de umas às outras basta projetar:</p>
+
+  <p>\[v'_i=\vers{e}\,'_i\cdot\vet{v}=\vers{e}\,'_i\cdot\sum_j v_j\vers{e}_j
+  =\sum_j\left(\vers{e}\,'_i\cdot\vers{e}_j\right)v_j.\]</p>
+
+  <p>Os nove números entre parênteses são os <strong>cossenos diretores</strong>, porque cada
+  um é o cosseno do ângulo entre um eixo novo e um eixo velho. Arrumados numa matriz,</p>
+
+  <div class="destaque">
+    <span class="anuncio">Mudança de base</span>
+    \[v'_i=R_{ij}v_j,\qquad R_{ij}=\vers{e}\,'_i\cdot\vers{e}_j.\]
+  </div>
+
+  <p>Nada aqui supõe que alguma coisa tenha se movido. Trata-se de dois observadores
+  descrevendo o mesmo vetor com réguas orientadas de maneiras diferentes, e a matriz é o
+  dicionário entre os dois vocabulários. A seção 8 volta a esse ponto, que é mais delicado do
+  que parece.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s2">2. Ortogonalidade</h2>
+
+  <p>Nem toda matriz \(3\cruz3\) corresponde a uma troca de sistema cartesiano. A exigência
+  aparece ao impor que a base nova também seja ortonormal. Escrevendo
+  \(\vers{e}\,'_i=\sum_j R_{ij}\vers{e}_j\) e calculando o produto escalar de dois deles,</p>
+
+  <p>\[\vers{e}\,'_i\cdot\vers{e}\,'_j=\sum_{k}R_{ik}R_{jk}=\delta_{ij},\]</p>
+
+  <p>que em forma matricial é</p>
+
+  <div class="destaque">
+    <span class="anuncio">Condição de ortogonalidade</span>
+    \[\Ten{R}\Ten{R}^{\sf T}=\Ten{R}^{\sf T}\Ten{R}=\Ten{1}
+    \qquad\Longleftrightarrow\qquad \Ten{R}^{-1}=\Ten{R}^{\sf T}.\]
+  </div>
+
+  <p>São nove equações, mas só seis independentes, porque a condição é simétrica em \(i\) e
+  \(j\). Das nove componentes da matriz sobram, portanto, <strong>três livres</strong>, o
+  mesmo número de graus de liberdade de orientação que o módulo 1 contou de outra maneira.
+  Os ângulos de Euler, que Mecânica Clássica III trata em detalhe, são uma escolha
+  particular desses três parâmetros.</p>
+
+  <div data-widget="matrizrot"></div>
+
+  <p>A consequência geométrica da ortogonalidade é que produtos escalares sobrevivem à
+  transformação: \(\vet{u}\,'\cdot\vet{v}\,'=u'_iv'_i=R_{ij}u_jR_{ik}v_k=\delta_{jk}u_jv_k
+  =\vet{u}\cdot\vet{v}\). Como comprimentos e ângulos saem de produtos escalares, nenhum dos
+  dois muda. Uma transformação ortogonal é uma <strong>isometria</strong>: ela pode virar a
+  figura de cabeça para baixo, mas não a estica, não a encolhe e não a entorta.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. Próprias e impróprias</h2>
+
+  <p>Tome o determinante dos dois lados da condição de ortogonalidade. Como
+  \(\det\Ten{R}^{\sf T}=\det\Ten{R}\), resulta \(\left(\det\Ten{R}\right)^2=1\), e sobram
+  dois valores possíveis. A diferença entre eles não é um detalhe de sinal:</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>\(\det\Ten{R}\)</th><th>Nome</th><th>O que faz</th><th>Grupo</th></tr></thead>
+    <tbody>
+      <tr><td>\(+1\)</td><td>própria</td><td>gira; mantém a mão do sistema</td><td>\(SO(3)\)</td></tr>
+      <tr><td>\(-1\)</td><td>imprópria</td><td>inclui uma reflexão; troca destro por canhoto</td><td>\(O(3)\setminus SO(3)\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>O determinante de um produto é o produto dos determinantes, de modo que compor rotações
+  próprias sempre devolve outra própria: por mais giros que se encadeiem, \(+1\) multiplicado
+  por si mesmo continua \(+1\). Nenhuma sequência de movimentos leva um objeto à sua imagem
+  especular, e é por isso que a mão esquerda não cabe na luva direita. O simulador acima
+  mostra as duas situações lado a lado, com o F espelhado aparecendo apenas no caso
+  impróprio.</p>
+
+  <p>Um movimento físico de corpo rígido é sempre contínuo a partir da identidade, e o
+  determinante, que só pode valer \(\pm1\), não tem como saltar de um valor ao outro sem
+  passar por valores proibidos. <strong>Movimento real, portanto, só realiza rotações
+  próprias.</strong> A inversão \(\vet{r}\mapsto-\vet{r}\), com determinante \((-1)^3=-1\), é
+  uma operação de simetria perfeitamente útil em física, mas não é um movimento.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. Rotações no plano</h2>
+
+  <p>No plano a situação é simples o bastante para ser escrita de uma vez. Girando os eixos
+  de \(\theta\) no sentido anti-horário,</p>
+
+  <p>\[\Ten{R}(\theta)=\begin{pmatrix}\cos\theta&-\sen\theta\\
+  \sen\theta&\cos\theta\end{pmatrix},\]</p>
+
+  <p>e multiplicando duas delas, com as fórmulas de soma de arcos, sai
+  \(\Ten{R}(\theta_1)\Ten{R}(\theta_2)=\Ten{R}(\theta_1+\theta_2)\). Compor rotações planas é
+  somar ângulos, e somar é comutativo. O grupo \(SO(2)\) é <strong>abeliano</strong>, e nele
+  a ordem dos giros não importa.</p>
+
+  <p>Essa facilidade não sobrevive à passagem para três dimensões, como o módulo 1 mostrou
+  com um cubo. A razão estrutural é que em duas dimensões há uma só direção de eixo possível,
+  perpendicular ao plano, e giros em torno do mesmo eixo sempre comutam. Em três dimensões há
+  um continuum de eixos, e giros em torno de eixos diferentes não comutam.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. O teorema de Euler</h2>
+
+  <p>Compor dois giros em torno de eixos diferentes produz uma matriz ortogonal de
+  determinante \(+1\), e é natural perguntar o que essa matriz faz geometricamente. Procure
+  uma direção que ela deixe parada, isto é, um vetor \(\vet{n}\) com
+  \(\Ten{R}\vet{n}=\vet{n}\). Tal vetor existe se e só se
+  \(\det\left(\Ten{R}-\Ten{1}\right)=0\), e a conta é curta. Usando \(\det\Ten{R}=1\) para
+  inserir \(\det\Ten{R}^{\sf T}\) de graça,</p>
+
+  <p>\[\det\left(\Ten{R}-\Ten{1}\right)
+  =\det\Ten{R}^{\sf T}\det\left(\Ten{R}-\Ten{1}\right)
+  =\det\left(\Ten{1}-\Ten{R}^{\sf T}\right)
+  =\det\left(\Ten{1}-\Ten{R}\right)
+  =-\det\left(\Ten{R}-\Ten{1}\right),\]</p>
+
+  <p>onde a penúltima igualdade usa que transpor não muda o determinante e a última que a
+  dimensão é ímpar. Um número igual ao próprio negativo é zero. Portanto:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Teorema de Euler (1775)</span>
+    Todo deslocamento de um corpo rígido com um ponto fixo é uma <strong>rotação em torno de
+    um único eixo</strong> que passa por esse ponto.
+  </div>
+
+  <p>Repare onde a dimensão entrou. No plano, \((-1)^2=+1\) e o argumento não fecha, o que
+  está certo: uma rotação plana não deixa direção nenhuma parada. O teorema é um fato sobre
+  dimensões ímpares.</p>
+
+  <p>O ângulo sai do traço. Numa base cujo terceiro vetor é o próprio eixo, a matriz fica com
+  um bloco de rotação plana e um 1 no canto, de modo que \(\Tr\Ten{R}=1+2\cos\varphi\). Como
+  o traço não muda ao se trocar de base, essa relação vale em qualquer uma, e o eixo sai da
+  parte antissimétrica, \(R_{ij}-R_{ji}=-2\varepsilon_{ijk}n_k\sen\varphi\).</p>
+
+  <div data-widget="eixoangulo"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. A fórmula de Rodrigues</h2>
+
+  <p>Saber que o eixo existe é uma coisa; escrever a matriz a partir dele é outra. Decomponha
+  um vetor \(\vet{v}\) em parcelas paralela e perpendicular ao eixo \(\vers{n}\). A paralela
+  não se mexe. A perpendicular gira de \(\varphi\) dentro do plano normal ao eixo, onde
+  \(\vet{v}_\perp\) e \(\vers{n}\cruz\vet{v}\) formam um par ortogonal de mesmo comprimento.
+  Montando o resultado,</p>
+
+  <div class="destaque">
+    <span class="anuncio">Fórmula de rotação de Rodrigues</span>
+    \[\vet{v}\,'=\vet{v}\cos\varphi+\left(\vers{n}\cruz\vet{v}\right)\sen\varphi
+    +\vers{n}\left(\vers{n}\cdot\vet{v}\right)\left(1-\cos\varphi\right).\]
+  </div>
+
+  <p>Em componentes, isso dá
+  \(R_{ij}=\delta_{ij}\cos\varphi-\varepsilon_{ijk}n_k\sen\varphi
+  +n_in_j\left(1-\cos\varphi\right)\). Confira os dois casos extremos: com
+  \(\varphi=0\) sobra \(\delta_{ij}\), a identidade; com \(\vet{v}\) paralelo a \(\vers{n}\),
+  os dois primeiros termos cancelam o que o terceiro acrescenta e sobra \(\vet{v}\).</p>
+
+  <p>Rodrigues publicou essa fórmula em 1840 e ela é hoje o modo padrão de representar
+  orientação em computação gráfica, robótica e controle de atitude de satélites, onde os
+  ângulos de Euler sofrem de uma singularidade conhecida como travamento de cardan. Quatro
+  números, o eixo e o ângulo, descrevem sem ambiguidade o que três ângulos descrevem com
+  ela.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. Rotações infinitesimais</h2>
+
+  <p>Faça \(\varphi=\epsilon\) pequeno na fórmula de Rodrigues e guarde apenas a primeira
+  ordem. O termo em \(1-\cos\varphi\) é de segunda ordem e some, restando</p>
+
+  <p>\[\vet{v}\,'=\vet{v}+\epsilon\,\vers{n}\cruz\vet{v},
+  \qquad\text{ou}\qquad \Ten{R}=\Ten{1}+\epsilon\,\Ten{A},\]</p>
+
+  <p>com \(A_{ij}=-\varepsilon_{ijk}n_k\) antissimétrica. A antissimetria não é acidente:
+  impondo a ortogonalidade a \(\Ten{1}+\epsilon\Ten{A}\) e desprezando \(\epsilon^2\), vem
+  \(\Ten{A}+\Ten{A}^{\sf T}=\Ten{0}\). É a mesma matriz que o módulo 1 obteve derivando
+  \(\vers{e}_i\cdot\vers{e}_j=\delta_{ij}\), e o vetor \(\vers{n}\) associado a ela é o mesmo
+  \(\vet{\omega}\) a menos do fator \(\epsilon/dt\).</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que os infinitesimais comutam</span>
+    <p>Multiplicando duas rotações pequenas,</p>
+    \[\left(\Ten{1}+\epsilon_1\Ten{A}_1\right)\left(\Ten{1}+\epsilon_2\Ten{A}_2\right)
+    =\Ten{1}+\epsilon_1\Ten{A}_1+\epsilon_2\Ten{A}_2
+    +\epsilon_1\epsilon_2\Ten{A}_1\Ten{A}_2,\]
+    <p>e trocando a ordem muda apenas o último termo. A diferença entre as duas ordens é o
+    comutador \(\Ten{A}_1\Ten{A}_2-\Ten{A}_2\Ten{A}_1\), que é de segunda ordem nos ângulos.
+    Daí a assimetria que o módulo 1 exibiu: um ângulo finito de rotação não é vetor, mas
+    \(\vet{\omega}=d\vet{\varphi}/dt\) é.</p>
+    <p>O comutador não é desprezível no plano teórico, porém. Calculando-o explicitamente
+    para as três matrizes básicas sai
+    \(\left[\Ten{A}_i,\Ten{A}_j\right]=\varepsilon_{ijk}\Ten{A}_k\), a mesma álgebra que o
+    momento angular satisfaz na Mecânica Quântica. As três matrizes \(\Ten{A}_i\) são
+    chamadas de <strong>geradores</strong> do grupo de rotações.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. Ativa ou passiva</h2>
+
+  <p>A mesma matriz \(\Ten{R}(\theta)\) comparece em duas operações que significam coisas
+  opostas, e confundi-las produz erros de sinal que sobrevivem até o fim da conta.</p>
+
+  <div data-widget="ativapassiva"></div>
+
+  <p>Na leitura <strong>passiva</strong>, o vetor é um objeto físico que não se mexe. Uma
+  velocidade continua sendo a mesma velocidade; o que gira é o sistema de eixos de quem
+  observa, e o que muda são as componentes. É a leitura da seção 1, e é a que o módulo 6 vai
+  usar para pôr um observador a girar com a Terra.</p>
+
+  <p>Na leitura <strong>ativa</strong>, os eixos ficam parados e quem gira é o corpo. Aí
+  \(\vet{v}\,'=\Ten{R}\vet{v}\) é um vetor genuinamente diferente do original. É a leitura
+  dos módulos 1 a 4, em que o corpo rígido efetivamente se move.</p>
+
+  <p>As duas estão ligadas por uma transposição, já que
+  \(\Ten{R}^{\sf T}(\theta)=\Ten{R}(-\theta)\) para uma matriz ortogonal. Girar os eixos de
+  \(+\theta\) produz nas contas o mesmo efeito de girar o mundo de \(-\theta\), o que é
+  intuitivo e é a origem da confusão. A regra prática é perguntar se algo se moveu de fato: se
+  sim, a transformação é ativa; se o que mudou foi apenas a descrição, é passiva.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. Vetores e pseudovetores</h2>
+
+  <p>Um vetor foi definido acima como uma trinca de números que se transforma segundo
+  \(v'_i=R_{ij}v_j\). Tome agora o produto vetorial de dois vetores e veja como ele se
+  comporta sob uma transformação <em>imprópria</em>, por exemplo a inversão
+  \(\Ten{R}=-\Ten{1}\). Os dois fatores trocam de sinal, e o produto, sendo bilinear,
+  <strong>não troca</strong>:</p>
+
+  <p>\[\vet{a}\mapsto-\vet{a},\quad\vet{b}\mapsto-\vet{b}
+  \quad\Longrightarrow\quad \vet{a}\cruz\vet{b}\mapsto+\vet{a}\cruz\vet{b}.\]</p>
+
+  <p>Objetos assim chamam-se <strong>pseudovetores</strong>, ou vetores axiais. Sob rotações
+  próprias eles se transformam como qualquer vetor, e é por isso que toda a mecânica dos
+  módulos anteriores funcionou sem que a distinção precisasse ser mencionada. Ela só aparece
+  quando entra uma reflexão.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Vetores verdadeiros (polares)</th><th>Pseudovetores (axiais)</th></tr></thead>
+    <tbody>
+      <tr><td>posição \(\vet{r}\), velocidade \(\vet{v}\)</td><td>velocidade angular \(\vet{\omega}\)</td></tr>
+      <tr><td>força \(\vet{F}\), momento \(\vet{p}\)</td><td>torque \(\vet{\tau}=\vet{r}\cruz\vet{F}\)</td></tr>
+      <tr><td>campo elétrico \(\vet{E}\)</td><td>momento angular \(\vet{L}=\vet{r}\cruz\vet{p}\)</td></tr>
+      <tr><td>aceleração \(\vet{a}\)</td><td>campo magnético \(\vet{B}\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>A consequência prática é que a seta que se desenha para \(\vet{\omega}\) não aponta para
+  lugar nenhum de verdade: ela é uma convenção, a da regra da mão direita, e trocar a
+  convenção inverteria todas as setas axiais sem mudar física alguma. Diante de um espelho,
+  um pião que gira no sentido horário continua girando no sentido horário na imagem quando se
+  olha pelo eixo, embora tudo o mais esteja invertido. É o mesmo motivo pelo qual uma equação
+  física legítima nunca iguala um vetor a um pseudovetor.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. Exercícios resolvidos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 5.1 · Checando uma matriz</span>
+    <p>Verifique se a matriz abaixo é de rotação e, se for, determine o eixo e o ângulo.</p>
+    \[\Ten{R}=\begin{pmatrix}0&0&1\\1&0&0\\0&1&0\end{pmatrix}.\]
+    <p><strong>Solução.</strong> As colunas são \((0,1,0)\), \((0,0,1)\) e \((1,0,0)\):
+    unitárias e mutuamente perpendiculares, de modo que \(\Ten{R}\Ten{R}^{\sf T}=\Ten{1}\).
+    O determinante, expandindo pela primeira linha, vale \(0-0+1\cruz(1-0)=+1\), e portanto
+    a rotação é própria.</p>
+    <p>O traço é \(0+0+0=0\), e de \(\Tr\Ten{R}=1+2\cos\varphi\) vem
+    \(\cos\varphi=-\tfrac12\), isto é \(\varphi=120^\circ\). Para o eixo, a parte
+    antissimétrica dá \(R_{32}-R_{23}=1-0=1\) e, por simetria, o mesmo nas outras duas
+    componentes, de onde</p>
+    \[\vers{n}=\frac{1}{\sqrt3}\left(1,1,1\right).\]
+    <p>A matriz permuta ciclicamente os eixos, e girar 120° em torno da diagonal do cubo é
+    exatamente o que leva \(x\to y\to z\to x\). Confira no simulador da seção 5 compondo
+    giros de 90° em \(x\) e em \(z\): o eixo equivalente é essa mesma diagonal.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 5.2 · Rodrigues na prática</span>
+    <p>Gire o vetor \(\vet{v}=(1,0,0)\) de 90° em torno do eixo
+    \(\vers{n}=\tfrac{1}{\sqrt2}(0,1,1)\).</p>
+    <p><strong>Solução.</strong> Com \(\cos90^\circ=0\) e \(\sen90^\circ=1\), a fórmula se
+    reduz a \(\vet{v}\,'=\vers{n}\cruz\vet{v}+\vers{n}(\vers{n}\cdot\vet{v})\). O produto
+    escalar é nulo, porque \(\vers{n}\) não tem componente \(x\), e sobra só o produto
+    vetorial:</p>
+    \[\vet{v}\,'=\frac{1}{\sqrt2}\left(0,1,1\right)\cruz\left(1,0,0\right)
+    =\frac{1}{\sqrt2}\left(0,1,-1\right).\]
+    <p>O resultado tem módulo 1, como tinha de ter, é perpendicular ao original e é
+    perpendicular ao eixo. Girar 90° a partir de um vetor que já era perpendicular ao eixo
+    leva ao outro vetor perpendicular do par, e o sinal sai da regra da mão direita.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 5.3 · Quantos parâmetros</span>
+    <p>Mostre, pela contagem de vínculos, que uma matriz ortogonal \(n\cruz n\) tem
+    \(n(n-1)/2\) parâmetros livres, e interprete o resultado em duas e três dimensões.</p>
+    <p><strong>Solução.</strong> A matriz tem \(n^2\) entradas. A condição
+    \(\Ten{R}\Ten{R}^{\sf T}=\Ten{1}\) é uma igualdade entre matrizes simétricas, de modo que
+    só \(n(n+1)/2\) das \(n^2\) equações são independentes. Restam</p>
+    \[n^2-\frac{n(n+1)}{2}=\frac{n(n-1)}{2}\ \text{parâmetros}.\]
+    <p>Em \(n=2\) isso dá 1, que é o único ângulo de uma rotação plana. Em \(n=3\) dá 3, que
+    são os três ângulos de Euler ou, equivalentemente, as duas coordenadas do eixo mais o
+    ângulo de giro. Em \(n=4\) daria 6, o número de rotações independentes do espaço-tempo na
+    relatividade restrita: três espaciais e três impulsos.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 5.4 · O sinal que some</span>
+    <p>Os eixos de um referencial são girados de \(+30^\circ\) em torno de \(z\). Um vetor tem
+    componentes \((2,0,0)\) na base antiga. Determine as componentes na base nova e compare
+    com o resultado de girar o vetor de \(+30^\circ\) mantendo os eixos.</p>
+    <p><strong>Solução.</strong> Na leitura passiva, \(v'_i=R_{ij}v_j\) com
+    \(R_{ij}=\vers{e}\,'_i\cdot\vers{e}_j\), isto é \(\Ten{R}^{\sf T}(30^\circ)\) na convenção
+    da seção 4:</p>
+    \[\vet{v}\,'=\left(2\cos30^\circ,\,-2\sen30^\circ,\,0\right)=\left(1{,}732;\,-1;\,0\right).\]
+    <p>Na leitura ativa, girando o vetor,</p>
+    \[\vet{v}\,'=\left(2\cos30^\circ,\,+2\sen30^\circ,\,0\right)=\left(1{,}732;\,+1;\,0\right).\]
+    <p>Os dois diferem no sinal da segunda componente, e nada mais. O módulo é 2 nos dois
+    casos. Na prática, convém fixar a convenção no início do problema e verificá-la num caso
+    simples como este antes de confiar no sinal.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. Exercícios propostos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Para resolver</span>
+    <ol>
+      <li><b>5.1</b> Verifique quais das matrizes abaixo são ortogonais e, entre as que
+      forem, quais são próprias: (a) \(\begin{pmatrix}1&0\\0&-1\end{pmatrix}\);
+      (b) \(\tfrac15\begin{pmatrix}3&-4\\4&3\end{pmatrix}\);
+      (c) \(\tfrac12\begin{pmatrix}1&1\\1&-1\end{pmatrix}\). Interprete geometricamente cada
+      uma.</li>
+
+      <li><b>5.2</b> Mostre que o produto de duas matrizes ortogonais é ortogonal e que a
+      inversa de uma ortogonal também é. Conclua que as matrizes ortogonais formam um grupo
+      e verifique que as próprias formam um subgrupo, mas as impróprias não.</li>
+
+      <li><b>5.3</b> Determine o eixo e o ângulo da rotação que leva \(\vers{x}\) em
+      \(\vers{y}\), \(\vers{y}\) em \(\vers{z}\) e \(\vers{z}\) em \(\vers{x}\). Depois
+      verifique que aplicá-la três vezes dá a identidade e explique por quê.</li>
+
+      <li><b>5.4</b> Escreva a matriz de rotação de 60° em torno de \(\vers{n}=(0,0,1)\) por
+      Rodrigues e confirme que coincide com a forma da seção 4 estendida a três
+      dimensões.</li>
+
+      <li><b>5.5</b> Calcule explicitamente as três matrizes geradoras \(\Ten{A}_x\),
+      \(\Ten{A}_y\) e \(\Ten{A}_z\) e verifique a relação
+      \(\left[\Ten{A}_x,\Ten{A}_y\right]=\Ten{A}_z\). Compare com as relações de comutação do
+      momento angular quântico.</li>
+
+      <li><b>5.6</b> Um vetor tem componentes \((3,4,0)\). Os eixos são girados de 53,13° em
+      torno de \(z\). Mostre que na base nova ele fica \((5,0,0)\) e explique por que esse
+      resultado era previsível sem fazer a conta.</li>
+
+      <li><b>5.7</b> Mostre que \(\vet{a}\cdot\left(\vet{b}\cruz\vet{c}\right)\) é um
+      pseudoescalar, isto é, troca de sinal sob transformações impróprias. Dê uma
+      interpretação geométrica usando o volume do paralelepípedo.</li>
+
+      <li><b>5.8</b> Demonstre a fórmula de Rodrigues decompondo \(\vet{v}\) em parcelas
+      paralela e perpendicular ao eixo e girando apenas a segunda. Identifique em que passo
+      a regra da mão direita foi usada.</li>
+
+      <li><b>5.9</b> Discuta em meia página: por que um espelho inverte esquerda e direita,
+      mas não em cima e embaixo? Use a linguagem desta aula, falando em determinante e em
+      eixos, e explique por que a pergunta está mal formulada.</li>
+    </ol>
+  </div>
+
+  <nav class="nav-aulas">
+    <a href="aula04.html"><small>Módulo anterior</small>← 4. Conservação e equilíbrio</a>
+    <span class="em-breve"><small>Em preparação</small>6. Referenciais em rotação</span>
+  </nav>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+<script src="assets/js/widgets.js?v=202611081913"></script>
+</body>
+</html>
