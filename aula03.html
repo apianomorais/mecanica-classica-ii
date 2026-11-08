@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 3: Momento angular, torque e equações de movimento | Mecânica Clássica II</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611081846">
+<script src="assets/js/comum.js?v=202611081846"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Mecânica Clássica II <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html">Início</a>
+      <span class="grupo">Corpos rígidos</span>
+      <a href="aula01.html" class="num" title="Módulo 1: Cinemática dos corpos rígidos">1</a>
+      <a href="aula02.html" class="num" title="Módulo 2: Centro de massa e momentos de inércia">2</a>
+      <a href="aula03.html" class="num ativo" title="Módulo 3: Momento angular, torque e equações de movimento">3</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+<aside class="lateral">
+  <h4>Neste módulo</h4>
+  <ol>
+    <li><a href="#s1">1. Torque e momento angular</a></li>
+    <li><a href="#s2">2. Somando sobre o sistema</a></li>
+    <li><a href="#s3">3. O ponto privilegiado</a></li>
+    <li><a href="#s4">4. Rotação em torno de um eixo fixo</a></li>
+    <li><a href="#s5">5. O pêndulo físico</a></li>
+    <li><a href="#s6">6. As duas equações de movimento</a></li>
+    <li><a href="#s7">7. O rolamento, agora com torque</a></li>
+    <li><a href="#s8">8. Trabalho e potência na rotação</a></li>
+    <li><a href="#s9">9. Impulso angular e centro de percussão</a></li>
+    <li><a href="#s10">10. Exercícios resolvidos</a></li>
+    <li><a href="#s11">11. Exercícios propostos</a></li>
+  </ol>
+</aside>
+
+<main class="conteudo">
+
+  <p class="chapeu">Módulo 3 · Corpos rígidos</p>
+  <h1>Momento angular, torque e equações de movimento</h1>
+  <p class="subtitulo">O módulo 2 separou o movimento em translação do centro de massa e
+  rotação em torno dele, e resolveu a primeira metade com \(\vet{F}=M\vet{A}\). Falta a
+  segunda. Aqui aparece a equação que governa a rotação, o cuidado que é preciso ter ao
+  escolher em torno de que ponto escrevê-la, e as consequências que vão do relógio de pêndulo
+  ao ponto certo de bater com um taco.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Objetivos</span>
+    <ul>
+      <li>Obter \(\der{\vet{L}}{t}=\vet{\tau}\) e identificar o papel da terceira lei forte;</li>
+      <li>Mostrar que a equação vale em torno do centro de massa mesmo quando ele acelera;</li>
+      <li>Aplicar \(\tau=I\alpha\) a eixos fixos e resolver o pêndulo físico;</li>
+      <li>Escrever as seis equações de Newton e Euler do corpo rígido;</li>
+      <li>Resolver o rolamento por torque e achar a condição de não deslizar;</li>
+      <li>Usar o impulso angular e localizar o centro de percussão.</li>
+    </ul>
+  </div>
+
+  <hr class="linha">
+
+  <!-- ================================================== -->
+  <h2 id="s1">1. Torque e momento angular</h2>
+
+  <p>Comece por uma única partícula de massa \(m\), posição \(\vet{r}\) e momento
+  \(\vet{p}=m\vet{v}\), ambos medidos a partir de uma origem \(O\). Defina</p>
+
+  <div class="destaque">
+    <span class="anuncio">Momento angular e torque</span>
+    \[\vet{L}=\vet{r}\cruz\vet{p},\qquad \vet{\tau}=\vet{r}\cruz\vet{F}.\]
+  </div>
+
+  <p>Derive o primeiro em relação ao tempo. O termo
+  \(\dot{\vet{r}}\cruz\vet{p}=\vet{v}\cruz m\vet{v}\) é nulo, porque o produto vetorial de um
+  vetor com ele mesmo se anula, e o que sobra é \(\vet{r}\cruz\dot{\vet{p}}
+  =\vet{r}\cruz\vet{F}\). Portanto</p>
+
+  <p>\[\der{\vet{L}}{t}=\vet{\tau}.\]</p>
+
+  <p>A forma é a mesma de \(\vet{F}=\der{\vet{p}}{t}\), com \(\vet{L}\) no lugar de
+  \(\vet{p}\) e \(\vet{\tau}\) no lugar de \(\vet{F}\). Há, porém, uma diferença que não
+  existe na versão linear: tanto \(\vet{L}\) quanto \(\vet{\tau}\) dependem de onde \(O\)
+  foi posta. Mudando a origem, os dois mudam juntos, e a igualdade continua valendo. Mas
+  antes de escrever qualquer equação de rotação é obrigatório dizer em torno de que ponto se
+  está trabalhando, sob pena de somar termos que se referem a coisas diferentes.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s2">2. Somando sobre o sistema</h2>
+
+  <p>Passe de uma partícula para \(N\) delas e some. A derivada do momento angular total é</p>
+
+  <p>\[\der{\vet{L}}{t}=\sum_i\vet{r}_i\cruz\vet{F}^{\rm ext}_i
+  +\sum_i\sum_{j\neq i}\vet{r}_i\cruz\vet{f}_{ij}.\]</p>
+
+  <p>Na soma dupla, agrupe os termos aos pares. O par \((i,j)\) contribui com
+  \(\vet{r}_i\cruz\vet{f}_{ij}+\vet{r}_j\cruz\vet{f}_{ji}\), e usando a terceira lei na
+  forma \(\vet{f}_{ji}=-\vet{f}_{ij}\) isso vira</p>
+
+  <p>\[\left(\vet{r}_i-\vet{r}_j\right)\cruz\vet{f}_{ij}.\]</p>
+
+  <p>O resultado só se anula se a força interna entre as duas partículas for paralela à reta
+  que as une, isto é, se for <strong>central</strong>. Essa exigência extra é a chamada
+  <em>forma forte</em> da terceira lei, e vale para a gravidade, para a força elétrica entre
+  cargas em repouso e para as forças de coesão que seguram um corpo rígido. Admitindo-a,</p>
+
+  <div class="destaque">
+    <span class="anuncio">Equação do momento angular de um sistema</span>
+    \[\der{\vet{L}}{t}=\vet{\tau}^{\rm ext}.\]
+    As forças internas não conseguem alterar o momento angular total, exatamente como não
+    conseguem alterar o momento linear total.
+  </div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Quando a forma forte falha</span>
+    <p>A força magnética entre duas cargas em movimento não é central, e nem sequer obedece à
+    forma fraca da terceira lei: as duas forças não são opostas. Somando apenas as
+    contribuições das partículas, o momento angular total parece não se conservar.</p>
+    <p>A conservação é restabelecida quando se inclui o momento angular armazenado no próprio
+    campo eletromagnético. Esse é um dos primeiros indícios históricos de que o campo não é
+    um artifício de cálculo, mas um sistema físico que carrega energia e momento. Em
+    Mecânica Clássica a questão não aparece, porque todas as forças consideradas são
+    centrais.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. O ponto privilegiado</h2>
+
+  <p>A seção anterior supôs que \(O\) fosse um ponto fixo de um referencial inercial. Num
+  corpo que voa, rola ou cai, porém, o ponto natural de referência é o centro de massa, e ele
+  em geral acelera. Escrever a equação de rotação em torno de um ponto acelerado parece
+  ilegítimo, e de fato costuma ser: num referencial que acelera com \(\vet{A}\), cada
+  partícula sofre uma força de inércia \(-m_i\vet{A}\), e essas forças exercem torque.</p>
+
+  <p>Calcule esse torque em torno do próprio centro de massa:</p>
+
+  <p>\[\vet{\tau}_{\rm inercia}=\sum_i\vet{r}\,'_i\cruz\left(-m_i\vet{A}\right)
+  =-\left(\sum_i m_i\vet{r}\,'_i\right)\cruz\vet{A}=\vet 0,\]</p>
+
+  <p>pela mesma identidade do módulo 2. As forças de inércia existem, agem sobre cada
+  partícula, e ainda assim não produzem torque resultante em torno do centro de massa, porque
+  o centro de massa é justamente o ponto em relação ao qual a massa está equilibrada. Em
+  consequência:</p>
+
+  <div class="destaque">
+    <span class="anuncio">A equação vale em torno do centro de massa</span>
+    \[\der{\vet{L}_{\rm cm}}{t}=\vet{\tau}^{\rm ext}_{\rm cm},\]
+    mesmo que o centro de massa esteja acelerando. Nenhum outro ponto acelerado tem essa
+    propriedade.
+  </div>
+
+  <p>É por isso que uma bola que quica, um pião que escorrega e um corpo que rola podem todos
+  ser tratados separando translação do centro de massa e rotação em torno dele. E é por isso
+  também que, ao escolher um ponto de referência, só três escolhas são seguras: um ponto fixo
+  no referencial inercial, o centro de massa, ou um ponto cuja aceleração aponte sempre para
+  o centro de massa.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. Rotação em torno de um eixo fixo</h2>
+
+  <p>Restrinja agora o corpo a girar em torno de um eixo fixo, que chamaremos de \(z\). Cada
+  partícula descreve uma circunferência de raio \(\rho_i\) com velocidade \(\rho_i\omega\), e
+  a componente \(z\) do seu momento angular vale \(m_i\rho_i^2\omega\). Somando,</p>
+
+  <p>\[L_z=\left(\sum_i m_i\rho_i^2\right)\omega=I\omega,\]</p>
+
+  <p>e derivando, com \(I\) constante porque o corpo é rígido e o eixo é fixo,</p>
+
+  <div class="destaque">
+    <span class="anuncio">A segunda lei da rotação</span>
+    \[\tau_z=I\,\der{\omega}{t}=I\alpha.\]
+  </div>
+
+  <p>Repare no subscrito. O que foi demonstrado vale para a componente ao longo do eixo, e
+  só para ela. As componentes perpendiculares de \(\vet{L}\) em geral não são nulas e em geral
+  variam com o tempo, e quem as segura são os mancais que impõem o eixo, com forças que
+  oscilam a cada volta. Esse é o assunto do tensor de inércia, reservado para Mecânica
+  Clássica III, e a razão prática de se balancearem rodas.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. O pêndulo físico</h2>
+
+  <p>Pendure um corpo qualquer por um eixo horizontal que não passe pelo seu centro de massa,
+  afaste-o um pouco da vertical e solte. O peso age no centro de massa, a uma distância
+  \(d\) do eixo, e o único torque em torno do eixo vale \(-Mgd\sen\theta\). Aplicando a
+  equação da seção 4 e aproximando \(\sen\theta\approx\theta\) para ângulos pequenos,</p>
+
+  <p>\[I_{\rm eixo}\ddot\theta=-Mgd\,\theta,\]</p>
+
+  <p>que é a equação do oscilador harmônico. O período sai dela de imediato:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Período e comprimento equivalente</span>
+    \[T=2\pi\sqrt{\frac{I_{\rm eixo}}{Mgd}}=2\pi\sqrt{\frac{\ell}{g}},
+    \qquad \ell\equiv\frac{I_{\rm eixo}}{Md}.\]
+  </div>
+
+  <p>A grandeza \(\ell\) tem dimensão de comprimento e ocupa, na fórmula, exatamente o lugar
+  que o comprimento do fio ocupa num pêndulo simples. Um pêndulo simples desse comprimento
+  acompanha o corpo batida por batida, e por isso \(\ell\) se chama <strong>comprimento
+  equivalente</strong>.</p>
+
+  <div data-widget="pendulofisico"></div>
+
+  <p>Use Steiner para escrever \(I_{\rm eixo}=M(k_g^2+d^2)\), e o comprimento equivalente
+  fica \(\ell=(k_g^2+d^2)/d\). Aproximando o eixo do centro de massa, \(d\) cai no
+  denominador e \(\ell\) cresce sem limite; afastando-o, o termo \(d^2\) passa a dominar e
+  \(\ell\) cresce de novo. Entre os dois extremos existe um mínimo, e derivando em relação a
+  \(d\) encontra-se que ele ocorre em \(d=k_g\). Pendurar mais longe, portanto, nem sempre
+  faz oscilar mais devagar.</p>
+
+  <p>O ponto situado a \(\ell\) do eixo recebe o nome de <strong>centro de oscilação</strong>.
+  Calcule o comprimento equivalente de um eixo colocado ali: com a distância ao centro de
+  massa valendo agora \(k_g^2/d\), o resultado é o mesmo \(\ell\) de antes. Os dois pontos são
+  reversíveis, e trocar um pelo outro não altera o período. Huygens descobriu essa simetria, e
+  Kater a transformou em instrumento: procurando os dois eixos que dão o mesmo período e
+  medindo a distância entre eles, obtém-se \(g\) com quatro casas decimais sem precisar
+  conhecer \(I\), \(M\) nem \(d\).</p>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. As duas equações de movimento</h2>
+
+  <p>Junte o que foi obtido no módulo 2 com o que foi obtido aqui. A translação é governada
+  pela resultante das forças externas, e a rotação em torno do centro de massa pelo torque
+  resultante em torno dele:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Equações de Newton e Euler do corpo rígido</span>
+    \[\vet{F}^{\rm ext}=M\der{\vet{V}_{\rm cm}}{t},\qquad
+    \vet{\tau}^{\rm ext}_{\rm cm}=\der{\vet{L}_{\rm cm}}{t}.\]
+  </div>
+
+  <p>São três equações escalares de cada lado, seis ao todo, e o módulo 1 mostrou que um
+  corpo rígido livre tem exatamente seis graus de liberdade. A contagem fecha: esse par de
+  equações vetoriais é a dinâmica completa de um corpo rígido, e todo problema deste curso
+  sobre corpos extensos é uma aplicação delas.</p>
+
+  <p>O que torna o caso geral difícil não é a física, e sim a segunda equação quando o eixo
+  de rotação muda de direção. Aí \(\vet{L}_{\rm cm}\) deixa de ser \(I\vet{\omega}\) com
+  \(I\) escalar, e é preciso o tensor de inércia. Nos módulos deste curso o eixo é sempre
+  fixo ou de direção constante, e a segunda equação se reduz a \(\tau=I\alpha\).</p>
+
+  <div data-widget="atwood"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. O rolamento, agora com torque</h2>
+
+  <p>O módulo 2 obteve a aceleração de um corpo que rola por conservação de energia. Refaça
+  o cálculo pela dinâmica, para ver o atrito aparecer explicitamente. Com o eixo \(x\) ao
+  longo da rampa e \(f\) a força de atrito estático, apontando rampa acima,</p>
+
+  <p>\[Mg\sen\theta-f=Ma,\qquad fR=I\alpha=kMR^2\frac{a}{R},\]</p>
+
+  <p>onde a segunda equação é o torque em torno do centro de massa e a condição de rolamento
+  \(a=\alpha R\) já foi usada. Da segunda, \(f=kMa\); levando à primeira,</p>
+
+  <p>\[a=\frac{g\sen\theta}{1+k},\qquad f=\frac{k}{1+k}Mg\sen\theta,\]</p>
+
+  <p>e a aceleração coincide com a do módulo 2, como tinha de ser. O ganho é a expressão do
+  atrito, que a conta por energia não fornece. Como o atrito estático é limitado por
+  \(f\leq\mu_s N=\mu_s Mg\cos\theta\), existe uma inclinação acima da qual o corpo deixa de
+  rolar e passa a escorregar:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Condição de rolar sem deslizar</span>
+    \[\tg\theta\leq\mu_s\,\frac{1+k}{k}.\]
+    Para um cilindro maciço, \(k=1/2\), isso dá \(\tg\theta\leq3\mu_s\).
+  </div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A escolha do ponto encurta a conta</span>
+    <p>Em vez do centro de massa, tome os torques em torno do <em>ponto de contato</em>. O
+    atrito e a normal passam pelo ponto e não exercem torque nenhum, de modo que só resta o
+    peso, com braço \(R\sen\theta\). O momento de inércia em torno do contato é, por Steiner,
+    \((1+k)MR^2\), e a equação fica</p>
+    \[MgR\sen\theta=\left(1+k\right)MR^2\frac{a}{R},\]
+    <p>que devolve a mesma resposta numa linha. Escolher bem o ponto em torno do qual se
+    escreve a equação de rotação é metade do trabalho em problemas de corpo rígido, e o ponto
+    de contato só é legítimo aqui porque a sua aceleração aponta para o centro de massa, que
+    é a terceira escolha segura listada na seção 3.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. Trabalho e potência na rotação</h2>
+
+  <p>Gire um corpo de um ângulo \(d\theta\) sob a ação de um torque \(\tau\) em torno do eixo.
+  Cada força aplicada percorre um arco \(\rho_i\,d\theta\), e somando as contribuições o
+  trabalho total fica \(\tau\,d\theta\). Daí</p>
+
+  <p>\[W=\int\tau\,d\theta,\qquad P=\tau\omega,\qquad
+  W=\Delta\left(\tfrac12I\omega^2\right),\]</p>
+
+  <p>completando a tabela de correspondências que o módulo 2 começou:</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Translação</th><th>Rotação em torno de eixo fixo</th></tr></thead>
+    <tbody>
+      <tr><td>\(\vet{F}=\der{\vet{p}}{t}\)</td><td>\(\vet{\tau}=\der{\vet{L}}{t}\)</td></tr>
+      <tr><td>\(\vet{p}=M\vet{v}\)</td><td>\(L=I\omega\)</td></tr>
+      <tr><td>\(W=\int F\,dx\)</td><td>\(W=\int\tau\,d\theta\)</td></tr>
+      <tr><td>\(P=Fv\)</td><td>\(P=\tau\omega\)</td></tr>
+      <tr><td>impulso \(\int F\,dt=\Delta p\)</td><td>impulso angular \(\int\tau\,dt=\Delta L\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Um motor é especificado por torque e por potência, e a última linha da tabela explica a
+  diferença entre as duas grandezas. Um motor de torque alto arranca forte; um de potência
+  alta mantém torque em rotação elevada. A caixa de marchas existe para converter uma coisa
+  na outra, trocando \(\tau\) por \(\omega\) com o produto aproximadamente conservado.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. Impulso angular e centro de percussão</h2>
+
+  <p>Segure uma barra por uma das pontas e dê nela uma pancada seca, de impulso \(J\), a uma
+  distância \(b\) da mão. O impulso angular em torno do eixo põe a barra a girar com
+  \(\omega=Jb/I_{\rm eixo}\), e o centro de massa, a uma distância \(d\) do eixo, passa a se
+  mover com \(V=\omega d\). O impulso linear total tem de bater com essa quantidade de
+  movimento, e a diferença é fornecida pela mão:</p>
+
+  <p>\[J+R=MV=M\omega d \quad\Longrightarrow\quad
+  R=J\left(\frac{Mdb}{I_{\rm eixo}}-1\right).\]</p>
+
+  <p>A reação \(R\) se anula quando os dois termos do parêntese se igualam, isto é, quando
+  \(b=I_{\rm eixo}/Md\). Mas esse quociente é o mesmo \(\ell\) da seção 5. O ponto onde se
+  pode bater sem que a mão sinta nada coincide com o centro de oscilação do pêndulo, e a
+  coincidência não é acidental: nos dois problemas a pergunta é onde aplicar a força para
+  que o vínculo no eixo não precise entrar em ação.</p>
+
+  <div class="destaque">
+    <span class="anuncio">Centro de percussão</span>
+    \[b_{\rm perc}=\frac{I_{\rm eixo}}{Md}=\ell.\]
+    Para uma haste uniforme segura por uma ponta, \(I=ML^2/3\) e \(d=L/2\) dão
+    \(b=\tfrac23L\).
+  </div>
+
+  <div data-widget="percussao"></div>
+
+  <p>Bata mais perto da mão e a barra gira devagar demais para o impulso recebido, de modo
+  que a mão leva um empurrão para trás; bata mais longe e ela gira depressa demais, e a mão é
+  puxada para a frente. Jogadores de beisebol e de tênis descrevem essas duas situações como
+  pegar a bola atrasada ou adiantada, e chamam o ponto intermediário de <em>sweet spot</em>.
+  O mesmo cálculo decide onde colocar as dobradiças de uma porta de vaivém para que não
+  arrebentem, e onde um martelo deve ser segurado.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. Exercícios resolvidos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 3.1 · Haste como pêndulo físico</span>
+    <p>Uma haste homogênea de massa \(M\) e comprimento \(L=1{,}00\) m oscila em torno de um
+    eixo horizontal numa das pontas. Determine o período, o comprimento equivalente e a
+    posição do eixo que tornaria o período mínimo.</p>
+    <p><strong>Solução.</strong> Pela ponta, \(I_{\rm eixo}=\tfrac13ML^2\) e \(d=L/2\), de
+    modo que</p>
+    \[\ell=\frac{I_{\rm eixo}}{Md}=\frac{ML^2/3}{ML/2}=\frac{2L}{3}=0{,}667\ {\rm m},
+    \qquad T=2\pi\sqrt{\frac{\ell}{g}}=1{,}638\ {\rm s}.\]
+    <p>O centro de oscilação fica a \(2L/3\) da ponta, isto é, a \(L/6\) abaixo do centro de
+    massa. Para o mínimo, \(k_g^2=L^2/12\) dá \(k_g=L/\sqrt{12}=0{,}2887\) m, e</p>
+    \[\ell_{\min}=2k_g=0{,}577\ {\rm m},\qquad T_{\min}=1{,}524\ {\rm s}.\]
+    <p>Pendurar a haste a 29 cm do centro, e não pela ponta, faz o período cair 7%. Confira
+    no simulador da seção 5 escolhendo "haste" e movendo o deslizante.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 3.2 · Atwood com polia de massa</span>
+    <p>Dois blocos de 2,0 kg e 1,2 kg são ligados por um fio que passa por uma polia em forma
+    de disco maciço de 1,0 kg. Determine a aceleração, as duas trações e compare com o
+    resultado de uma polia ideal.</p>
+    <p><strong>Solução.</strong> Com \(k=1/2\), a inércia efetiva da polia é
+    \(kM_p=0{,}50\) kg, e</p>
+    \[a=\frac{\left(m_1-m_2\right)g}{m_1+m_2+kM_p}
+    =\frac{0{,}8\cruz9{,}807}{2{,}0+1{,}2+0{,}5}=2{,}120\ {\rm m/s^2}.\]
+    <p>As trações saem da segunda lei aplicada a cada bloco:</p>
+    \[T_1=m_1\left(g-a\right)=15{,}37\ {\rm N},\qquad
+    T_2=m_2\left(g+a\right)=14{,}31\ {\rm N}.\]
+    <p>A diferença, 1,06 N, é exatamente \(kM_pa=0{,}5\cruz2{,}120\), que é o que fornece o
+    torque sobre a polia. Com polia ideal teríamos \(a=2{,}452\) m/s² e trações iguais a
+    14,71 N; a polia de 1 kg reduz a aceleração em 13,5%.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 3.3 · Até onde a bola ainda rola</span>
+    <p>Uma bola maciça é posta a rolar numa rampa cujo coeficiente de atrito estático vale
+    \(\mu_s=0{,}25\). Acima de que inclinação ela passa a escorregar?</p>
+    <p><strong>Solução.</strong> Com \(k=2/5\), a condição da seção 7 dá</p>
+    \[\tg\theta\leq\mu_s\frac{1+k}{k}=0{,}25\cruz\frac{1{,}4}{0{,}4}=0{,}875
+    \quad\Longrightarrow\quad \theta\leq41{,}2^\circ.\]
+    <p>Para um cilindro maciço, \(k=1/2\) daria \(\tg\theta\leq0{,}75\) e
+    \(\theta\leq36{,}9^\circ\); para um aro, \(k=1\) daria \(\tg\theta\leq0{,}50\) e
+    \(\theta\leq26{,}6^\circ\). O aro é o primeiro a escorregar, porque é o que precisa de
+    mais torque para acompanhar a própria descida. Note que \(M\) e \(R\) desaparecem outra
+    vez.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 3.4 · Onde segurar o martelo</span>
+    <p>Um martelo é modelado como uma haste de 30 cm e 0,20 kg com uma cabeça de 0,60 kg
+    concentrada na extremidade. Determine o centro de percussão em relação ao cabo.</p>
+    <p><strong>Solução.</strong> Tome a origem na ponta do cabo. O centro de massa fica em</p>
+    \[d=\frac{0{,}20\cruz0{,}15+0{,}60\cruz0{,}30}{0{,}80}=0{,}2625\ {\rm m},\]
+    <p>e o momento de inércia em torno daquela ponta é</p>
+    \[I=\tfrac13\cruz0{,}20\cruz0{,}30^2+0{,}60\cruz0{,}30^2
+    =0{,}0060+0{,}0540=0{,}0600\ {\rm kg\,m^2}.\]
+    <p>Com isso,</p>
+    \[b=\frac{I}{Md}=\frac{0{,}0600}{0{,}80\cruz0{,}2625}=0{,}2857\ {\rm m},\]
+    <p>isto é, a 28,6 cm da ponta do cabo, praticamente sobre a cabeça do martelo. É aí que a
+    pancada deve ocorrer para que a mão não receba contragolpe, e é por isso que a massa de um
+    martelo fica toda na extremidade.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. Exercícios propostos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Para resolver</span>
+    <ol>
+      <li><b>3.1</b> Mostre que, para uma partícula em movimento retilíneo uniforme, o
+      momento angular em torno de qualquer ponto fora da trajetória é constante e não nulo.
+      Interprete geometricamente o módulo \(L=mvb\), com \(b\) a distância da reta ao
+      ponto.</li>
+
+      <li><b>3.2</b> Um disco de 2,0 kg e 20 cm de raio gira livremente a 300 rpm. Um atrito
+      constante no eixo o freia até parar em 40 s. Determine o torque de atrito, o número de
+      voltas até parar e a energia dissipada.</li>
+
+      <li><b>3.3</b> Demonstre que, em torno de um ponto \(Q\) que acelera com \(\vet{a}_Q\),
+      vale \(\der{\vet{L}_Q}{t}=\vet{\tau}_Q-M\left(\vet{R}-\vet{r}_Q\right)\cruz\vet{a}_Q\).
+      Verifique que o termo extra se anula nas três situações listadas na seção 3.</li>
+
+      <li><b>3.4</b> Uma porta de 80 cm de largura e 25 kg é atingida por uma bola de 0,3 kg a
+      5 m/s, que bate a 60 cm da dobradiça e volta a 2 m/s. Determine a velocidade angular da
+      porta logo após o choque e o impulso nas dobradiças. Onde a bola deveria ter batido para
+      que esse impulso fosse nulo?</li>
+
+      <li><b>3.5</b> Um ioiô de \(I=\tfrac12MR^2\) desce desenrolando o fio. Resolva por
+      torque em torno do centro de massa e, depois, por torque em torno do ponto de contato do
+      fio. Compare o trabalho das duas contas.</li>
+
+      <li><b>3.6</b> Mostre que o período de um pêndulo físico não muda se o corpo for
+      substituído por outro de mesma massa cujo raio de giração e cuja distância ao eixo
+      satisfaçam \(k_g^2+d^2=\) constante vezes \(d\). Dê um exemplo concreto de dois corpos
+      diferentes com o mesmo período.</li>
+
+      <li><b>3.7</b> Um cilindro maciço é solto numa rampa de 35° com \(\mu_s=0{,}20\).
+      Verifique se ele rola ou escorrega. No caso de escorregar, escreva as equações com
+      atrito cinético \(\mu_k=0{,}15\) e determine quando, se é que em algum momento, o
+      rolamento se estabelece.</li>
+
+      <li><b>3.8</b> Uma bola de bilhar é golpeada horizontalmente a uma altura \(h\) acima da
+      mesa. Mostre que ela rola sem deslizar desde o primeiro instante se
+      \(h=\tfrac75R\), e discuta o que acontece para \(h\) maior e menor.</li>
+
+      <li><b>3.9</b> Discuta em meia página: por que a equação \(\vet{\tau}=\der{\vet{L}}{t}\)
+      vale em torno do centro de massa de um corpo que cai, mas não em torno de um ponto
+      qualquer preso ao corpo? Use o resultado do exercício 3.3 e dê um contraexemplo
+      numérico.</li>
+    </ol>
+  </div>
+
+  <nav class="nav-aulas">
+    <a href="aula02.html"><small>Módulo anterior</small>← 2. Centro de massa e inércia</a>
+    <span class="em-breve"><small>Em preparação</small>4. Conservação e equilíbrio</span>
+  </nav>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+<script src="assets/js/widgets.js?v=202611081846"></script>
+</body>
+</html>

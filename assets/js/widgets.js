@@ -1485,6 +1485,650 @@
     registrarRedesenho(desenhar);
   };
 
+
+  /* =================================================================
+     7. Pêndulo físico
+     O período não cai monotonicamente com a distância ao eixo: ele tem
+     mínimo em d = k_g, e isso só convence vendo a curva. A vista da
+     oscilação põe ao lado o pêndulo simples de mesmo período, que é o
+     significado operacional do comprimento equivalente, e marca o
+     centro de oscilação, de onde sai a reversibilidade de Huygens.
+     ================================================================= */
+  REGISTRO.pendulofisico = function (raiz) {
+    /* kg2 é o raio de giração ao quadrado, em m² */
+    var FORMAS = [
+      { n: 'haste', tam: 1.0, kg2: 1.0 * 1.0 / 12, dmax: 0.5 },
+      { n: 'disco', tam: 0.5, kg2: 0.5 * 0.5 / 2, dmax: 0.5 },
+      { n: 'aro', tam: 0.5, kg2: 0.5 * 0.5, dmax: 0.5 },
+      { n: 'placa quadrada', tam: 0.7, kg2: 2 * 0.7 * 0.7 / 12, dmax: 0.49 }
+    ];
+    var G0 = 9.80665;
+    var est = { vista: 'oscila', f: 0, d: 0.35, amp: 18, t: 0, rodando: true };
+
+    var corpo = moldura(raiz, 'Pêndulo físico: período, comprimento equivalente e o mínimo');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, [
+      { rot: 'A oscilação', v: 'oscila' },
+      { rot: 'Período contra distância', v: 'curva' }
+    ], 0, function (v) { est.vista = v; });
+
+    var c1 = el('div', { class: 'controles' });
+    corpo.appendChild(c1);
+    c1.appendChild(el('span', { class: 'etiqueta', texto: 'corpo' }));
+    opcoes(c1, FORMAS.map(function (s, i) { return { rot: s.n, v: i }; }), 0,
+      function (v) { est.f = v; est.t = 0; });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    var slD = deslizante(ctr, 'distância do eixo ao centro de massa', 0.03, 0.5, 0.01, 0.35,
+      function (v) { est.d = v; est.t = 0; },
+      function (v) { return F.fmt(v, 2) + ' m'; });
+    deslizante(ctr, 'amplitude', 4, 30, 1, 18,
+      function (v) { est.amp = v; }, function (v) { return v + '°'; });
+    var bt = el('button', { type: 'button', texto: 'pausar' });
+    bt.addEventListener('click', function () {
+      est.rodando = !est.rodando;
+      bt.textContent = est.rodando ? 'pausar' : 'continuar';
+    });
+    ctr.appendChild(bt);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'raio de giração k<sub>g</sub>', k: 'kg' },
+      { rot: 'I pelo eixo (kg·m², M = 1)', k: 'ip' },
+      { rot: 'comprimento equivalente ℓ', k: 'l' },
+      { rot: 'período T', k: 'tt' },
+      { rot: 'd que minimiza o período', k: 'dm' },
+      { rot: 'período mínimo', k: 'tm' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function dados() {
+      var s = FORMAS[est.f], d = Math.min(est.d, s.dmax);
+      var Ip = s.kg2 + d * d;                   // com M = 1 kg
+      var l = Ip / d;                           // comprimento equivalente
+      var kg = Math.sqrt(s.kg2);
+      return { s: s, d: d, Ip: Ip, l: l, kg: kg,
+               T: 2 * Math.PI * Math.sqrt(l / G0),
+               Tmin: 2 * Math.PI * Math.sqrt(2 * kg / G0) };
+    }
+
+    function desenhaCorpo(ct, X, Y, esc, s, cx, cy, th) {
+      ct.save();
+      ct.translate(X(cx), Y(cy));
+      /* o eixo y da tela aponta para baixo, de modo que o giro que leva
+         o corpo a acompanhar a reta eixo-centro de massa é -th */
+      ct.rotate(-th);
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2;
+      ct.fillStyle = 'rgba(23,107,93,.16)';
+      if (s.n === 'haste') {
+        var h = s.tam * esc, l2 = Math.max(7, esc * 0.05);
+        ct.fillRect(-l2, -h / 2, 2 * l2, h);
+        ct.strokeRect(-l2, -h / 2, 2 * l2, h);
+      } else if (s.n === 'placa quadrada') {
+        var a = s.tam * esc;
+        ct.fillRect(-a / 2, -a / 2, a, a);
+        ct.strokeRect(-a / 2, -a / 2, a, a);
+      } else {
+        ct.beginPath(); ct.arc(0, 0, s.tam * esc, 0, 2 * Math.PI);
+        if (s.n === 'aro') { ct.lineWidth = Math.max(4, esc * 0.05); ct.stroke(); }
+        else { ct.fill(); ct.stroke(); }
+      }
+      ct.restore();
+    }
+
+    function desenhaOscila() {
+      var D = dados(), alt = 330;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var th = est.amp * Math.PI / 180 * Math.cos(2 * Math.PI * est.t / D.T);
+      var alturaCena = Math.max(D.l, D.d + D.s.tam) + 0.25;
+      var esc = Math.min((alt - 46) / alturaCena, 230);
+      var yTopo = 30;
+      var X = function (u) { return u; };
+      var Y = function (u) { return yTopo + u * esc; };
+
+      var xA = Lp * (Lp > 560 ? 0.33 : 0.3);
+      var xB = Lp * (Lp > 560 ? 0.72 : 0.74);
+
+      /* suporte */
+      ct.strokeStyle = G.COR.suave; ct.lineWidth = 2;
+      ct.beginPath(); ct.moveTo(20, yTopo); ct.lineTo(Lp - 20, yTopo); ct.stroke();
+
+      /* o corpo */
+      var cxA = xA + D.d * esc * Math.sin(th), cyA = D.d * Math.cos(th);
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 1.6;
+      ct.beginPath(); ct.moveTo(xA, Y(0)); ct.lineTo(cxA, Y(cyA)); ct.stroke();
+      desenhaCorpo(ct, X, Y, esc, D.s, cxA, cyA, th);
+      ct.beginPath(); ct.arc(cxA, Y(cyA), 3.5, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.mestra; ct.fill();
+      ct.beginPath(); ct.arc(xA, Y(0), 4, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.tinta; ct.fill();
+
+      /* centro de oscilação, a ℓ do eixo */
+      var xo = xA + D.l * esc * Math.sin(th), yo = D.l * Math.cos(th);
+      if (Y(yo) < alt - 14) {
+        ct.beginPath(); ct.arc(xo, Y(yo), 5, 0, 2 * Math.PI);
+        ct.strokeStyle = G.COR.roxo; ct.lineWidth = 2;
+        ct.setLineDash([3, 3]); ct.stroke(); ct.setLineDash([]);
+        rotulo(ct, 'centro de oscilação', xo, Y(yo) + 15, G.COR.roxo);
+      }
+
+      /* pêndulo simples de mesmo período, ao lado */
+      var xb = xB + D.l * esc * Math.sin(th), yb = D.l * Math.cos(th);
+      ct.strokeStyle = G.COR.bronze; ct.lineWidth = 1.6;
+      ct.beginPath(); ct.moveTo(xB, Y(0)); ct.lineTo(xb, Y(yb)); ct.stroke();
+      ct.beginPath(); ct.arc(xb, Y(yb), 7, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.bronze; ct.fill();
+      ct.beginPath(); ct.arc(xB, Y(0), 4, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.tinta; ct.fill();
+
+      rotulo(ct, 'pêndulo físico', xA, 16, G.COR.mestra);
+      rotulo(ct, 'pêndulo simples de comprimento ℓ', xB, 16, G.COR.bronze);
+      rotulo(ct, 'T = ' + F.fmt(D.T, 3) + ' s nos dois', Lp / 2, alt - 10, G.COR.suave);
+    }
+
+    function desenhaCurva() {
+      var D = dados(), s = D.s;
+      var f = function (d) {
+        return d < 0.012 ? 99 : 2 * Math.PI * Math.sqrt((s.kg2 + d * d) / (G0 * d));
+      };
+      var ymax = Math.min(4.2, f(0.03) * 1.05);
+      var gr = G.eixos(cv, {
+        altura: 320, xmin: 0, xmax: s.dmax, ymin: 0, ymax: ymax,
+        rotX: 'distância do eixo ao centro de massa (m)', rotY: 'período (s)',
+        marcasX: G.marcasLineares(0, s.dmax, 5, 2),
+        formataY: function (v) { return F.fmt(v, 1); }
+      });
+      G.curva(gr, f, G.COR.mestra, 2.6);
+      G.vertical(gr, D.d, G.COR.suave, '', true);
+
+      var ct = gr.ct;
+      var dm = D.kg;
+      if (dm <= s.dmax) {
+        G.vertical(gr, dm, G.COR.bronze, '', true);
+        ct.beginPath(); ct.arc(gr.X(dm), gr.Y(f(dm)), 5, 0, 2 * Math.PI);
+        ct.fillStyle = G.COR.bronze; ct.fill();
+        rotulo(ct, 'mínimo em d = k_g = ' + F.fmt(dm, 3) + ' m',
+          gr.X(dm) + 8, gr.Y(f(dm)) - 16, G.COR.bronze, 'left');
+      }
+      ct.beginPath(); ct.arc(gr.X(D.d), gr.Y(f(D.d)), 5, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.roxo; ct.fill();
+      rotulo(ct, 'T = ' + F.fmt(D.T, 3) + ' s', gr.X(D.d), gr.Y(f(D.d)) - 15, G.COR.roxo);
+      rotulo(ct, 'perto do eixo pelo centro de massa o período dispara',
+        gr.x0 + 8, gr.y0 + 14, G.COR.suave, 'left');
+    }
+
+    function desenhar() {
+      var D = dados();
+      if (slD.max !== String(D.s.dmax)) slD.max = D.s.dmax;
+      if (est.vista === 'oscila') desenhaOscila();
+      else desenhaCurva();
+      mostrar({
+        kg: F.fmt(D.kg, 3) + ' m',
+        ip: F.fmt(D.Ip, 4),
+        l: F.fmt(D.l, 3) + ' m',
+        tt: F.fmt(D.T, 3) + ' s',
+        dm: F.fmt(D.kg, 3) + ' m',
+        tm: F.fmt(D.Tmin, 3) + ' s'
+      });
+    }
+
+    function texto() {
+      var D = dados();
+      nota.innerHTML =
+        '<p>Pendure um corpo por um ponto qualquer, afaste-o um pouco da vertical e solte. '
+        + 'O peso age no centro de massa, a uma distância \\(d\\) do eixo, e o torque que ele '
+        + 'exerce vale \\(-Mgd\\sen\\theta\\). Igualando ao produto do momento de inércia '
+        + 'pelo ângulo acelerado, e tomando \\(\\sen\\theta\\approx\\theta\\),</p>'
+        + '\\[I_{\\rm eixo}\\ddot\\theta=-Mgd\\,\\theta \\quad\\Longrightarrow\\quad '
+        + 'T=2\\pi\\sqrt{\\frac{I_{\\rm eixo}}{Mgd}}=2\\pi\\sqrt{\\frac{\\ell}{g}},'
+        + '\\qquad \\ell\\equiv\\frac{I_{\\rm eixo}}{Md}.\\]'
+        + '<p>O número \\(\\ell\\) tem a dimensão de comprimento e faz o papel exato do '
+        + 'comprimento de um pêndulo simples. Na vista da oscilação ele está desenhado ao '
+        + 'lado: uma massa pontual num fio de ' + F.fmt(D.l, 3) + ' m acompanha o corpo '
+        + 'batida por batida. Daí o nome <strong>comprimento equivalente</strong>.</p>'
+        + '<p>Usando Steiner, \\(I_{\\rm eixo}=M(k_g^2+d^2)\\), o comprimento equivalente '
+        + 'fica \\(\\ell=(k_g^2+d^2)/d\\). Aproximar o eixo do centro de massa faz \\(d\\) '
+        + 'cair no denominador e \\(\\ell\\) crescer sem limite; afastá-lo faz \\(d^2\\) '
+        + 'dominar e \\(\\ell\\) crescer também. Entre os dois extremos há um mínimo, e '
+        + 'derivando sai \\(d=k_g\\): para este corpo, ' + F.fmt(D.kg, 3) + ' m, com '
+        + 'período ' + F.fmt(D.Tmin, 3) + ' s. <strong>Pendurar mais longe nem sempre faz '
+        + 'oscilar mais devagar.</strong></p>'
+        + '<p>O ponto a \\(\\ell\\) do eixo, marcado em roxo, chama-se <strong>centro de '
+        + 'oscilação</strong>. Pendurando o corpo por ele, o novo comprimento equivalente dá '
+        + 'exatamente o mesmo \\(\\ell\\), e o período não muda. Essa reciprocidade foi '
+        + 'descoberta por Huygens e virou instrumento de precisão nas mãos de Kater, que a '
+        + 'usou para medir \\(g\\) com quatro casas sem precisar medir \\(I\\) nem \\(d\\): '
+        + 'basta achar os dois eixos de mesmo período e medir a distância entre eles.</p>';
+      tipografar(corpo);
+    }
+
+    var chaveAnt = '';
+    function quadro() {
+      if (est.rodando) est.t += 0.016;
+      desenhar();
+      var chave = est.f + '|' + F.fmt(est.d, 2) + '|' + est.vista;
+      if (chave !== chaveAnt) { chaveAnt = chave; texto(); }
+      requestAnimationFrame(quadro);
+    }
+
+    texto();
+    requestAnimationFrame(quadro);
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     8. Centro de percussão
+     O mesmo ℓ do pêndulo físico reaparece aqui, e essa coincidência é
+     o ponto da seção: bater no centro de oscilação é bater sem que a
+     mão sinta nada. A vista do gráfico mostra a reação trocando de
+     sinal, que é o que o jogador descreve como bater "atrasado" ou
+     "adiantado" no taco.
+     ================================================================= */
+  REGISTRO.percussao = function (raiz) {
+    /* corpos pendurados por uma ponta; d é a distância do eixo ao
+       centro de massa e kg2 o raio de giração ao quadrado em torno do
+       centro de massa, ambos em unidades do comprimento L = 1 */
+    var CORPOS = [
+      /* haste homogênea de massa 1 sobre [0, 1] */
+      { n: 'haste uniforme', d: 0.5, kg2: 1 / 12, perfil: 'uniforme' },
+      /* cabo de 0,4 homogêneo mais 0,6 concentrado em 0,85 */
+      { n: 'taco', d: 0.71, kg2: 0.06273, perfil: 'taco' },
+      /* cabo de 0,5 homogêneo mais 0,5 de aro em 0,80 */
+      { n: 'raquete', d: 0.65, kg2: 0.06417, perfil: 'raquete' }
+    ];
+    var est = { vista: 'pancada', c: 0, b: 0.6, t: 0, rodando: true };
+
+    var corpo = moldura(raiz, 'Centro de percussão: onde bater para a mão não sentir');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, [
+      { rot: 'A pancada', v: 'pancada' },
+      { rot: 'Reação contra o ponto', v: 'curva' }
+    ], 0, function (v) { est.vista = v; });
+
+    var c1 = el('div', { class: 'controles' });
+    corpo.appendChild(c1);
+    c1.appendChild(el('span', { class: 'etiqueta', texto: 'corpo' }));
+    opcoes(c1, CORPOS.map(function (c, i) { return { rot: c.n, v: i }; }), 0,
+      function (v) { est.c = v; est.t = 0; });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'ponto da pancada, a partir do eixo', 0.05, 1, 0.01, 0.6,
+      function (v) { est.b = v; est.t = 0; },
+      function (v) { return F.fmt(v, 2) + ' L'; });
+    var bt = el('button', { type: 'button', texto: 'bater de novo' });
+    bt.addEventListener('click', function () { est.t = 0; est.rodando = true; });
+    ctr.appendChild(bt);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'I pelo eixo (M = 1, L = 1)', k: 'ip' },
+      { rot: 'centro de percussão', k: 'cp' },
+      { rot: 'ponto da pancada', k: 'b' },
+      { rot: 'reação no eixo, por unidade de impulso', k: 'r' },
+      { rot: 'o que a mão sente', k: 'sente' },
+      { rot: 'ω logo após a pancada', k: 'w' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function dados() {
+      var c = CORPOS[est.c];
+      var Ip = c.kg2 + c.d * c.d;        // M = 1
+      var b = est.b;
+      return { c: c, Ip: Ip, b: b, cp: Ip / c.d, R: c.d * b / Ip - 1, w: b / Ip };
+    }
+
+    function desenhaCorpoBarra(ct, x0, y0, esc, c, th) {
+      ct.save();
+      ct.translate(x0, y0);
+      ct.rotate(-th);
+      var w0 = Math.max(8, esc * 0.035);
+      ct.fillStyle = 'rgba(23,107,93,.18)';
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2;
+      if (c.perfil === 'uniforme') {
+        ct.fillRect(-w0, 0, 2 * w0, esc);
+        ct.strokeRect(-w0, 0, 2 * w0, esc);
+      } else if (c.perfil === 'taco') {
+        ct.beginPath();
+        ct.moveTo(-w0 * 0.5, 0); ct.lineTo(w0 * 0.5, 0);
+        ct.lineTo(w0 * 1.6, esc); ct.lineTo(-w0 * 1.6, esc);
+        ct.closePath(); ct.fill(); ct.stroke();
+      } else {
+        ct.fillRect(-w0 * 0.45, 0, w0 * 0.9, esc * 0.55);
+        ct.strokeRect(-w0 * 0.45, 0, w0 * 0.9, esc * 0.55);
+        ct.beginPath();
+        ct.ellipse(0, esc * 0.78, w0 * 1.7, esc * 0.22, 0, 0, 2 * Math.PI);
+        ct.fill(); ct.stroke();
+      }
+      ct.restore();
+    }
+
+    function desenhaPancada() {
+      var D = dados(), alt = 330;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var esc = Math.min(alt - 86, Lp * 0.38);
+      var x0 = Lp * 0.38, y0 = 34;
+      /* gira só depois da pancada, com ângulo limitado para não sair do
+         quadro: o que interessa aqui é o instante do impulso, não a
+         trajetória posterior */
+      var th = est.t < 0.25 ? 0
+        : Math.min(0.42, D.w * (est.t - 0.25) * 1.6);
+
+      ct.strokeStyle = G.COR.suave; ct.lineWidth = 2;
+      ct.beginPath(); ct.moveTo(x0 - 70, y0); ct.lineTo(x0 + 70, y0); ct.stroke();
+
+      desenhaCorpoBarra(ct, x0, y0, esc, D.c, th);
+
+      /* centro de massa e centro de percussão, sobre a barra girada */
+      function sobre(u) {
+        return [x0 + u * esc * Math.sin(th), y0 + u * esc * Math.cos(th)];
+      }
+      var pcm = sobre(D.c.d), pcp = sobre(D.cp), pb = sobre(D.b);
+
+      if (D.cp <= 1.02) {
+        ct.beginPath(); ct.arc(pcp[0], pcp[1], 6, 0, 2 * Math.PI);
+        ct.strokeStyle = G.COR.roxo; ct.lineWidth = 2;
+        ct.setLineDash([3, 3]); ct.stroke(); ct.setLineDash([]);
+        /* afasta o rótulo perpendicularmente à barra, senão ele cai em cima dela */
+        rotulo(ct, 'centro de percussão',
+          pcp[0] + 18 * Math.cos(th), pcp[1] - 18 * Math.sin(th),
+          G.COR.roxo, 'left');
+      }
+      ct.beginPath(); ct.arc(pcm[0], pcm[1], 4, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.mestra; ct.fill();
+      rotulo(ct, 'cm', pcm[0] - 12, pcm[1], G.COR.mestra, 'right');
+
+      /* o impulso da pancada */
+      if (est.t < 0.75) {
+        var al = est.t < 0.5 ? 1 : (0.75 - est.t) * 4;
+        ct.globalAlpha = Math.max(0, al);
+        seta(ct, pb[0] - 58, pb[1], pb[0] - 8, pb[1], G.COR.bronze, 3);
+        rotulo(ct, 'impulso J', pb[0] - 62, pb[1] - 13, G.COR.bronze, 'right');
+        ct.globalAlpha = 1;
+      }
+      ct.beginPath(); ct.arc(pb[0], pb[1], 4, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.bronze; ct.fill();
+
+      /* a reação no eixo */
+      var esq = D.R;
+      ct.beginPath(); ct.arc(x0, y0, 5, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.tinta; ct.fill();
+      if (Math.abs(esq) > 0.02 && est.t < 1.1) {
+        var comp = Math.min(60, Math.abs(esq) * 70);
+        seta(ct, x0, y0 - 16, x0 + Math.sign(esq) * comp, y0 - 16, G.COR.vinho, 2.6);
+        rotulo(ct, 'a mão sente', x0 + Math.sign(esq) * comp * 0.5, y0 - 30, G.COR.vinho);
+      } else if (est.t < 1.1) {
+        rotulo(ct, 'a mão não sente nada', x0, y0 - 22, G.COR.mestra);
+      }
+      rotulo(ct, 'eixo (a mão)', x0 - 76, y0, G.COR.tinta, 'right');
+    }
+
+    function desenhaCurva() {
+      var D = dados();
+      var f = function (b) { return D.c.d * b / D.Ip - 1; };
+      var gr = G.eixos(cv, {
+        altura: 310, xmin: 0, xmax: 1, ymin: -1.1, ymax: 1.1,
+        rotX: 'ponto da pancada, a partir do eixo (em L)',
+        rotY: 'reação no eixo, por unidade de impulso',
+        marcasX: G.marcasLineares(0, 1, 5, 2),
+        formataY: function (v) { return F.fmt(v, 1); }
+      });
+      var ct = gr.ct;
+      /* a linha do zero, que é o que se procura */
+      ct.strokeStyle = G.COR.grade; ct.lineWidth = 1.5;
+      ct.beginPath(); ct.moveTo(gr.x0, gr.Y(0)); ct.lineTo(gr.x1, gr.Y(0)); ct.stroke();
+      G.curva(gr, f, G.COR.mestra, 2.6);
+      G.vertical(gr, D.b, G.COR.suave, '', true);
+      if (D.cp <= 1) {
+        ct.beginPath(); ct.arc(gr.X(D.cp), gr.Y(0), 5.5, 0, 2 * Math.PI);
+        ct.fillStyle = G.COR.roxo; ct.fill();
+        rotulo(ct, 'centro de percussão: ' + F.fmt(D.cp, 3) + ' L',
+          gr.X(D.cp), gr.Y(0) - 16, G.COR.roxo);
+      }
+      rotulo(ct, 'bateu perto demais: a mão é empurrada para trás',
+        gr.x0 + 8, gr.Y(-0.62), G.COR.vinho, 'left');
+      rotulo(ct, 'bateu longe demais: a mão é puxada para a frente',
+        gr.x1 - 8, gr.Y(0.72), G.COR.vinho, 'right');
+    }
+
+    function desenhar() {
+      var D = dados();
+      if (est.vista === 'pancada') desenhaPancada();
+      else desenhaCurva();
+      var sente = Math.abs(D.R) < 0.03 ? 'nada: é o ponto certo'
+        : D.R < 0 ? 'empurrão para trás' : 'puxão para a frente';
+      mostrar({
+        ip: F.fmt(D.Ip, 4),
+        cp: F.fmt(D.cp, 3) + ' L',
+        b: F.fmt(D.b, 2) + ' L',
+        r: F.fmt(D.R, 3),
+        sente: sente,
+        w: F.fmt(D.w, 2) + ' J/(kg·m)'
+      });
+    }
+
+    function texto() {
+      var D = dados();
+      nota.innerHTML =
+        '<p>Segure uma barra por uma ponta e dê nela uma pancada seca, de impulso \\(J\\), a '
+        + 'uma distância \\(b\\) da mão. O impulso angular em torno do eixo põe a barra a '
+        + 'girar com \\(\\omega=Jb/I_{\\rm eixo}\\), e o centro de massa, que está a \\(d\\) '
+        + 'do eixo, passa a andar com \\(V=\\omega d\\). Mas o impulso linear total tem de '
+        + 'bater com essa quantidade de movimento, e quem fecha a conta é a mão:</p>'
+        + '\\[J+R=MV=M\\omega d \\quad\\Longrightarrow\\quad '
+        + 'R=J\\left(\\frac{Mdb}{I_{\\rm eixo}}-1\\right).\\]'
+        + '<p>Essa reação some quando os dois termos se igualam, isto é, quando</p>'
+        + '\\[b=\\frac{I_{\\rm eixo}}{Md}=\\ell.\\]'
+        + '<p>O ponto a essa distância é o <strong>centro de percussão</strong>, e o '
+        + '\\(\\ell\\) que apareceu é o mesmo comprimento equivalente do pêndulo físico da '
+        + 'seção anterior. Centro de percussão e centro de oscilação são o mesmo ponto, o '
+        + 'que não é coincidência: nos dois casos a pergunta é onde pôr a força para que o '
+        + 'vínculo no eixo não precise entrar em ação.</p>'
+        + '<p>Para a ' + D.c.n + ' deste simulador, ele fica a ' + F.fmt(D.cp, 3)
+        + ' L do eixo. Batendo mais perto, a barra gira devagar demais para o impulso '
+        + 'recebido e a mão leva um empurrão para trás; batendo mais longe, gira depressa '
+        + 'demais e a mão é puxada para a frente. É o que um jogador chama de pegar a bola '
+        + 'atrasada ou adiantada no taco, e o ponto no meio é o que ele chama de '
+        + '<em>sweet spot</em>.</p>'
+        + '<p>Numa haste uniforme segura pela ponta, \\(I=ML^2/3\\) e \\(d=L/2\\) dão '
+        + '\\(b=2L/3\\). Concentrando massa na extremidade, como num taco, o centro de '
+        + 'percussão se desloca para mais longe da mão: compare os três corpos nos '
+        + 'botões.</p>';
+      tipografar(corpo);
+    }
+
+    var chaveAnt = '';
+    function quadro() {
+      if (est.rodando) {
+        est.t += 0.016;
+        if (est.t > 1.9) est.t = 0;
+      }
+      desenhar();
+      var chave = est.c + '|' + F.fmt(est.b, 2) + '|' + est.vista;
+      if (chave !== chaveAnt) { chaveAnt = chave; texto(); }
+      requestAnimationFrame(quadro);
+    }
+
+    texto();
+    requestAnimationFrame(quadro);
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     9. Máquina de Atwood com polia de massa
+     Enquanto a polia é ideal, as duas trações são iguais e o problema
+     não precisa de torque nenhum. Dar massa à polia quebra essa
+     igualdade, e a diferença entre as trações é exatamente o que
+     fornece o torque: é o exemplo mais curto em que τ = Iα é
+     indispensável.
+     ================================================================= */
+  REGISTRO.atwood = function (raiz) {
+    var G0 = 9.80665, Rp = 0.12;
+    var est = { m1: 2, m2: 1.2, mp: 1, k: 0.5, t: 0, rodando: true };
+
+    var corpo = moldura(raiz, 'Atwood com polia de massa: onde τ = Iα é indispensável');
+
+    var c1 = el('div', { class: 'controles' });
+    corpo.appendChild(c1);
+    c1.appendChild(el('span', { class: 'etiqueta', texto: 'polia' }));
+    opcoes(c1, [
+      { rot: 'disco maciço (k = ½)', v: 0.5 },
+      { rot: 'aro (k = 1)', v: 1 },
+      { rot: 'ideal, sem massa', v: 0 }
+    ], 0, function (v) { est.k = v; est.t = 0; });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'massa m₁', 0.5, 4, 0.1, 2,
+      function (v) { est.m1 = v; est.t = 0; },
+      function (v) { return F.fmt(v, 1) + ' kg'; });
+    deslizante(ctr, 'massa m₂', 0.5, 4, 0.1, 1.2,
+      function (v) { est.m2 = v; est.t = 0; },
+      function (v) { return F.fmt(v, 1) + ' kg'; });
+    deslizante(ctr, 'massa da polia', 0, 6, 0.1, 1,
+      function (v) { est.mp = v; est.t = 0; },
+      function (v) { return F.fmt(v, 1) + ' kg'; });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'aceleração a (m/s²)', k: 'a' },
+      { rot: 'tração T₁ (N)', k: 't1' },
+      { rot: 'tração T₂ (N)', k: 't2' },
+      { rot: 'diferença T₁ − T₂ (N)', k: 'dt' },
+      { rot: 'a com polia ideal (m/s²)', k: 'ai' },
+      { rot: 'quanto a polia freia', k: 'err' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function dados() {
+      var ef = est.k * est.mp;                 // inércia efetiva da polia, I/R²
+      var a = (est.m1 - est.m2) * G0 / (est.m1 + est.m2 + ef);
+      var ai = (est.m1 - est.m2) * G0 / (est.m1 + est.m2);
+      return { a: a, ai: ai, ef: ef,
+               T1: est.m1 * (G0 - a), T2: est.m2 * (G0 + a) };
+    }
+
+    function desenhar() {
+      var D = dados(), alt = 318;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+
+      var esc = 150;                           // px por metro
+      var rp = Rp * esc;
+      var cx = Lp / 2, cy = 52;
+      var s = Math.min(0.78, 0.5 * D.a * est.t * est.t);   // deslocamento, m
+      if (D.a < 0) s = Math.max(-0.78, s);
+
+      /* suporte e polia */
+      ct.strokeStyle = G.COR.suave; ct.lineWidth = 3;
+      ct.beginPath(); ct.moveTo(cx - 70, 16); ct.lineTo(cx + 70, 16); ct.stroke();
+      ct.beginPath(); ct.moveTo(cx, 16); ct.lineTo(cx, cy); ct.stroke();
+
+      var fi = s / Rp;
+      ct.save(); ct.translate(cx, cy); ct.rotate(fi);
+      ct.beginPath(); ct.arc(0, 0, rp, 0, 2 * Math.PI);
+      if (est.k === 0) {
+        ct.strokeStyle = G.COR.grade; ct.lineWidth = 2;
+        ct.setLineDash([4, 4]); ct.stroke(); ct.setLineDash([]);
+      } else if (est.k === 1) {
+        ct.strokeStyle = G.COR.mestra; ct.lineWidth = Math.max(5, rp * 0.3); ct.stroke();
+      } else {
+        ct.fillStyle = 'rgba(23,107,93,.2)'; ct.fill();
+        ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2; ct.stroke();
+      }
+      ct.beginPath(); ct.moveTo(0, 0); ct.lineTo(0, -rp);
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 1.6; ct.stroke();
+      ct.restore();
+
+      /* blocos: o deslocamento é limitado para m₂ não subir dentro da
+         polia nem m₁ sair pelo pé do quadro */
+      var desl = Math.max(-78, Math.min(78, s * 130));
+      var repouso = cy + rp + 88;
+      var y1 = repouso + desl, y2 = repouso - desl;
+      [[cx - rp, y1, est.m1, 'm₁', D.T1, G.COR.bronze],
+       [cx + rp, y2, est.m2, 'm₂', D.T2, G.COR.azul]].forEach(function (b) {
+        ct.strokeStyle = G.COR.tinta; ct.lineWidth = 1.6;
+        ct.beginPath(); ct.moveTo(b[0], cy); ct.lineTo(b[0], b[1]); ct.stroke();
+        var lado = 16 + 9 * Math.pow(b[2], 1 / 3);
+        ct.fillStyle = b[5] + '33';
+        ct.fillRect(b[0] - lado / 2, b[1], lado, lado);
+        ct.strokeStyle = b[5]; ct.lineWidth = 2;
+        ct.strokeRect(b[0] - lado / 2, b[1], lado, lado);
+        rotulo(ct, b[3], b[0], b[1] + lado / 2, b[5]);
+        rotulo(ct, F.fmt(b[4], 2) + ' N', b[0] + (b[0] < cx ? -1 : 1) * (lado / 2 + 8),
+          b[1] + lado / 2, b[5], b[0] < cx ? 'right' : 'left');
+      });
+
+      rotulo(ct, est.k === 0 ? 'polia ideal: T₁ = T₂'
+        : 'polia com massa: T₁ ≠ T₂, e a diferença gira a polia',
+        Lp / 2, alt - 12, est.k === 0 ? G.COR.suave : G.COR.mestra);
+
+      mostrar({
+        a: F.fmt(D.a, 3), t1: F.fmt(D.T1, 2), t2: F.fmt(D.T2, 2),
+        dt: F.fmt(D.T1 - D.T2, 3), ai: F.fmt(D.ai, 3),
+        err: D.ai === 0 ? 'nada a frear' : F.pct(1 - D.a / D.ai, 1) + ' a menos'
+      });
+    }
+
+    function texto() {
+      var D = dados();
+      nota.innerHTML =
+        '<p>Escreva a segunda lei para cada bloco e a equação de rotação para a polia, de '
+        + 'raio \\(R\\) e momento de inércia \\(I=kM_pR^2\\). O fio não desliza, de modo que '
+        + '\\(a=\\alpha R\\):</p>'
+        + '\\[m_1g-T_1=m_1a,\\qquad T_2-m_2g=m_2a,\\qquad \\left(T_1-T_2\\right)R=I\\frac{a}{R}.\\]'
+        + '<p>A terceira equação já diz o essencial: a diferença entre as trações é o que '
+        + 'fornece o torque, e vale \\(T_1-T_2=kM_pa\\). Somando as três,</p>'
+        + '\\[a=\\frac{\\left(m_1-m_2\\right)g}{m_1+m_2+kM_p}.\\]'
+        + '<p>A polia entra no denominador como se fosse uma massa adicional de \\(kM_p\\), '
+        + 'que para um disco maciço é metade da massa dela. Ela não cai nem sobe, mas precisa '
+        + 'ser posta a girar, e isso custa a mesma coisa que arrastar massa.</p>'
+        + '<p>Ponha a massa da polia em zero e repare no que acontece com os dois números das '
+        + 'trações: eles se igualam. <strong>A regra de que a tração é a mesma dos dois lados '
+        + 'de uma polia só vale para polia sem massa</strong>, e o motivo é que uma tração '
+        + 'igual dos dois lados não exerce torque nenhum. Com a polia atual, de '
+        + F.fmt(est.mp, 1) + ' kg, a diferença é ' + F.fmt(D.T1 - D.T2, 3) + ' N e a '
+        + 'aceleração cai '
+        + (D.ai === 0 ? 'nada, porque as massas estão equilibradas' : F.pct(1 - D.a / D.ai, 1))
+        + ' em relação ao caso ideal.</p>';
+      tipografar(corpo);
+    }
+
+    var chaveAnt = '';
+    function quadro() {
+      if (est.rodando) {
+        est.t += 0.016;
+        if (est.t > 2.4) est.t = 0;
+      }
+      desenhar();
+      var chave = F.fmt(dados().a, 3) + '|' + est.k + '|' + F.fmt(est.mp, 1);
+      if (chave !== chaveAnt) { chaveAnt = chave; texto(); }
+      requestAnimationFrame(quadro);
+    }
+
+    texto();
+    requestAnimationFrame(quadro);
+    registrarRedesenho(desenhar);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {
