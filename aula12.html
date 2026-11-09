@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 12: Espaço de fase e o teorema de Liouville | Mecânica Clássica II</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611082133">
+<script src="assets/js/comum.js?v=202611082133"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Mecânica Clássica II <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html">Início</a>
+      <span class="grupo">Corpos rígidos</span>
+      <a href="aula01.html" class="num" title="Módulo 1: Cinemática dos corpos rígidos">1</a>
+      <a href="aula02.html" class="num" title="Módulo 2: Centro de massa e momentos de inércia">2</a>
+      <a href="aula03.html" class="num" title="Módulo 3: Momento angular, torque e equações de movimento">3</a>
+      <a href="aula04.html" class="num" title="Módulo 4: Conservação e equilíbrio estático">4</a>
+      <span class="grupo">Referenciais</span>
+      <a href="aula05.html" class="num" title="Módulo 5: Matrizes de rotação e transformações de coordenadas">5</a>
+      <a href="aula06.html" class="num" title="Módulo 6: Referenciais em rotação e forças fictícias">6</a>
+      <span class="grupo">Variacional</span>
+      <a href="aula07.html" class="num" title="Módulo 7: Cálculo variacional: ação e caminhos extremos">7</a>
+      <a href="aula08.html" class="num" title="Módulo 8: A equação de Euler-Lagrange e o princípio de Hamilton">8</a>
+      <span class="grupo">Lagrange e Hamilton</span>
+      <a href="aula09.html" class="num" title="Módulo 9: Coordenadas generalizadas, vínculos e equações de Lagrange">9</a>
+      <a href="aula10.html" class="num" title="Módulo 10: Aplicações do formalismo lagrangiano">10</a>
+      <a href="aula11.html" class="num" title="Módulo 11: Transformação de Legendre e equações de Hamilton">11</a>
+      <a href="aula12.html" class="num ativo" title="Módulo 12: Espaço de fase e o teorema de Liouville">12</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+<aside class="lateral">
+  <h4>Neste módulo</h4>
+  <ol>
+    <li><a href="#s1">1. O espaço de fase</a></li>
+    <li><a href="#s2">2. O fluxo hamiltoniano</a></li>
+    <li><a href="#s3">3. O teorema de Liouville</a></li>
+    <li><a href="#s4">4. A equação de Liouville</a></li>
+    <li><a href="#s5">5. O que o teorema proíbe</a></li>
+    <li><a href="#s6">6. Parênteses de Poisson</a></li>
+    <li><a href="#s7">7. Álgebra de Lie</a></li>
+    <li><a href="#s8">8. A dinâmica em uma linha</a></li>
+    <li><a href="#s9">9. Constantes de movimento</a></li>
+    <li><a href="#s10">10. Transformações canônicas</a></li>
+    <li><a href="#s11">11. A ponte para a mecânica quântica</a></li>
+    <li><a href="#s12">12. Exercícios resolvidos</a></li>
+    <li><a href="#s13">13. Exercícios propostos</a></li>
+    <li><a href="#s14">14. Onde o curso termina</a></li>
+  </ol>
+</aside>
+
+<main class="conteudo">
+
+  <p class="chapeu">Módulo 12 · Formalismo lagrangiano e hamiltoniano</p>
+  <h1>Espaço de fase e o teorema de Liouville</h1>
+  <p class="subtitulo">As equações de Hamilton descrevem o escoamento de um fluido imaginário
+  cujas partículas são estados possíveis do sistema. Esse fluido é incompressível, e dessa
+  única propriedade saem a mecânica estatística, a estrutura algébrica da mecânica e a
+  passagem para a mecânica quântica.</p>
+
+  <hr class="linha">
+
+  <!-- ================================================== -->
+  <h2 id="s1">1. O espaço de fase</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Definição · Espaço de fase</span>
+    <p>O espaço de \(2n\) dimensões cujas coordenadas são
+    \(\left(q_1,\dots,q_n,p_1,\dots,p_n\right)\). Cada ponto dele representa um
+    <strong>estado completo</strong> do sistema, e a evolução temporal é uma trajetória nesse
+    espaço.</p>
+  </div>
+
+  <p>A diferença em relação ao espaço de configuração, de \(n\) dimensões, é decisiva. No
+  espaço de configuração a trajetória não determina o futuro: pelo mesmo ponto podem passar
+  infinitos movimentos, com velocidades diferentes. No espaço de fase, por cada ponto passa
+  <strong>uma e só uma</strong> trajetória, porque o estado inclui o momento, e as equações de
+  Hamilton dizem univocamente para onde ir.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>No retrato de fase</th><th>Significa</th></tr></thead>
+    <tbody>
+      <tr><td>um ponto</td><td>o estado instantâneo \(\left(q,p\right)\)</td></tr>
+      <tr><td>uma curva</td><td>a história do sistema</td></tr>
+      <tr><td>curvas de nível de \(H\)</td><td>estados de mesma energia</td></tr>
+      <tr><td>pontos fixos</td><td>equilíbrios, onde \(\dot q=\dot p=0\)</td></tr>
+      <tr><td>órbitas fechadas</td><td>movimento periódico</td></tr>
+      <tr><td>separatriz</td><td>a fronteira entre regimes distintos</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Duas trajetórias jamais se cruzam, porque um cruzamento significaria dois futuros
+  distintos para o mesmo estado. Elas podem se aproximar indefinidamente, podem se acumular
+  sobre uma separatriz, mas não se tocam.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s2">2. O fluxo hamiltoniano</h2>
+
+  <p>As equações de Hamilton definem, em cada ponto do espaço de fase, um vetor:</p>
+
+  <p>\[\vet{V}=\left(\dot q_1,\dots,\dot q_n,\;\dot p_1,\dots,\dot p_n\right)
+  =\left(\pder{H}{p_1},\dots,\pder{H}{p_n},\;
+  -\pder{H}{q_1},\dots,-\pder{H}{q_n}\right).\]</p>
+
+  <p>É um campo vetorial, chamado <strong>fluxo hamiltoniano</strong>, e as trajetórias são as
+  suas linhas de corrente. A metáfora que organiza todo o resto deste módulo é a seguinte:
+  imagine o espaço de fase preenchido por um fluido, em que cada partícula de fluido é um
+  estado possível do sistema. O fluido escoa segundo \(\vet{V}\).</p>
+
+  <p>A pergunta natural, para qualquer escoamento, é se ele comprime ou dilata o fluido. A
+  resposta está na divergência do campo, e ela tem uma propriedade notável.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. O teorema de Liouville</h2>
+
+  <p>Calcule a divergência de \(\vet{V}\), somando as derivadas de cada componente em relação
+  à sua própria coordenada:</p>
+
+  <p>\[\nabla\cdot\vet{V}
+  =\sum_j\left(\pder{\dot q_j}{q_j}+\pder{\dot p_j}{p_j}\right)
+  =\sum_j\left(\frac{\partial^2H}{\partial q_j\,\partial p_j}
+  -\frac{\partial^2H}{\partial p_j\,\partial q_j}\right)=0,\]</p>
+
+  <p>porque as derivadas parciais mistas comutam. O cancelamento é exato, termo a termo, e não
+  depende de qual seja a hamiltoniana: ele vem apenas do sinal relativo entre as duas equações
+  canônicas.</p>
+
+  <div class="destaque">
+    <span class="anuncio">Teorema de Liouville</span>
+    O fluxo hamiltoniano preserva o volume no espaço de fase:
+    \[\der{V}{t}=0.\]
+    Equivalentemente, o jacobiano da transformação
+    \(\left(q(0),p(0)\right)\to\left(q(t),p(t)\right)\) vale 1 em todo instante.
+  </div>
+
+  <div data-widget="liouville"></div>
+
+  <p>O widget mede a área pela fórmula do cadarço a cada quadro. No oscilador a mancha apenas
+  gira rigidamente, e a conservação é óbvia. No pêndulo e na queda livre ela estica
+  violentamente, porque pontos de energias diferentes percorrem a órbita em tempos diferentes,
+  e ainda assim a razão de áreas fica em 1.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A área não muda, o perímetro explode</span>
+    <p>Esse é o fenômeno que o cartão do perímetro revela, e é ele que torna o teorema
+    interessante em vez de trivial. A mancha vira um filamento cada vez mais longo e mais
+    fino, enrolando-se sobre a superfície de energia. Um fio comprido e estreito tem a mesma
+    área de uma bolha gorda, e é essa a saída para a aparente contradição entre reversibilidade
+    microscópica e irreversibilidade observada: a informação não se perde, ela se esconde em
+    escalas cada vez menores. Qualquer medida de resolução finita deixa de distinguir o
+    filamento de uma distribuição espalhada.</p>
+  </div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O contraexemplo que prova o ponto</span>
+    <p>Escolha no widget o oscilador com atrito. A equação \(\ddot x+b\dot x/m+kx/m=0\) não
+    vem de nenhuma hamiltoniana, a divergência do campo passa a valer \(-b/m\), e a área
+    encolhe exponencialmente até virar um ponto. A origem é um <strong>atrator</strong>. É por
+    isso que sistemas hamiltonianos não têm atratores de espécie nenhuma: não há para onde o
+    volume ir.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. A equação de Liouville</h2>
+
+  <p>Em vez de seguir uma mancha, acompanhe uma densidade de probabilidade
+  \(\varrho\left(q,p,t\right)\) no espaço de fase. Como o número de estados se conserva e o
+  volume também, a densidade obedece a uma equação de continuidade cujo termo de compressão se
+  anula:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Equação de Liouville</span>
+    \[\pder{\varrho}{t}+\left\{\varrho,H\right\}=0,
+    \qquad\text{isto é}\qquad\der{\varrho}{t}=0.\]
+  </div>
+
+  <p>A leitura é exatamente a de um fluido incompressível: a densidade medida <em>andando
+  junto com o escoamento</em> não muda. Um observador parado num ponto do espaço de fase vê
+  \(\varrho\) variar; um observador que acompanha o estado não vê variação nenhuma.</p>
+
+  <p>A consequência para a mecânica estatística é imediata. Qualquer \(\varrho\) que dependa
+  de \(\left(q,p\right)\) apenas através de \(H\) torna o parêntese nulo, e portanto é uma
+  distribuição <strong>estacionária</strong>. Daí vêm os ensembles: o microcanônico, com
+  \(\varrho\) constante sobre a superfície de energia, e o canônico, com
+  \(\varrho\propto e^{-H/k_BT}\). Nenhum dos dois é um postulado isolado: os dois são as
+  soluções estacionárias da equação acima.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. O que o teorema proíbe</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Três consequências</span>
+    <p><strong>Não há atratores.</strong> Um atrator é uma região para a qual volumes
+    convergem, e volumes não convergem. Um pêndulo ideal nunca para; um pêndulo real para
+    porque o atrito o retira do mundo hamiltoniano.</p>
+    <p><strong>Não há como esfriar sem trocar algo.</strong> Comprimir um feixe de partículas
+    em posição exige dilatá-lo em momento. Esse é o <em>teorema de Liouville dos
+    aceleradores</em>, e ele limita a emitância alcançável por qualquer óptica de feixes
+    puramente conservativa. Resfriar feixes de verdade exige processos dissipativos, como
+    resfriamento estocástico ou por laser.</p>
+    <p><strong>O sistema volta.</strong> Se o movimento está confinado a uma região de volume
+    finito, e o volume é preservado, então quase toda trajetória retorna arbitrariamente perto
+    do ponto de partida. É o <strong>teorema da recorrência de Poincaré</strong>, provado em
+    1890 pelo mesmo argumento de contagem de volumes.</p>
+  </div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A objeção de Zermelo</span>
+    <p>A recorrência pareceu, por algum tempo, refutar a segunda lei da termodinâmica: se o
+    gás volta ao canto da caixa, a entropia volta a cair. Zermelo levantou essa objeção contra
+    Boltzmann em 1896, e a resposta é quantitativa. O tempo de recorrência de um gás
+    macroscópico é da ordem de \(e^{N}\) com \(N\sim10^{23}\), um número diante do qual a idade
+    do universo é zero. A segunda lei não é um teorema sobre o impossível, é um enunciado sobre
+    o esmagadoramente improvável, e a recorrência não a contradiz: apenas marca a escala em que
+    ela deixaria de valer.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. Parênteses de Poisson</h2>
+
+  <p>Na equação de Liouville apareceu uma operação nova, e ela merece ser estudada por conta
+  própria, porque reorganiza toda a mecânica.</p>
+
+  <div class="destaque">
+    <span class="anuncio">Parêntese de Poisson</span>
+    \[\left\{f,g\right\}=\sum_{i=1}^{n}
+    \left(\pder{f}{q_i}\pder{g}{p_i}-\pder{f}{p_i}\pder{g}{q_i}\right).\]
+  </div>
+
+  <p>Em um grau de liberdade a soma tem um termo só. A leitura é que \(\left\{f,g\right\}\)
+  mede a taxa de variação de \(f\) ao longo do fluxo gerado por \(g\), e vice-versa com o
+  sinal trocado. Quando o parêntese é nulo, as duas funções não interferem uma na outra.</p>
+
+  <p>Os parênteses entre as próprias coordenadas são os mais importantes, e saem direto da
+  definição:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Parênteses fundamentais</span>
+    \[\left\{q_i,q_j\right\}=0,\qquad
+    \left\{p_i,p_j\right\}=0,\qquad
+    \left\{q_i,p_j\right\}=\delta_{ij}.\]
+  </div>
+
+  <p>Para um grau de liberdade a verificação é imediata:
+  \(\left\{q,p\right\}=1\cdot1-0\cdot0=1\) e
+  \(\left\{q,q\right\}=1\cdot0-0\cdot1=0\). Essas três relações <em>definem</em> a estrutura
+  canônica do espaço de fase, e tudo o mais se apoia nelas.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Forma matricial</span>
+    <p>Empilhando as \(2n\) coordenadas num vetor \(\xi=\left(q,p\right)\), o parêntese
+    escreve-se</p>
+    \[\left\{f,g\right\}=\nabla f\cdot\Ten{J}\cdot\nabla g,
+    \qquad\Ten{J}=\begin{pmatrix}0&amp;I_n\\-I_n&amp;0\end{pmatrix}.\]
+    <p>A matriz \(\Ten{J}\) chama-se <strong>simplética</strong>, e é ela que faz o papel que
+    a métrica faz em geometria riemanniana. É antissimétrica em vez de simétrica, e é por isso
+    que o espaço de fase não tem uma noção natural de distância, mas tem uma noção natural de
+    área: a geometria da mecânica hamiltoniana é simplética, não métrica.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. Álgebra de Lie</h2>
+
+  <p>O parêntese satisfaz quatro propriedades, e as quatro juntas fazem dele uma
+  <strong>álgebra de Lie</strong>.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Propriedade</th><th>Enunciado</th></tr></thead>
+    <tbody>
+      <tr><td>antissimetria</td><td>\(\left\{f,g\right\}=-\left\{g,f\right\}\)</td></tr>
+      <tr><td>bilinearidade</td><td>\(\left\{af+bg,h\right\}=a\left\{f,h\right\}+b\left\{g,h\right\}\)</td></tr>
+      <tr><td>regra de Leibniz</td><td>\(\left\{fg,h\right\}=f\left\{g,h\right\}+\left\{f,h\right\}g\)</td></tr>
+      <tr><td>identidade de Jacobi</td><td>\(\left\{f,\left\{g,h\right\}\right\}+\left\{g,\left\{h,f\right\}\right\}+\left\{h,\left\{f,g\right\}\right\}=0\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>A antissimetria sai de olhar a definição e trocar \(f\) por \(g\): os dois termos trocam
+  de lugar e de sinal. Da antissimetria decorre que \(\left\{f,f\right\}=0\) para qualquer
+  \(f\), fato que será usado três vezes nas próximas seções. A identidade de Jacobi é a mais
+  trabalhosa de verificar e a mais importante de todas, porque é dela que vem o teorema de
+  Poisson da seção 9.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. A dinâmica em uma linha</h2>
+
+  <p>Tome uma função qualquer \(f\left(q,p,t\right)\) e calcule a sua derivada total ao longo
+  do movimento, pela regra da cadeia, substituindo as equações canônicas:</p>
+
+  <p>\[\der{f}{t}=\sum_i\left(\pder{f}{q_i}\dot q_i+\pder{f}{p_i}\dot p_i\right)+\pder{f}{t}
+  =\sum_i\left(\pder{f}{q_i}\pder{H}{p_i}
+  -\pder{f}{p_i}\pder{H}{q_i}\right)+\pder{f}{t}.\]</p>
+
+  <p>A soma é exatamente o parêntese de \(f\) com \(H\):</p>
+
+  <div class="destaque">
+    <span class="anuncio">A equação de movimento, na forma final</span>
+    \[\der{f}{t}=\left\{f,H\right\}+\pder{f}{t}.\]
+  </div>
+
+  <p>Toda a dinâmica cabe nessa linha, e os casos particulares a confirmam. Com \(f=q_i\),
+  ela devolve \(\dot q_i=\partial H/\partial p_i\); com \(f=p_i\), devolve
+  \(\dot p_i=-\partial H/\partial q_i\); com \(f=H\), devolve \(dH/dt=\partial H/\partial t\),
+  porque \(\left\{H,H\right\}=0\). As três equações do módulo 11 saem de uma só.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A hamiltoniana gera o tempo</span>
+    <p>Lendo a equação de outro jeito: \(H\) é o <em>gerador</em> das translações temporais,
+    no sentido de que o parêntese com \(H\) produz a variação no tempo. O padrão se repete.
+    O momento linear \(p_x\) é o gerador das translações em \(x\), porque
+    \(\left\{f,p_x\right\}=\partial f/\partial x\); o momento angular \(L_z\) é o gerador das
+    rotações em torno de \(z\). Simetria e quantidade conservada deixam de ser duas coisas
+    ligadas por um teorema e passam a ser duas leituras da mesma função.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. Constantes de movimento</h2>
+
+  <p>Da equação acima sai o critério mais econômico da mecânica. Se \(f\) não depende
+  explicitamente do tempo, então</p>
+
+  <div class="destaque">
+    <span class="anuncio">Critério de conservação</span>
+    \[\left\{f,H\right\}=0\quad\Longleftrightarrow\quad f\text{ é constante de movimento}.\]
+  </div>
+
+  <p>Não é preciso integrar nada, nem conhecer a trajetória: basta calcular derivadas
+  parciais e verificar se o resultado é zero.</p>
+
+  <div data-widget="conservadas"></div>
+
+  <div class="bloco def">
+    <span class="rotulo">Teorema de Poisson</span>
+    <p>Se \(f\) e \(g\) são constantes de movimento, então \(\left\{f,g\right\}\) também é.</p>
+    <p><strong>Demonstração.</strong> Pela identidade de Jacobi,</p>
+    \[\left\{\left\{f,g\right\},H\right\}
+    =-\left\{\left\{g,H\right\},f\right\}-\left\{\left\{H,f\right\},g\right\},\]
+    <p>e os dois parênteses internos são nulos por hipótese. Logo
+    \(\left\{\left\{f,g\right\},H\right\}=0\), e se nem \(f\) nem \(g\) dependem
+    explicitamente do tempo, \(\left\{f,g\right\}\) é conservada.</p>
+    <p>As constantes de movimento formam portanto uma <strong>álgebra fechada</strong>. Para
+    as componentes do momento angular, \(\left\{L_x,L_y\right\}=L_z\) e as suas permutações
+    cíclicas, o teorema diz que conservar duas componentes obriga a conservar a terceira. Essa
+    relação é a álgebra de Lie do grupo de rotações.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. Transformações canônicas</h2>
+
+  <p>Mudar de coordenadas no espaço de fase é livre, mas nem toda mudança preserva a forma das
+  equações de Hamilton. As que preservam chamam-se <strong>canônicas</strong>, e o critério é
+  que os parênteses fundamentais sobrevivam:</p>
+
+  <p>\[\left\{Q_i,Q_j\right\}_{q,p}=0,\qquad
+  \left\{P_i,P_j\right\}_{q,p}=0,\qquad
+  \left\{Q_i,P_j\right\}_{q,p}=\delta_{ij},\]</p>
+
+  <p>com os parênteses calculados nas variáveis antigas. Em um grau de liberdade a condição se
+  reduz ao determinante jacobiano valer 1.</p>
+
+  <div data-widget="canonica"></div>
+
+  <p>A transformação \(Q=p\), \(P=-q\) merece atenção especial. Ela é canônica, e com isso diz
+  algo que não teria sentido no formalismo lagrangiano: posição e momento não são categorias
+  distintas, são rótulos, e uma transformação canônica pode trocá-los.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Para que serve</span>
+    <p>Se existir uma transformação canônica que torne todas as novas coordenadas cíclicas,
+    todos os novos momentos serão constantes e o problema estará resolvido sem integrar nada.
+    Procurar essa transformação é o programa de <strong>Hamilton-Jacobi</strong>, e para
+    sistemas periódicos ele produz as variáveis de <strong>ação e ângulo</strong>, em que a
+    ação é a área cercada pela órbita no espaço de fase,</p>
+    \[J=\oint p\,dq.\]
+    <p>Foi quantizando essa área, com \(J=nh\), que Bohr e Sommerfeld acertaram os níveis do
+    hidrogênio uma década antes de existir equação de Schrödinger. A regra parecia arbitrária
+    e não era: a ação é o invariante natural do espaço de fase, e é o único candidato com
+    dimensão de \(h\).</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. A ponte para a mecânica quântica</h2>
+
+  <p>Compare as duas colunas abaixo. Elas não são analogia pedagógica: foi literalmente assim,
+  olhando para os parênteses de Poisson, que Dirac construiu a mecânica quântica em 1925.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Mecânica clássica</th><th>Mecânica quântica</th></tr></thead>
+    <tbody>
+      <tr><td>função \(f\left(q,p\right)\)</td><td>operador \(\hat f\)</td></tr>
+      <tr><td>\(\left\{f,g\right\}\)</td><td>\(\dfrac{1}{i\hbar}\left[\hat f,\hat g\right]\)</td></tr>
+      <tr><td>\(\left\{q,p\right\}=1\)</td><td>\(\left[\hat q,\hat p\right]=i\hbar\)</td></tr>
+      <tr><td>\(\der{f}{t}=\left\{f,H\right\}\)</td><td>\(\der{\hat f}{t}=\dfrac{1}{i\hbar}\left[\hat f,\hat H\right]\)</td></tr>
+      <tr><td>\(\left\{L_x,L_y\right\}=L_z\)</td><td>\(\left[\hat L_x,\hat L_y\right]=i\hbar\hat L_z\)</td></tr>
+      <tr><td>\(\left\{f,H\right\}=0\)</td><td>\(\left[\hat f,\hat H\right]=0\)</td></tr>
+      <tr><td>equação de Liouville</td><td>equação de von Neumann</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>A terceira linha é a relação de comutação canônica, de onde sai o princípio de incerteza.
+  A quarta é a equação de Heisenberg. A última linha governa a evolução da matriz densidade, e
+  tem exatamente a forma da equação de Liouville com o parêntese trocado pelo comutador.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que a correspondência funciona</span>
+    <p>Os parênteses de Poisson e os comutadores obedecem às mesmas quatro propriedades da
+    seção 7: antissimetria, bilinearidade, Leibniz e Jacobi. São duas realizações da mesma
+    estrutura algébrica. A mecânica clássica é a que usa funções que comutam entre si; a
+    quântica é a que usa operadores que não comutam, com \(\hbar\) medindo o quanto falham em
+    comutar. Fazer \(\hbar\to0\) devolve uma da outra, e é esse o conteúdo preciso do
+    princípio da correspondência.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s12">12. Exercícios resolvidos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 12.1 · Parênteses elementares</span>
+    <p>Para \(H=p^2/2m+U(x)\), calcule \(\left\{x,H\right\}\), \(\left\{p,H\right\}\) e
+    \(\left\{x,p^2\right\}\).</p>
+    <p><strong>Solução.</strong> Pela definição em um grau de liberdade,</p>
+    \[\left\{x,H\right\}=\pder{x}{x}\pder{H}{p}-\pder{x}{p}\pder{H}{x}
+    =1\cdot\frac{p}{m}-0=\frac{p}{m},\]
+    \[\left\{p,H\right\}=\pder{p}{x}\pder{H}{p}-\pder{p}{p}\pder{H}{x}
+    =0-1\cdot U'(x)=-U'(x).\]
+    <p>Os dois resultados são \(\dot x\) e \(\dot p\): as equações de Hamilton reaparecem como
+    casos particulares de \(df/dt=\left\{f,H\right\}\). Para o terceiro,</p>
+    \[\left\{x,p^2\right\}=\pder{x}{x}\pder{\left(p^2\right)}{p}=2p.\]
+    <p>Compare com o resultado quântico \(\left[\hat x,\hat p^2\right]=2i\hbar\hat p\): a
+    correspondência \(\left\{\,,\right\}\to\left[\,,\right]/i\hbar\) funciona termo a
+    termo.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 12.2 · A álgebra do momento angular</span>
+    <p>Mostre que \(\left\{L_x,L_y\right\}=L_z\).</p>
+    <p><strong>Solução.</strong> Com \(L_x=yp_z-zp_y\) e \(L_y=zp_x-xp_z\), o parêntese em
+    três graus de liberdade tem três somas. Das seis derivadas possíveis, só sobrevivem as que
+    envolvem \(z\) e \(p_z\), porque são as únicas coordenadas que aparecem nas duas
+    funções:</p>
+    \[\left\{L_x,L_y\right\}
+    =\pder{L_x}{z}\pder{L_y}{p_z}-\pder{L_x}{p_z}\pder{L_y}{z}
+    =\left(-p_y\right)\left(-x\right)-\left(y\right)\left(p_x\right)
+    =xp_y-yp_x=L_z.\]
+    <p>As outras duas relações saem por permutação cíclica. O que esse resultado diz é
+    estrutural: as três componentes do momento angular não são independentes do ponto de vista
+    algébrico, e pelo teorema de Poisson basta conservar duas para conservar a terceira. Em
+    mecânica quântica a mesma álgebra, com \(i\hbar\) no lugar do 1, impede medir
+    simultaneamente duas componentes, e é daí que vêm os números quânticos \(\ell\) e
+    \(m_\ell\).</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 12.3 · Uma transformação suspeita</span>
+    <p>Verifique se \(Q=q\cos\alpha-p\sen\alpha\), \(P=q\sen\alpha+p\cos\alpha\) é canônica, e
+    interprete.</p>
+    <p><strong>Solução.</strong> Calculando o parêntese nas variáveis antigas,</p>
+    \[\left\{Q,P\right\}=\pder{Q}{q}\pder{P}{p}-\pder{Q}{p}\pder{P}{q}
+    =\cos\alpha\cdot\cos\alpha-\left(-\sen\alpha\right)\sen\alpha
+    =\cos^2\alpha+\sen^2\alpha=1.\]
+    <p>É canônica, para qualquer \(\alpha\). A transformação é uma <em>rotação</em> do plano
+    de fase, e com \(\alpha=\pi/2\) ela se reduz a \(Q=-p\), \(P=q\), que é a troca de papéis
+    entre posição e momento. Repare no que isso exige: para girar o plano \(\left(q,p\right)\)
+    é preciso que os dois eixos tenham a mesma unidade, o que só acontece depois de
+    adimensionalizar com \(\sqrt{m\omega}\). Feita essa escala, o oscilador harmônico fica
+    \(H=\left(Q^2+P^2\right)/2\), invariante por essas rotações, e a rotação no plano de fase
+    é precisamente a evolução temporal do oscilador.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 12.4 · Liouville no oscilador</span>
+    <p>Uma nuvem de condições iniciais ocupa o retângulo
+    \(\left|q-q_0\right|\le a\), \(\left|p-p_0\right|\le b\) para um oscilador de frequência
+    \(\omega=1\) em unidades adimensionais. Descreva a nuvem após um quarto de período e após
+    um tempo longo.</p>
+    <p><strong>Solução.</strong> Com \(H=\left(q^2+p^2\right)/2\), o fluxo é
+    \(\dot q=p\), \(\dot p=-q\), isto é, rotação rígida com velocidade angular 1. Após
+    \(t=\pi/2\) o retângulo girou de 90°, e as semilarguras trocaram de papel: \(a\) em
+    \(q\) virou \(a\) em \(p\). A área \(4ab\) não mudou, e nem podia, mas a <em>forma</em>
+    tampouco mudou, porque a rotação é rígida.</p>
+    <p>Esse é o caso excepcional. Basta a frequência depender da amplitude, como no pêndulo,
+    para que anéis internos girem mais depressa que os externos, e a mancha se enrole numa
+    espiral cada vez mais fina. A área continua \(4ab\); o perímetro cresce sem limite. É o
+    que o widget da seção 3 mostra quando se troca o oscilador pelo pêndulo, e é o mecanismo
+    chamado <strong>filamentação</strong>.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s13">13. Exercícios propostos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Para resolver</span>
+    <ol>
+      <li><b>12.1</b> Calcule \(\left\{x,p^n\right\}\) e \(\left\{x^n,p\right\}\) para \(n\)
+      inteiro positivo, usando a regra de Leibniz e indução.</li>
+
+      <li><b>12.2</b> Verifique a identidade de Jacobi explicitamente para
+      \(f=q\), \(g=p\) e \(h=qp\).</li>
+
+      <li><b>12.3</b> Mostre que \(\left\{L_z,x\right\}=-y\) e
+      \(\left\{L_z,p_x\right\}=-p_y\), e interprete os dois resultados em termos de \(L_z\)
+      gerar rotações em torno do eixo \(z\).</li>
+
+      <li><b>12.4</b> Para qual valor de \(\alpha\) e \(\beta\) a transformação
+      \(Q=q^\alpha\cos\beta p\), \(P=q^\alpha\sen\beta p\) é canônica? Sugestão: imponha
+      \(\left\{Q,P\right\}=1\) e resolva.</li>
+
+      <li><b>12.5</b> Mostre, calculando o parêntese, que o vetor de Laplace-Runge-Lenz
+      \(\vet{A}=\vet{p}\cruz\vet{L}-mk\vers{r}\) satisfaz \(\left\{A_x,H\right\}=0\) para
+      \(H=p^2/2m-k/r\). Por que isso falha para qualquer outra potência do potencial?</li>
+
+      <li><b>12.6</b> Variáveis de ação e ângulo do oscilador: mostre que
+      \(J=\oint p\,dq=2\pi E/\omega\) e que a transformação para
+      \(\left(J,\theta\right)\) torna \(H=\omega J/2\pi\), com \(\theta\) cíclico.</li>
+
+      <li><b>12.7</b> Para o fluxo \(\dot q=p\), \(\dot p=-q-b p\) do oscilador amortecido,
+      calcule a divergência do campo e mostre que uma área inicial \(A_0\) evolui como
+      \(A_0e^{-bt}\). Confirme no widget da seção 3.</li>
+
+      <li><b>12.8</b> Estime a ordem de grandeza do tempo de recorrência de Poincaré para um
+      gás de \(N=10^{20}\) moléculas, supondo que o estado precise voltar a uma vizinhança que
+      ocupe uma fração \(10^{-N}\) do volume acessível. Compare com a idade do universo,
+      \(4{,}4\cruz10^{17}\) s.</li>
+
+      <li><b>12.9</b> Mostre que a equação de Liouville admite como solução estacionária
+      qualquer \(\varrho\) que seja função apenas de \(H\). Verifique explicitamente para
+      \(\varrho\propto e^{-\beta H}\).</li>
+
+      <li><b>12.10</b> Discuta em meia página: se o fluxo hamiltoniano preserva volume e o
+      movimento é reversível, de onde vem a seta do tempo da termodinâmica? Use os conceitos
+      de filamentação e de resolução finita das medidas.</li>
+    </ol>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s14">14. Onde o curso termina</h2>
+
+  <p>Doze módulos atrás o ponto de partida era a cinemática de um corpo rígido, com
+  \(\vet{v}=\vet{\omega}\cruz\vet{r}\) e a soma de velocidades de arrastamento. A trajetória
+  percorrida desde lá tem uma direção clara: cada reformulação trocou objetos concretos por
+  objetos mais abstratos, e ganhou alcance em troca.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Formulação</th><th>Objeto central</th><th>O que organiza</th></tr></thead>
+    <tbody>
+      <tr><td>Newton</td><td>força \(\vet{F}\)</td><td>causas instante a instante</td></tr>
+      <tr><td>Lagrange</td><td>escalar \(\Lag=T-V\)</td><td>coordenadas livres e vínculos</td></tr>
+      <tr><td>Hamilton</td><td>escalar \(H\) e o par \(\left(q,p\right)\)</td><td>estrutura e conservação</td></tr>
+      <tr><td>Poisson</td><td>a operação \(\left\{\,,\right\}\)</td><td>álgebra e simetria</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>O que cada passo custou foi intuição imediata; o que cada passo rendeu foi generalidade.
+  A força é palpável e não se estende a campos nem a sistemas com vínculos complicados; o
+  parêntese de Poisson é abstrato e sobrevive à passagem para a mecânica quântica sem precisar
+  mudar de forma.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O que fica para Mecânica Clássica III</span>
+    <p>O tensor de inércia e a sua diagonalização, as equações de Euler para o corpo rígido
+    livre, o pião simétrico com os seus três ângulos, a precessão e a nutação, os giroscópios,
+    as pequenas vibrações em torno do equilíbrio com modos normais e coordenadas normais, e a
+    passagem ao contínuo, com a corda vibrante e as primeiras equações de campo. Tudo isso se
+    monta sobre o que este curso estabeleceu: a lagrangiana continua sendo \(T-V\), e as
+    equações continuam saindo de \(\delta\Acao=0\).</p>
+  </div>
+
+  <nav class="nav-aulas">
+    <a href="aula11.html"><small>Módulo anterior</small>← 11. Equações de Hamilton</a>
+    <a class="prox" href="index.html"><small>Voltar</small>Página inicial →</a>
+  </nav>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+<script src="assets/js/widgets.js?v=202611082133"></script>
+</body>
+</html>

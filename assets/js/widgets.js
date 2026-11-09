@@ -7617,6 +7617,558 @@
     })();
   };
 
+  /* =================================================================
+     44. Liouville: a mancha que se deforma e não encolhe
+     Um contorno de condições iniciais evolui pelo fluxo. A área é
+     medida pela fórmula do cadarço a cada quadro. Com atrito, que não
+     é fluxo hamiltoniano, ela encolhe: é o contraexemplo que mostra
+     de onde vem o teorema.
+     ================================================================= */
+  REGISTRO.liouville = function (raiz) {
+    var SIS = {
+      osc: { n: 'oscilador', ham: true,
+        d: function (q, p) { return [p, -q]; }, qmax: 3, pmax: 3 },
+      pend: { n: 'pêndulo', ham: true,
+        d: function (q, p) { return [p, -Math.sin(q)]; }, qmax: 4.4, pmax: 3 },
+      queda: { n: 'queda livre', ham: true,
+        d: function (q, p) { return [p, -1]; }, qmax: 4.4, pmax: 3 },
+      atrito: { n: 'oscilador com atrito', ham: false,
+        d: function (q, p) { return [p, -q - 0.45 * p]; }, qmax: 3, pmax: 3 }
+    };
+    var est = { k: 'pend', t: 0, rodando: true };
+    var pts = [], hist = [], A0 = 0;
+
+    var corpo = moldura(raiz, 'O teorema de Liouville: a mancha muda de forma e não de tamanho');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, Object.keys(SIS).map(function (k) {
+      return { rot: SIS[k].n, v: k };
+    }), 1, function (v) { est.k = v; reiniciar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    var bt = el('button', { type: 'button', texto: 'recomeçar' });
+    bt.addEventListener('click', reiniciar);
+    ctr.appendChild(bt);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'fluxo hamiltoniano', k: 'ham' },
+      { rot: 'divergência do campo', k: 'div' },
+      { rot: 'área inicial', k: 'A0' },
+      { rot: 'área agora', k: 'A' },
+      { rot: 'razão A/A₀', k: 'raz' },
+      { rot: 'perímetro / perímetro inicial', k: 'per' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function area(lista) {
+      var s = 0;
+      for (var i = 0; i < lista.length; i++) {
+        var a = lista[i], b = lista[(i + 1) % lista.length];
+        s += a[0] * b[1] - b[0] * a[1];
+      }
+      return Math.abs(s) / 2;
+    }
+    function perimetro(lista) {
+      var s = 0;
+      for (var i = 0; i < lista.length; i++) {
+        var a = lista[i], b = lista[(i + 1) % lista.length];
+        s += Math.hypot(b[0] - a[0], b[1] - a[1]);
+      }
+      return s;
+    }
+    function reiniciar() {
+      pts = [];
+      var N = 220, cq = 1.1, cp = 0.9, rq = 0.42, rp = 0.30;
+      for (var i = 0; i < N; i++) {
+        var a = 2 * Math.PI * i / N;
+        pts.push([cq + rq * Math.cos(a), cp + rp * Math.sin(a)]);
+      }
+      A0 = area(pts); est.P0 = perimetro(pts);
+      hist = []; est.t = 0;
+    }
+    reiniciar();
+
+    function passo(y, h) {
+      var D = SIS[est.k].d;
+      function f(z) { return D(z[0], z[1]); }
+      function soma(a, b, g) { return [a[0] + g * b[0], a[1] + g * b[1]]; }
+      var k1 = f(y), k2 = f(soma(y, k1, h / 2));
+      var k3 = f(soma(y, k2, h / 2)), k4 = f(soma(y, k3, h));
+      return [y[0] + h / 6 * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]),
+              y[1] + h / 6 * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1])];
+    }
+
+    function desenhar() {
+      var C = SIS[est.k];
+      var alt = 330;
+      var pp = G.preparar(cv, alt), ct = pp.ct, Lp = pp.L;
+      ct.clearRect(0, 0, Lp, alt);
+      var meia = Lp * 0.56;
+
+      var g1 = G.eixos(cv, {
+        altura: alt, xmin: -C.qmax, xmax: C.qmax, ymin: -C.pmax, ymax: C.pmax,
+        rotX: 'q', rotY: 'p',
+        marcasX: G.marcasLineares(-C.qmax, C.qmax, 6, 1),
+        formataY: function (v) { return F.fmt(v, 1); },
+        limpar: false, margem: { e: 50, d: Lp - meia + 10, c: 16, b: 40 }
+      });
+      var c1 = g1.ct;
+      /* o campo, de fundo */
+      for (var a = 0; a < 11; a++) {
+        for (var b = 0; b < 8; b++) {
+          var q = -C.qmax + 2 * C.qmax * (a + 0.5) / 11;
+          var p = -C.pmax + 2 * C.pmax * (b + 0.5) / 8;
+          var v = C.d(q, p), m = Math.hypot(v[0], v[1]) || 1;
+          seta(c1, g1.X(q), g1.Y(p), g1.X(q) + v[0] / m * 11,
+            g1.Y(p) - v[1] / m * 11, 'rgba(27,31,36,.22)', 1.1);
+        }
+      }
+      /* a mancha */
+      c1.beginPath();
+      pts.forEach(function (z, i) {
+        (i ? c1.lineTo : c1.moveTo).call(c1, g1.X(z[0]), g1.Y(z[1]));
+      });
+      c1.closePath();
+      c1.fillStyle = C.ham ? 'rgba(23,107,93,.30)' : 'rgba(140,47,57,.26)';
+      c1.fill();
+      c1.strokeStyle = C.ham ? G.COR.mestra : G.COR.vinho;
+      c1.lineWidth = 2.2; c1.stroke();
+
+      /* painel 2: a área ao longo do tempo */
+      var A = area(pts);
+      hist.push([est.t, A / A0, perimetro(pts) / est.P0]);
+      if (hist.length > 2000) hist.shift();
+      var topo = 1.4;
+      hist.forEach(function (z) { topo = Math.max(topo, z[2] * 1.05); });
+      var g2 = G.eixos(cv, {
+        altura: alt, xmin: 0, xmax: Math.max(14, est.t),
+        ymin: 0, ymax: Math.min(topo, 9),
+        rotX: 't', rotY: 'razão com o valor inicial',
+        marcasX: G.marcasLineares(0, Math.max(14, est.t), 7, 0),
+        formataY: function (v) { return F.fmt(v, 1); },
+        limpar: false, margem: { e: meia + 60, d: 16, c: 16, b: 40 }
+      });
+      var c2 = g2.ct;
+      [[2, G.COR.bronze, 2], [1, C.ham ? G.COR.mestra : G.COR.vinho, 2.8]].forEach(
+        function (par) {
+          c2.beginPath();
+          hist.forEach(function (z, i) {
+            (i ? c2.lineTo : c2.moveTo).call(c2,
+              g2.X(z[0]), g2.Y(Math.min(z[par[0]], g2.ymax)));
+          });
+          c2.strokeStyle = par[1]; c2.lineWidth = par[2]; c2.stroke();
+        });
+      G.curva(g2, function () { return 1; }, G.COR.grade, 1.6);
+      G.legenda(g2, [
+        { texto: 'área', cor: C.ham ? G.COR.mestra : G.COR.vinho },
+        { texto: 'perímetro', cor: G.COR.bronze }
+      ]);
+
+      mostrar({
+        ham: C.ham ? 'sim' : 'não (há atrito)',
+        div: C.ham ? 'zero' : '−0,45',
+        A0: F.fmt(A0, 5),
+        A: F.fmt(A, 5),
+        raz: F.fmt(A / A0, 5),
+        per: F.fmt(perimetro(pts) / est.P0, 3)
+      });
+
+      nota.innerHTML =
+        '<p>Tome uma nuvem de condições iniciais, isto é, uma região do espaço de fase, e '
+        + 'deixe cada ponto dela evoluir pelas equações de Hamilton. A região se deforma, e '
+        + 'às vezes se deforma muito: estica, torce, se enrola em filamentos finíssimos. O '
+        + 'que ela <strong>não</strong> faz é mudar de tamanho.</p>'
+        + '<div class="destaque"><span class="anuncio">Teorema de Liouville</span>'
+        + 'O fluxo hamiltoniano preserva o volume no espaço de fase: \\(dV/dt=0\\).</div>'
+        + '<p>A demonstração cabe em três linhas. O campo de velocidades no espaço de fase '
+        + 'tem componentes \\(\\dot q_j=\\partial H/\\partial p_j\\) e '
+        + '\\(\\dot p_j=-\\partial H/\\partial q_j\\), de modo que a sua divergência é</p>'
+        + '\\[\\nabla\\cdot\\vet{V}=\\sum_j\\left(\\pder{\\dot q_j}{q_j}'
+        + '+\\pder{\\dot p_j}{p_j}\\right)'
+        + '=\\sum_j\\left(\\frac{\\partial^2H}{\\partial q_j\\,\\partial p_j}'
+        + '-\\frac{\\partial^2H}{\\partial p_j\\,\\partial q_j}\\right)=0,\\]'
+        + '<p>porque as derivadas parciais mistas comutam. Um campo de divergência nula é '
+        + '<strong>incompressível</strong>, e um fluido incompressível conserva volume. O '
+        + 'teorema de Liouville é esse fato de fluidos, aplicado ao escoamento dos estados '
+        + 'em vez do escoamento de matéria.</p>'
+        + '<p>O widget mede a área a cada quadro pela fórmula do cadarço aplicada ao '
+        + 'contorno. No oscilador a mancha apenas gira rigidamente, e a conservação é óbvia. '
+        + 'No pêndulo e na queda livre ela estica e se deforma bastante, porque pontos de '
+        + 'energias diferentes percorrem a órbita em tempos diferentes, e mesmo assim a '
+        + 'razão de áreas fica em 1. Repare no cartão do perímetro: ele <em>cresce</em> sem '
+        + 'limite, enquanto a área não muda. A mancha vira um fio, e um fio longo e fino tem '
+        + 'a mesma área de uma bolha gorda.</p>'
+        + '<p>Agora escolha o oscilador com atrito. A equação deixa de vir de uma '
+        + 'hamiltoniana, a divergência do campo passa a valer \\(-b/m\\), e a área encolhe '
+        + 'exponencialmente até virar um ponto: a origem é um <strong>atrator</strong>. Essa '
+        + 'é a diferença estrutural entre sistemas conservativos e dissipativos, e é por isso '
+        + 'que sistemas hamiltonianos não têm atratores de espécie nenhuma.</p>'
+        + '<p>A consequência mais pesada é estatística. Se a área é preservada mas o fluido '
+        + 'se espalha em filamentos por toda a superfície de energia, então uma medida '
+        + 'grosseira, que não resolva os filamentos, verá a nuvem como se tivesse preenchido '
+        + 'tudo. É assim que um sistema perfeitamente reversível produz comportamento que '
+        + 'parece irreversível, e é daí que a mecânica estatística tira o direito de usar o '
+        + 'ensemble microcanônico: a densidade \\(\\varrho\\) obedece '
+        + '\\(\\partial\\varrho/\\partial t+\\{\\varrho,H\\}=0\\), e uma \\(\\varrho\\) '
+        + 'constante sobre a superfície de energia é solução estacionária.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+    (function animar() {
+      if (est.rodando) {
+        for (var i = 0; i < 3; i++) {
+          pts = pts.map(function (z) { return passo(z, 0.01); });
+          est.t += 0.01;
+        }
+        desenhar();
+      }
+      requestAnimationFrame(animar);
+    })();
+  };
+
+  /* =================================================================
+     45. Constantes de movimento e o parêntese com H
+     Órbita de Kepler, com quatro candidatas a constante acompanhadas
+     ao longo do tempo. As que têm parêntese nulo com H ficam retas.
+     ================================================================= */
+  REGISTRO.conservadas = function (raiz) {
+    var est = { e: 0.6, t: 0, rodando: true };
+    var s = null, rastro = [];
+
+    var corpo = moldura(raiz, 'Constantes de movimento: quem tem parêntese nulo com H');
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'excentricidade inicial', 0.05, 0.85, 0.01, 0.6,
+      function (v) { est.e = v; reiniciar(); },
+      function (v) { return F.fmt(v, 2); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'H (energia)', k: 'H' },
+      { rot: 'L = x p_y − y p_x', k: 'L' },
+      { rot: 'A_x (Laplace-Runge-Lenz)', k: 'Ax' },
+      { rot: 'p_x (não se conserva)', k: 'px' },
+      { rot: '{L, H} numérico', k: 'LH' },
+      { rot: '{p_x, H} numérico', k: 'pH' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* m = k = 1, H = (px² + py²)/2 − 1/r */
+    function Hf(z) {
+      var r = Math.hypot(z[0], z[1]);
+      return (z[2] * z[2] + z[3] * z[3]) / 2 - 1 / r;
+    }
+    function Lf(z) { return z[0] * z[3] - z[1] * z[2]; }
+    function Af(z) {
+      var r = Math.hypot(z[0], z[1]), L = Lf(z);
+      return [z[3] * L - z[0] / r, -z[2] * L - z[1] / r];
+    }
+    function deriv(z) {
+      var r = Math.hypot(z[0], z[1]), r3 = r * r * r;
+      return [z[2], z[3], -z[0] / r3, -z[1] / r3];
+    }
+    function passo(z, h) {
+      function soma(a, b, f) { return a.map(function (v, i) { return v + f * b[i]; }); }
+      var k1 = deriv(z), k2 = deriv(soma(z, k1, h / 2));
+      var k3 = deriv(soma(z, k2, h / 2)), k4 = deriv(soma(z, k3, h));
+      return z.map(function (v, i) {
+        return v + h / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]);
+      });
+    }
+    /* parêntese de Poisson numérico em duas dimensões espaciais */
+    function poisson(f, g, z) {
+      var h = 1e-5;
+      function dd(fun, i) {
+        var a = z.slice(), b = z.slice();
+        a[i] += h; b[i] -= h;
+        return (fun(a) - fun(b)) / (2 * h);
+      }
+      return dd(f, 0) * dd(g, 2) - dd(f, 2) * dd(g, 0)
+        + dd(f, 1) * dd(g, 3) - dd(f, 3) * dd(g, 1);
+    }
+    function reiniciar() {
+      var a = 1, rp = a * (1 - est.e);
+      s = [rp, 0, 0, Math.sqrt((1 + est.e) / rp)];
+      rastro = []; est.t = 0;
+      est.ref = { H: Hf(s), L: Lf(s), A: Af(s) };
+    }
+    reiniciar();
+
+    var hist = [];
+    function desenhar() {
+      var alt = 330;
+      var pp = G.preparar(cv, alt), ct = pp.ct, Lp = pp.L;
+      ct.clearRect(0, 0, Lp, alt);
+      var meia = Lp * 0.42;
+
+      var esc = Math.min(meia * 0.30, alt * 0.22);
+      var ox = meia * 0.58, oy = alt * 0.50;
+      function X(u) { return ox + u * esc; }
+      function Y(u) { return oy - u * esc; }
+
+      ct.beginPath();
+      rastro.forEach(function (z, i) {
+        (i ? ct.lineTo : ct.moveTo).call(ct, X(z[0]), Y(z[1]));
+      });
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2.2; ct.stroke();
+      ct.beginPath(); ct.arc(X(0), Y(0), 7, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.bronze; ct.fill();
+      ct.beginPath(); ct.arc(X(s[0]), Y(s[1]), 7, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.tinta; ct.fill();
+
+      /* o vetor de Laplace-Runge-Lenz, que aponta para o periélio */
+      var A = Af(s);
+      seta(ct, X(0), Y(0), X(A[0] * 1.4), Y(A[1] * 1.4), G.COR.vinho, 2.4);
+      rotulo(ct, 'vetor LRL', X(A[0] * 1.4) + 10, Y(A[1] * 1.4) - 10, G.COR.vinho, 'left');
+      rotulo(ct, 'aponta sempre para o periélio', 12, alt - 14, G.COR.suave, 'left');
+
+      /* painel 2: as quatro quantidades ao longo do tempo, normalizadas */
+      hist.push([est.t, Hf(s) / Math.abs(est.ref.H), Lf(s) / est.ref.L,
+        Af(s)[0] / (Math.abs(est.ref.A[0]) || 1), s[2]]);
+      if (hist.length > 2400) hist.shift();
+      var g2 = G.eixos(cv, {
+        altura: alt, xmin: Math.max(0, est.t - 14), xmax: Math.max(14, est.t),
+        ymin: -2.2, ymax: 2.2,
+        rotX: 't', rotY: 'valor (normalizado)',
+        marcasX: G.marcasLineares(Math.max(0, est.t - 14), Math.max(14, est.t), 7, 0),
+        formataY: function (v) { return F.fmt(v, 1); },
+        limpar: false, margem: { e: meia + 60, d: 16, c: 16, b: 40 }
+      });
+      var c2 = g2.ct;
+      [[1, G.COR.mestra], [2, G.COR.azul], [3, G.COR.bronze], [4, G.COR.vinho]]
+        .forEach(function (par) {
+          c2.beginPath();
+          var primeiro = true;
+          hist.forEach(function (z) {
+            if (z[0] < g2.xmin) { primeiro = true; return; }
+            var Xp = g2.X(z[0]), Yp = g2.Y(Math.max(-2.2, Math.min(2.2, z[par[0]])));
+            if (primeiro) { c2.moveTo(Xp, Yp); primeiro = false; } else c2.lineTo(Xp, Yp);
+          });
+          c2.strokeStyle = par[1]; c2.lineWidth = 2.4; c2.stroke();
+        });
+      G.legenda(g2, [
+        { texto: 'H', cor: G.COR.mestra },
+        { texto: 'L', cor: G.COR.azul },
+        { texto: 'A_x', cor: G.COR.bronze },
+        { texto: 'p_x', cor: G.COR.vinho }
+      ]);
+
+      mostrar({
+        H: F.fmt(Hf(s), 6),
+        L: F.fmt(Lf(s), 6),
+        Ax: F.fmt(Af(s)[0], 6),
+        px: F.fmt(s[2], 4),
+        LH: F.fmt(poisson(Lf, Hf, s), 8),
+        pH: F.fmt(poisson(function (z) { return z[2]; }, Hf, s), 6)
+      });
+
+      nota.innerHTML =
+        '<p>A evolução de qualquer função do espaço de fase se escreve numa linha só:</p>'
+        + '\\[\\der{f}{t}=\\{f,H\\}+\\pder{f}{t}.\\]'
+        + '<p>A demonstração é a regra da cadeia seguida das equações canônicas:</p>'
+        + '\\[\\der{f}{t}=\\sum_i\\left(\\pder{f}{q_i}\\dot q_i+\\pder{f}{p_i}\\dot p_i\\right)'
+        + '+\\pder{f}{t}'
+        + '=\\sum_i\\left(\\pder{f}{q_i}\\pder{H}{p_i}-\\pder{f}{p_i}\\pder{H}{q_i}\\right)'
+        + '+\\pder{f}{t}.\\]'
+        + '<p>Daí sai o critério mais econômico da mecânica: uma função que não dependa '
+        + 'explicitamente do tempo é <strong>constante de movimento</strong> se, e somente '
+        + 'se, \\(\\{f,H\\}=0\\). Não é preciso integrar nada, nem conhecer a trajetória: '
+        + 'basta calcular derivadas parciais.</p>'
+        + '<p>A órbita desenhada é a de Kepler, com \\(H=\\left(p_x^2+p_y^2\\right)/2-1/r\\). '
+        + 'Quatro quantidades estão sendo acompanhadas. A energia \\(H\\) e o momento angular '
+        + '\\(L=xp_y-yp_x\\) são as de sempre. O vetor de '
+        + '<strong>Laplace-Runge-Lenz</strong>,</p>'
+        + '\\[\\vet{A}=\\vet{p}\\cruz\\vet{L}-mk\\,\\vers{r},\\]'
+        + '<p>é uma constante a mais, que só existe para o potencial \\(1/r\\): ele aponta '
+        + 'sempre para o periélio, e é exatamente por ele ser conservado que a elipse de '
+        + 'Kepler não precessa. O quarto acompanhado é \\(p_x\\), que oscila: o cartão mostra '
+        + '\\(\\{p_x,H\\}\\neq0\\), e de fato há força na direção \\(x\\).</p>'
+        + '<p>Os parênteses dos cartões são calculados numericamente, por diferenças '
+        + 'centradas, sem usar a trajetória. O de \\(L\\) com \\(H\\) dá zero até o erro de '
+        + 'arredondamento; o de \\(p_x\\) com \\(H\\) não dá.</p>'
+        + '<p>Há ainda um teorema de brinde, devido a Poisson: se \\(f\\) e \\(g\\) são '
+        + 'constantes de movimento, então \\(\\{f,g\\}\\) também é. A demonstração usa a '
+        + 'identidade de Jacobi. Aplicado às componentes do momento angular, que satisfazem '
+        + '\\(\\{L_x,L_y\\}=L_z\\), ele diz que basta conservar duas componentes para '
+        + 'conservar a terceira. Essa relação é a álgebra de Lie de SO(3), e é a mesma que, '
+        + 'trocando \\(\\{\\,,\\}\\) por \\(\\left[\\,,\\right]/i\\hbar\\), governa o spin em '
+        + 'mecânica quântica.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+    (function animar() {
+      if (est.rodando) {
+        for (var i = 0; i < 6; i++) { s = passo(s, 0.004); est.t += 0.004; }
+        rastro.push([s[0], s[1]]);
+        if (rastro.length > 2000) rastro.shift();
+        desenhar();
+      }
+      requestAnimationFrame(animar);
+    })();
+  };
+
+  /* =================================================================
+     46. Transformações canônicas
+     Uma região do espaço de fase e a sua imagem. O jacobiano diz se a
+     transformação preserva a estrutura; a área diz a mesma coisa de
+     outro jeito.
+     ================================================================= */
+  REGISTRO.canonica = function (raiz) {
+    var TR = {
+      escala: { n: 'Q = λq, P = p/λ',
+        f: function (q, p, l) { return [l * q, p / l]; }, can: true,
+        obs: 'muda a escala e compensa no momento' },
+      troca: { n: 'Q = p, P = −q',
+        f: function (q, p) { return [p, -q]; }, can: true,
+        obs: 'troca os papéis de posição e momento' },
+      cis: { n: 'Q = q, P = p + αq',
+        f: function (q, p, l) { return [q, p + (l - 1) * q]; }, can: true,
+        obs: 'cisalha o espaço de fase' },
+      ruim: { n: 'Q = q, P = λp',
+        f: function (q, p, l) { return [q, l * p]; }, can: false,
+        obs: 'estica só um dos eixos: não é canônica' }
+    };
+    var est = { k: 'escala', l: 1.8 };
+
+    var corpo = moldura(raiz, 'Transformações canônicas: o que o jacobiano tem de valer');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, Object.keys(TR).map(function (k) {
+      return { rot: TR[k].n, v: k };
+    }), 0, function (v) { est.k = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'parâmetro λ', 0.4, 2.6, 0.05, 1.8,
+      function (v) { est.l = v; desenhar(); },
+      function (v) { return F.fmt(v, 2); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'transformação', k: 't' },
+      { rot: '∂Q/∂q', k: 'a' },
+      { rot: '∂P/∂p', k: 'd' },
+      { rot: 'parêntese {Q, P}', k: 'qp' },
+      { rot: 'razão entre as áreas', k: 'ar' },
+      { rot: 'veredito', k: 'v' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function area(lista) {
+      var s = 0;
+      for (var i = 0; i < lista.length; i++) {
+        var a = lista[i], b = lista[(i + 1) % lista.length];
+        s += a[0] * b[1] - b[0] * a[1];
+      }
+      return Math.abs(s) / 2;
+    }
+
+    function desenhar() {
+      var T = TR[est.k], l = est.l;
+      var orig = [], img = [];
+      var N = 160, cq = 0.9, cp = 0.6, rq = 0.5, rp = 0.34;
+      for (var i = 0; i < N; i++) {
+        var a = 2 * Math.PI * i / N;
+        var z = [cq + rq * Math.cos(a), cp + rp * Math.sin(a)];
+        orig.push(z); img.push(T.f(z[0], z[1], l));
+      }
+
+      var lim = 2.6;
+      img.forEach(function (z) {
+        lim = Math.max(lim, Math.abs(z[0]) * 1.2, Math.abs(z[1]) * 1.2);
+      });
+      var gr = G.eixos(cv, {
+        altura: 320, xmin: -lim, xmax: lim, ymin: -lim, ymax: lim,
+        rotX: 'q, Q', rotY: 'p, P',
+        marcasX: G.marcasLineares(-lim, lim, 6, 1),
+        formataY: function (v) { return F.fmt(v, 1); }
+      });
+      var ct = gr.ct;
+      [[orig, G.COR.clara, 'rgba(123,184,171,.32)', 'região original'],
+       [img, T.can ? G.COR.mestra : G.COR.vinho,
+        T.can ? 'rgba(23,107,93,.32)' : 'rgba(140,47,57,.28)', 'imagem']]
+        .forEach(function (par, k) {
+          ct.beginPath();
+          par[0].forEach(function (z, i) {
+            (i ? ct.lineTo : ct.moveTo).call(ct, gr.X(z[0]), gr.Y(z[1]));
+          });
+          ct.closePath();
+          ct.fillStyle = par[2]; ct.fill();
+          ct.strokeStyle = par[1]; ct.lineWidth = 2.4; ct.stroke();
+          rotulo(ct, par[3], gr.x0 + 8, gr.y0 + 14 + k * 17, par[1], 'left');
+        });
+
+      /* jacobiano numérico no centro da região */
+      var h = 1e-5;
+      function J(q, p) {
+        var a = T.f(q + h, p, l), b = T.f(q - h, p, l);
+        var c = T.f(q, p + h, l), d = T.f(q, p - h, l);
+        return [[(a[0] - b[0]) / (2 * h), (c[0] - d[0]) / (2 * h)],
+                [(a[1] - b[1]) / (2 * h), (c[1] - d[1]) / (2 * h)]];
+      }
+      var m = J(cq, cp);
+      var det = m[0][0] * m[1][1] - m[0][1] * m[1][0];
+
+      mostrar({
+        t: T.n,
+        a: F.fmt(m[0][0], 4),
+        d: F.fmt(m[1][1], 4),
+        qp: F.fmt(det, 6),
+        ar: F.fmt(area(img) / area(orig), 6),
+        v: Math.abs(det - 1) < 1e-4 ? 'é canônica' : 'não é canônica'
+      });
+
+      nota.innerHTML =
+        '<p>Mudar de coordenadas no espaço de fase é livre, mas nem toda mudança preserva a '
+        + 'forma das equações. As que preservam chamam-se <strong>canônicas</strong>, e o '
+        + 'critério é que os parênteses fundamentais sobrevivam:</p>'
+        + '\\[\\{Q_i,Q_j\\}=0,\\qquad\\{P_i,P_j\\}=0,\\qquad\\{Q_i,P_j\\}=\\delta_{ij}.\\]'
+        + '<p>Num grau de liberdade a condição se reduz a uma só, e ela é o determinante '
+        + 'jacobiano da mudança:</p>'
+        + '\\[\\{Q,P\\}=\\pder{Q}{q}\\pder{P}{p}-\\pder{Q}{p}\\pder{P}{q}=1.\\]'
+        + '<p>O desenho mostra o que isso significa. A região original está em verde-claro, a '
+        + 'imagem em cor cheia. Quando a transformação é canônica, a imagem pode estar '
+        + 'deslocada, girada, esticada numa direção e espremida na outra, e a '
+        + '<strong>área</strong> é a mesma. O cartão da razão entre as áreas confirma, e '
+        + 'coincide com o jacobiano.</p>'
+        + '<p>A última opção do menu, \\(Q=q\\) e \\(P=\\lambda p\\), estica só um dos eixos. '
+        + 'O jacobiano vale \\(\\lambda\\), a área muda, e as equações de Hamilton deixam de '
+        + 'valer na forma de sempre. É uma mudança de variáveis perfeitamente legítima como '
+        + 'matemática, e inútil como mecânica.</p>'
+        + '<p>A segunda opção merece atenção. \\(Q=p\\) e \\(P=-q\\) é canônica, e isso diz '
+        + 'algo profundo: no formalismo hamiltoniano, posição e momento não são categorias '
+        + 'distintas, são apenas rótulos. Uma transformação canônica pode trocá-los. Essa '
+        + 'democracia entre \\(q\\) e \\(p\\) não tem contrapartida no formalismo '
+        + 'lagrangiano, onde \\(q\\) é a variável e \\(\\dot q\\) é a sua derivada.</p>'
+        + '<p>A utilidade prática é esta: se existir uma transformação canônica que torne '
+        + 'todas as novas coordenadas cíclicas, todos os novos momentos são constantes e o '
+        + 'problema está resolvido. Procurar essa transformação é o programa de '
+        + 'Hamilton-Jacobi, e para sistemas periódicos ele produz as variáveis de '
+        + '<strong>ação e ângulo</strong>, em que a ação é a área cercada pela órbita no '
+        + 'espaço de fase. Foi quantizando essa área que Bohr e Sommerfeld acertaram os '
+        + 'níveis do hidrogênio antes de existir equação de Schrödinger.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {
