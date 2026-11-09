@@ -553,3 +553,12 @@ h3.unidade:first-of-type{margin-top:1.2rem}
   font-family:var(--sans);font-size:.84rem;color:var(--tinta-suave);
   margin:.6rem auto 0;max-width:62ch;line-height:1.55;
 }
+
+/* Figuras do autor em SVG, lado a lado em telas largas */
+.figuras{display:flex;flex-wrap:wrap;gap:1rem;margin:.25rem 0 1rem}
+.figuras figure{flex:1 1 150px;margin:0;min-width:0;max-width:100%}
+.figuras img{width:100%;height:auto;display:block}
+.figuras figcaption{
+  font-size:.82rem;color:var(--tinta-suave);text-align:center;
+  margin-top:.35rem;line-height:1.35}
+@media (max-width:620px){.figuras{gap:1.4rem}.figuras figure{flex:1 1 100%}}

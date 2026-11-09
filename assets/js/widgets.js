@@ -3817,11 +3817,10 @@
 
   /* =================================================================
      23. Os dois tubos: a altura da maré por equilíbrio
-     Redesenhado sobre os três desenhos do autor. A leitura das camadas
-     é a dele: círculo cheio = Terra sólida; tracejado = nível médio do
-     mar, dentro da água; borda da mancha = superfície já deformada. Os
-     tubos são pares de paredes abertas, de modo que o trecho submerso
-     aparece cheio e o resto vazio.
+     As três figuras são do autor, em SVG, recoloridas para a paleta do
+     site e com as larguras de traço ajustadas. O widget cuida dos
+     números: as componentes da maré no ângulo escolhido e a altura que
+     sai do equilíbrio.
      ================================================================= */
   REGISTRO.tubos = function (raiz) {
     var GN = 6.67430e-11, RT = 6.371e6, g0 = 9.81, RHO = 1025;
@@ -3830,17 +3829,29 @@
 
     var corpo = moldura(raiz, 'Os dois tubos: de onde sai a altura da maré');
 
-    var cv = el('canvas');
-    corpo.appendChild(cv);
+    var figs = el('div', { class: 'figuras' });
+    [['mare-1.svg', 'Um par de tubos: o radial, que sai da superfície, e o '
+        + 'tangencial, que acompanha a curvatura da Terra.'],
+     ['mare-2.svg', 'O par pode ser posto em qualquer ponto, e em cada um deles '
+        + 'a condição de equilíbrio é a mesma.'],
+     ['mare-3.svg', 'Pormenor: a altura h da coluna, o comprimento L do tubo '
+        + 'tangencial e as duas componentes da maré.']
+    ].forEach(function (q) {
+      var f = el('figure');
+      f.appendChild(el('img', { src: 'assets/img/' + q[0], alt: q[1], loading: 'lazy' }));
+      f.appendChild(el('figcaption', { texto: q[1] }));
+      figs.appendChild(f);
+    });
+    corpo.appendChild(figs);
 
     var ctr = el('div', { class: 'controles' });
     corpo.appendChild(ctr);
-    deslizante(ctr, 'posição do par de tubos', 2, 88, 1, 45,
+    deslizante(ctr, 'ângulo θ a partir da direção da Lua', 2, 88, 1, 45,
       function (v) { est.th = v; desenhar(); }, function (v) { return v + '°'; });
 
     var mostrar = cartoes(corpo, [
-      { rot: 'f_r aqui (radial)', k: 'fr' },
-      { rot: 'f_θ aqui (tangencial)', k: 'ft' },
+      { rot: 'f_r neste θ (radial)', k: 'fr' },
+      { rot: 'f_θ neste θ (tangencial)', k: 'ft' },
       { rot: 'f_r / g', k: 'raz' },
       { rot: 'h para L = 1000 km', k: 'hl' },
       { rot: 'desnível total h_dif', k: 'h' },
@@ -3854,172 +3865,7 @@
     function ft(g) { return 1.5 * A0 * Math.sin(2 * g * Math.PI / 180); }
     var HDIF = 1.5 * GN * LUA.M * RT * RT / (g0 * Math.pow(LUA.D, 3));
 
-    /* um tubo é apenas um par de paredes paralelas, sem preenchimento:
-       o que estiver atrás aparece por dentro dele */
-    function tubo(ct, pts, lar, cor) {
-      var i, lados = [[], []];
-      for (i = 0; i < pts.length; i++) {
-        var a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)];
-        var dx = b[0] - a[0], dy = b[1] - a[1], n = Math.hypot(dx, dy) || 1;
-        var nx = -dy / n * lar / 2, ny = dx / n * lar / 2;
-        lados[0].push([pts[i][0] + nx, pts[i][1] + ny]);
-        lados[1].push([pts[i][0] - nx, pts[i][1] - ny]);
-      }
-      ct.strokeStyle = cor; ct.lineWidth = 2.2;
-      ct.lineJoin = 'miter'; ct.lineCap = 'butt';
-      lados.forEach(function (lado) {
-        ct.beginPath();
-        lado.forEach(function (q, k) { (k ? ct.lineTo : ct.moveTo).call(ct, q[0], q[1]); });
-        ct.stroke();
-      });
-    }
-
-    /* cota pontilhada de duas pontas, à maneira do desenho do autor */
-    function cota(ct, a, b, desl, texto, cor) {
-      var dx = b[0] - a[0], dy = b[1] - a[1], n = Math.hypot(dx, dy) || 1;
-      var px = -dy / n * desl, py = dx / n * desl;
-      var A = [a[0] + px, a[1] + py], B = [b[0] + px, b[1] + py];
-      ct.save();
-      ct.setLineDash([3, 3]); ct.strokeStyle = cor; ct.lineWidth = 1.1;
-      ct.beginPath(); ct.moveTo(a[0], a[1]); ct.lineTo(A[0], A[1]); ct.stroke();
-      ct.beginPath(); ct.moveTo(b[0], b[1]); ct.lineTo(B[0], B[1]); ct.stroke();
-      ct.restore();
-      seta(ct, A[0], A[1], B[0], B[1], cor, 1.5);
-      seta(ct, B[0], B[1], A[0], A[1], cor, 1.5);
-      rotulo(ct, texto, (A[0] + B[0]) / 2 + px * 0.9, (A[1] + B[1]) / 2 + py * 0.9, cor);
-    }
-
     function desenhar() {
-      var alt = 360;
-      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
-      ct.clearRect(0, 0, Lp, alt);
-
-      var th = est.th * Math.PI / 180;
-
-      /* ---------- painel da esquerda: o globo ---------- */
-      var cx = Lp * 0.24, cy = alt * 0.47;
-      var Rt = Math.min(alt * 0.27, Lp * 0.155);     // Terra sólida
-      var Rm = Rt * 1.14;                            // nível médio do mar
-      var amp = Rt * 0.17;                           // amplitude da maré
-      function Rs(g) { return Rm + amp * (3 * Math.pow(Math.cos(g), 2) - 1) / 2; }
-      function sup(g) { return [cx + Rs(g) * Math.cos(g), cy - Rs(g) * Math.sin(g)]; }
-
-      /* a água: da Terra sólida até a superfície deformada */
-      ct.beginPath();
-      for (var i = 0; i <= 260; i++) {
-        var g = i / 260 * 2 * Math.PI, q = sup(g);
-        (i ? ct.lineTo : ct.moveTo).call(ct, q[0], q[1]);
-      }
-      ct.closePath();
-      ct.fillStyle = 'rgba(123,184,171,.45)'; ct.fill();
-      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2.2; ct.stroke();
-
-      /* o nível médio do mar, em tracejado, por dentro da água */
-      ct.beginPath(); ct.arc(cx, cy, Rm, 0, 2 * Math.PI);
-      ct.strokeStyle = G.COR.tinta; ct.lineWidth = 1.3;
-      ct.setLineDash([6, 4]); ct.stroke(); ct.setLineDash([]);
-
-      /* a Terra sólida */
-      ct.beginPath(); ct.arc(cx, cy, Rt, 0, 2 * Math.PI);
-      ct.fillStyle = '#fff'; ct.fill();
-      ct.strokeStyle = G.COR.tinta; ct.lineWidth = 2.6; ct.stroke();
-
-      /* o ângulo θ, medido a partir da direção da Lua */
-      ct.strokeStyle = G.COR.suave; ct.lineWidth = 1.1;
-      ct.setLineDash([4, 4]);
-      ct.beginPath(); ct.moveTo(cx, cy); ct.lineTo(cx + Rm + amp + 8, cy); ct.stroke();
-      ct.beginPath();
-      ct.moveTo(cx, cy);
-      ct.lineTo(cx + (Rm + 20) * Math.cos(th), cy - (Rm + 20) * Math.sin(th));
-      ct.stroke(); ct.setLineDash([]);
-      ct.beginPath(); ct.arc(cx, cy, Rt * 0.42, -th, 0); ct.stroke();
-      rotulo(ct, 'θ = ' + est.th + '°',
-        cx + Rt * 0.60 * Math.cos(th / 2), cy - Rt * 0.60 * Math.sin(th / 2), G.COR.suave);
-
-      /* o par de tubos, com o trecho tangencial acompanhando a curvatura,
-         como no primeiro desenho */
-      var nx = Math.cos(th), ny = -Math.sin(th);
-      var base = [cx + Rt * nx, cy + Rt * ny];
-      tubo(ct, [[base[0] - nx * 3, base[1] - ny * 3],
-                [base[0] + nx * (amp + Rm - Rt + 34),
-                 base[1] + ny * (amp + Rm - Rt + 44)]], 11, G.COR.azul);
-      var arcoG = 0.62, pts = [], rTan = Rt + (Rm - Rt) * 0.55;
-      for (var k = 0; k <= 30; k++) {
-        var gg = th - arcoG * k / 30;
-        pts.push([cx + rTan * Math.cos(gg), cy - rTan * Math.sin(gg)]);
-      }
-      tubo(ct, pts, 11, G.COR.azul);
-
-      seta(ct, cx + Rm + amp + 16, cy, Lp * 0.455, cy, G.COR.bronze, 2);
-      rotulo(ct, 'para a Lua', Lp * 0.455, cy - 15, G.COR.bronze, 'right');
-      rotulo(ct, 'maré alta', cx + Rm + amp - 6, cy + 32, G.COR.mestra, 'right',
-        'middle', '600 11px system-ui, sans-serif');
-      rotulo(ct, 'Terra sólida, nível médio tracejado, água em verde',
-        cx, cy + Rm + amp + 26, G.COR.suave);
-
-      /* ---------- painel da direita: o detalhe ampliado ---------- */
-      var dxc = Lp * 0.70, Rd = Lp * 0.50, dyc = alt * 0.76 + Rd;
-      function pSup(a, dr) {
-        return [dxc + (Rd + dr) * Math.sin(a), dyc - (Rd + dr) * Math.cos(a)];
-      }
-      var fx = 0.26, esMed = 22, esTot = 44;
-      var fundo = [], medio = [], topo = [];
-      for (var k2 = 0; k2 <= 60; k2++) {
-        var a2 = -fx + 2 * fx * k2 / 60;
-        var cres = esTot * (0.50 + 0.50 * (a2 + fx) / (2 * fx));
-        fundo.push(pSup(a2, 0)); medio.push(pSup(a2, esMed));
-        topo.push(pSup(a2, cres));
-      }
-      ct.beginPath();
-      fundo.forEach(function (q, k) { (k ? ct.lineTo : ct.moveTo).call(ct, q[0], q[1]); });
-      for (var k3 = topo.length - 1; k3 >= 0; k3--) ct.lineTo(topo[k3][0], topo[k3][1]);
-      ct.closePath(); ct.fillStyle = 'rgba(123,184,171,.45)'; ct.fill();
-      ct.beginPath();
-      topo.forEach(function (q, k) { (k ? ct.lineTo : ct.moveTo).call(ct, q[0], q[1]); });
-      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2.2; ct.stroke();
-      ct.beginPath();
-      medio.forEach(function (q, k) { (k ? ct.lineTo : ct.moveTo).call(ct, q[0], q[1]); });
-      ct.strokeStyle = G.COR.tinta; ct.lineWidth = 1.3;
-      ct.setLineDash([6, 4]); ct.stroke(); ct.setLineDash([]);
-      ct.beginPath();
-      fundo.forEach(function (q, k) { (k ? ct.lineTo : ct.moveTo).call(ct, q[0], q[1]); });
-      ct.strokeStyle = G.COR.tinta; ct.lineWidth = 2.6; ct.stroke();
-
-      /* o vértice pousa na Terra sólida e os dois tubos saem dali em V,
-         como no terceiro desenho: ambos deixam a água mais acima */
-      var aV = -0.05;
-      var V = pSup(aV, 0);
-      var rr = pSup(aV, 100), nrm = [(rr[0] - V[0]) / 100, (rr[1] - V[1]) / 100];
-      function gira(v, gr) {
-        var c = Math.cos(gr), s = Math.sin(gr);
-        return [v[0] * c - v[1] * s, v[0] * s + v[1] * c];
-      }
-      var dirH = gira(nrm, -0.36), dirL = gira(nrm, 0.62);
-      var hv = 46, lL = 86;
-      function ao(d, v) { return [V[0] + v[0] * d, V[1] + v[1] * d]; }
-
-      tubo(ct, [V, ao(hv * 3.1, dirH)], 11, G.COR.azul);
-      tubo(ct, [V, ao(lL * 1.9, dirL)], 11, G.COR.azul);
-      ct.beginPath(); ct.arc(V[0], V[1], 3.5, 0, 2 * Math.PI);
-      ct.fillStyle = G.COR.tinta; ct.fill();
-
-      cota(ct, V, ao(hv, dirH), -20, 'h', G.COR.vinho);
-      cota(ct, V, ao(lL, dirL), 22, 'L', G.COR.vinho);
-
-      /* as duas componentes da maré, num V apoiado logo acima do vértice */
-      var O = ao(96, nrm), Lf = 56;
-      seta(ct, O[0], O[1], O[0] + dirH[0] * Lf, O[1] + dirH[1] * Lf, G.COR.vinho, 2.4);
-      rotulo(ct, 'f_r', O[0] + dirH[0] * Lf * 0.62 - 15,
-        O[1] + dirH[1] * Lf * 0.62 + 8, G.COR.vinho, 'right');
-      seta(ct, O[0], O[1], O[0] + dirL[0] * Lf, O[1] + dirL[1] * Lf, G.COR.vinho, 2.4);
-      rotulo(ct, 'f_θ', O[0] + dirL[0] * Lf * 0.62 + 15,
-        O[1] + dirL[1] * Lf * 0.62 + 4, G.COR.vinho, 'left');
-
-      rotulo(ct, 'detalhe: tubo radial de altura h e tubo tangencial de comprimento L',
-        Lp * 0.72, 18, G.COR.suave);
-      rotulo(ct, 'a água é empurrada para a maré alta →', Lp - 12, alt - 14,
-        G.COR.mestra, 'right');
-
       var f1 = fr(est.th), f2 = ft(est.th), hL = 1e6 * f2 / g0;
       mostrar({
         fr: F.fmt(f1 * 1e6, 3) + ' μm/s²',
@@ -4044,32 +3890,31 @@
         + '<strong>tangencial</strong> \\(f_\\theta\\). A condição de equilíbrio geral é</p>'
         + '\\[\\varrho h\\left(g-f_r\\right)=\\varrho L f_\\theta'
         + '\\qquad\\Longrightarrow\\qquad h=L\\,\\frac{f_\\theta}{g-f_r}.\\]'
-        + '<p>Na Terra \\(f_r\\) é irrisória diante de \\(g\\): no ponto escolhido a razão é de '
-        + 'uma parte em ' + F.fmt(g0 / Math.max(Math.abs(f1), 1e-30) / 1e6, 2) + ' milhões. '
-        + 'Vale portanto \\(h\\simeq Lf_\\theta/g\\). Tomando o tubo tangencial como um arco '
-        + 'infinitesimal, \\(L=R\\,d\\theta\\), o desnível acumulado ao longo da superfície é</p>'
+        + '<p>Na Terra \\(f_r\\) é irrisória diante de \\(g\\): no ângulo escolhido a razão é '
+        + 'de uma parte em ' + F.fmt(g0 / Math.max(Math.abs(f1), 1e-30) / 1e6, 2)
+        + ' milhões. Vale portanto \\(h\\simeq Lf_\\theta/g\\). Tomando o tubo tangencial como '
+        + 'um arco infinitesimal, \\(L=R\\,d\\theta\\), o desnível acumulado ao longo da '
+        + 'superfície é</p>'
         + '\\[dh\\simeq\\frac{Rf_\\theta}{g}\\,d\\theta'
         + '\\qquad\\Longrightarrow\\qquad '
         + 'h_{\\rm dif}=\\frac{R}{g}\\int_0^{\\pi/2}f_\\theta\\,d\\theta'
         + '=\\frac{3}{2}\\,\\frac{GM_LR^2}{g\\,D^3}=' + F.fmt(HDIF * 100, 1) + '\\ \\text{cm}.\\]'
-        + '<p>Repare nas três camadas do desenho. O círculo de traço cheio é a '
-        + '<strong>Terra sólida</strong>; o tracejado é o <strong>nível médio do mar</strong>, '
-        + 'que seria a superfície se não houvesse Lua; e a borda da mancha verde é a '
-        + '<strong>superfície deformada</strong>, acima do nível médio nos dois pontos de maré '
-        + 'alta e abaixo dele nos de maré baixa. A altura \\(h_{\\rm dif}\\) é a diferença '
-        + 'entre esses dois extremos.</p>'
-        + '<p>Repare também no que o argumento dispensa. Não houve dinâmica, nem equação de '
-        + 'onda, nem atrito: só a exigência de que, no estado final, a água não tenha para '
-        + 'onde escorrer. É um argumento de <strong>equilíbrio</strong>, e por isso o '
-        + 'resultado se chama maré de equilíbrio. Os ' + F.fmt(RHO * g0 * HDIF, 0)
-        + ' Pa de excesso na base correspondem a meio metro de coluna d\'água espalhado sobre '
+        + '<p>Nas figuras, o círculo de traço cheio é a Terra sólida, o tracejado é o nível '
+        + 'médio do mar e a borda da mancha verde é a superfície já deformada. A altura '
+        + '\\(h_{\\rm dif}\\) é a diferença entre o ponto de maré alta e o de maré baixa.</p>'
+        + '<p>Repare no que o argumento dispensa. Não houve dinâmica, nem equação de onda, nem '
+        + 'atrito: só a exigência de que, no estado final, a água não tenha para onde '
+        + 'escorrer. É um argumento de <strong>equilíbrio</strong>, e por isso o resultado se '
+        + 'chama maré de equilíbrio. Os ' + F.fmt(RHO * g0 * HDIF, 0) + ' Pa de excesso na '
+        + 'base correspondem a meio metro de coluna d\'água espalhado sobre '
         + F.fmt(Math.PI * RT / 2 / 1e3, 0) + ' km de arco: uma rampa de uma parte em vinte '
         + 'milhões, que é o quanto a maré realmente inclina o oceano.</p>';
       tipografar(corpo);
     }
 
-    registrarRedesenho(desenhar);
+    desenhar();
   };
+
   /* =================================================================
      20. O que é um funcional
      A definição ("uma regra que associa um número a uma função
