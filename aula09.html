@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 9: Coordenadas generalizadas, vínculos e equações de Lagrange | Mecânica Clássica II</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611082224">
-<script src="assets/js/comum.js?v=202611082224"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611082243">
+<script src="assets/js/comum.js?v=202611082243"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -93,7 +93,7 @@
     constante \(k\). As posições são \(x_1(t)\) e \(x_2(t)\), e</p>
     \[\Lag=\tfrac12m_1\dot x_1^2+\tfrac12m_2\dot x_2^2
     -\tfrac12k\left(x_2-x_1\right)^2.\]
-    <p>As duas equações de Lagrange ficam</p>
+    <p>As duas equações de <a href="https://pt.wikipedia.org/wiki/Joseph-Louis_Lagrange">Lagrange</a> ficam</p>
     \[m_1\ddot x_1=-k\left(x_1-x_2\right),\qquad
     m_2\ddot x_2=-k\left(x_2-x_1\right),\]
     <p>acopladas. Somando-as, o lado direito se cancela e aparece
@@ -162,7 +162,7 @@
 
   <p>\[u_{xx}+u_{yy}=0,\]</p>
 
-  <p>que é a <strong>equação de Laplace</strong>. A forma de uma película de sabão presa a um
+  <p>que é a <strong>equação de <a href="https://pt.wikipedia.org/wiki/Pierre-Simon_de_Laplace">Laplace</a></strong>. A forma de uma película de sabão presa a um
   aro torto, a distribuição de temperatura em regime estacionário e o potencial eletrostático
   numa região sem cargas satisfazem todos a mesma equação, e pelo mesmo motivo: todos
   minimizam uma integral quadrática do gradiente.</p>
@@ -172,8 +172,8 @@
     <p>Troque \((x,y)\) pelas quatro coordenadas do espaço-tempo e \(u\) por um campo
     \(\phi\), e a mesma equação passa a ser a equação de movimento do campo. Com
     \(f=\tfrac12\left(\partial_t\phi\right)^2-\tfrac12\left(\nabla\phi\right)^2
-    -\tfrac12m^2\phi^2\) sai a equação de Klein-Gordon; com a densidade lagrangiana de
-    Maxwell saem as equações de Maxwell. A mecânica lagrangiana não é um capítulo isolado da
+    -\tfrac12m^2\phi^2\) sai a <a href="https://pt.wikipedia.org/wiki/Equa%C3%A7%C3%A3o_de_Klein%E2%80%93Gordon">equação de Klein-Gordon</a>; com a densidade lagrangiana de
+    <a href="https://pt.wikipedia.org/wiki/James_Clerk_Maxwell">Maxwell</a> saem as equações de Maxwell. A mecânica lagrangiana não é um capítulo isolado da
     mecânica clássica: é a linguagem em que a física moderna escreve as suas leis, e a
     diferença entre os casos está apenas na escolha da densidade lagrangiana.</p>
   </div>
@@ -204,7 +204,7 @@
       <tr><td>conta num aro que gira</td><td>\(\theta\)</td><td>1</td></tr>
       <tr><td>partícula sobre uma esfera</td><td>\(\theta,\varphi\)</td><td>2</td></tr>
       <tr><td>máquina de Atwood</td><td>\(x\) de um dos blocos</td><td>1</td></tr>
-      <tr><td>corpo rígido livre</td><td>3 do centro de massa, 3 de Euler</td><td>6</td></tr>
+      <tr><td>corpo rígido livre</td><td>3 do centro de massa, 3 de <a href="https://pt.wikipedia.org/wiki/Leonhard_Euler">Euler</a></td><td>6</td></tr>
       <tr><td>pião com ponta fixa</td><td>ângulos de Euler \(\varphi,\theta,\psi\)</td><td>3</td></tr>
     </tbody>
   </table>
@@ -258,7 +258,7 @@
   <h2 id="s6">6. As equações de Lagrange</h2>
 
   <p>Com coordenadas generalizadas \(q_i\) escolhidas de modo a já respeitar os vínculos
-  holônomos, aplique o princípio de Hamilton à ação</p>
+  holônomos, aplique o princípio de <a href="https://pt.wikipedia.org/wiki/William_Rowan_Hamilton">Hamilton</a> à ação</p>
 
   <p>\[\Acao\left[q_1,\dots,q_n\right]
   =\int_{t_1}^{t_2}\Lag\left(q_1,\dots,q_n,\dot q_1,\dots,\dot q_n,t\right)dt,
@@ -282,7 +282,7 @@
     <span class="rotulo">Partícula livre em uma dimensão</span>
     <p>Com \(T=\tfrac12m\dot x^2\) e \(V=0\), temos \(\Lag=\tfrac12m\dot x^2\),
     \(\partial\Lag/\partial x=0\) e \(\partial\Lag/\partial\dot x=m\dot x\). A equação devolve
-    \(m\ddot x=0\), isto é \(x=x_0+v_0t\): a primeira lei de Newton.</p>
+    \(m\ddot x=0\), isto é \(x=x_0+v_0t\): a primeira lei de <a href="https://pt.wikipedia.org/wiki/Isaac_Newton">Newton</a>.</p>
   </div>
 
   <div class="bloco def">
@@ -294,7 +294,7 @@
   <div class="bloco def">
     <span class="rotulo">Oscilador harmônico</span>
     <p>Com \(\Lag=\tfrac12m\dot x^2-\tfrac12kx^2\), a equação dá \(m\ddot x+kx=0\), ou
-    \(\ddot x+\omega^2x=0\) com \(\omega=\sqrt{k/m}\). A lei de Hooke, sem que se tenha
+    \(\ddot x+\omega^2x=0\) com \(\omega=\sqrt{k/m}\). A lei de <a href="https://pt.wikipedia.org/wiki/Robert_Hooke">Hooke</a>, sem que se tenha
     escrito \(\vet{F}=-k\vet{x}\) em momento algum.</p>
   </div>
 
@@ -473,7 +473,7 @@
     isoperimétricos no módulo 7. A diferença é que ali o multiplicador é uma
     <em>constante</em>, e não uma função do tempo, porque o vínculo é um só para a curva
     inteira. Minimizando \(\int f\,dx\) com \(\int g\,dx\) fixo, aplica-se Euler-Lagrange a
-    \(f+\lambda g\), e o problema de Dido devolve o círculo.</p>
+    \(f+\lambda g\), e o problema de <a href="https://en.wikipedia.org/wiki/Dido">Dido</a> devolve o círculo.</p>
   </div>
 
   <!-- ================================================== -->
@@ -579,7 +579,7 @@
     ela veio: do termo \(r^2\dot\varphi^2\) da energia cinética, e não de um postulado sobre
     referenciais girantes. Escrevendo \(V_{\rm ef}(r)=V(r)+\ell^2/2mr^2\), o problema de duas
     coordenadas vira um problema unidimensional em \(r\), que é exatamente o que torna o
-    problema de Kepler solúvel.</p>
+    problema de <a href="https://pt.wikipedia.org/wiki/Johannes_Kepler">Kepler</a> solúvel.</p>
   </div>
 
   <div class="bloco def">
@@ -667,6 +667,6 @@
   Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
 </footer>
 
-<script src="assets/js/widgets.js?v=202611082224"></script>
+<script src="assets/js/widgets.js?v=202611082243"></script>
 </body>
 </html>

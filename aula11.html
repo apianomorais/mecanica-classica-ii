@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 11: Transformação de Legendre e equações de Hamilton | Mecânica Clássica II</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611082224">
-<script src="assets/js/comum.js?v=202611082224"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611082243">
+<script src="assets/js/comum.js?v=202611082243"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -84,7 +84,7 @@
   ocasiões: é ele que se conserva quando a coordenada é cíclica, é ele que difere do momento
   mecânico numa carga em campo magnético, e é ele que vira operador na mecânica quântica. A
   operação matemática que faz essa troca de maneira limpa e reversível chama-se transformação
-  de Legendre.</p>
+  de <a href="https://pt.wikipedia.org/wiki/Adrien-Marie_Legendre">Legendre</a>.</p>
 
   <!-- ================================================== -->
   <h2 id="s2">2. A transformação de Legendre</h2>
@@ -104,7 +104,7 @@
   =x+\left(p-\der{f}{x}\right)\der{x}{p}=x,\]</p>
 
   <p>porque o parêntese é nulo pela própria definição de \(p\). É o mesmo cancelamento que
-  aparecerá adiante ao deduzir as equações de Hamilton, e não é coincidência.</p>
+  aparecerá adiante ao deduzir as equações de <a href="https://pt.wikipedia.org/wiki/William_Rowan_Hamilton">Hamilton</a>, e não é coincidência.</p>
 
   <div data-widget="legendre"></div>
 
@@ -148,7 +148,7 @@
     cinética for uma forma quadrática definida positiva nas velocidades, o que é o caso de
     todos os sistemas tratados neste curso. Sistemas em que ela falha existem, chamam-se
     <em>singulares</em>, e são a regra em teorias de calibre, onde o tratamento correto exige
-    a maquinaria de vínculos de Dirac.</p>
+    a maquinaria de vínculos de <a href="https://pt.wikipedia.org/wiki/Paul_Dirac">Dirac</a>.</p>
   </div>
 
   <div class="bloco fisica">
@@ -156,7 +156,7 @@
     <p>Partindo da energia interna \(U(S,V)\), com \(T=\partial U/\partial S\), a
     transformação de Legendre em \(S\) produz a energia livre de Helmholtz
     \(F=U-TS\), função de \(T\) e \(V\). Trocando \(V\) por \(P\) obtém-se a entalpia, e
-    trocando as duas, a energia livre de Gibbs. O quadro de Born, que os estudantes de
+    trocando as duas, a energia livre de <a href="https://pt.wikipedia.org/wiki/Josiah_Willard_Gibbs">Gibbs</a>. O quadro de <a href="https://pt.wikipedia.org/wiki/Max_Born">Born</a>, que os estudantes de
     termodinâmica memorizam, é um diagrama de transformações de Legendre, e a razão de haver
     quatro potenciais é que há duas variáveis para trocar.</p>
   </div>
@@ -229,7 +229,7 @@
     </ol>
   </div>
 
-  <p>A demonstração usa o teorema de Euler para funções homogêneas. Se \(T\) é homogênea de
+  <p>A demonstração usa o teorema de <a href="https://pt.wikipedia.org/wiki/Leonhard_Euler">Euler</a> para funções homogêneas. Se \(T\) é homogênea de
   grau dois nas velocidades, então</p>
 
   <p>\[\sum_j\pder{T}{\dot q_j}\dot q_j=2T,\]</p>
@@ -258,7 +258,7 @@
 
   <p>Aqui \(H\) <em>é</em> a energia, mas expressa de maneira nada trivial em \(\vet{p}\): o
   termo cinético só reaparece depois de subtrair \(q\vet{A}\). É essa a forma que, pela
-  substituição \(\vet{p}\to-i\hbar\nabla\), produz a equação de Schrödinger de uma partícula
+  substituição \(\vet{p}\to-i\hbar\nabla\), produz a equação de <a href="https://pt.wikipedia.org/wiki/Erwin_Schr%C3%B6dinger">Schrödinger</a> de uma partícula
   carregada.</p>
 
   <h3>Vínculos que dependem do tempo</h3>
@@ -303,7 +303,7 @@
     do aro. Derivando, o fundo deixa de ser mínimo quando \(\Omega^2>g/R\), e nasce um
     equilíbrio novo em \(\cos\theta_0=g/R\Omega^2\). Abaixo do \(\Omega\) crítico a conta
     oscila em torno do fundo; acima dele, ela oscila em torno de um ângulo que cresce com a
-    rotação. É uma bifurcação, e é o princípio do regulador centrífugo de Watt.</p>
+    rotação. É uma bifurcação, e é o princípio do <a href="https://pt.wikipedia.org/wiki/Governador_centr%C3%ADfugo">regulador centrífugo</a> de <a href="https://pt.wikipedia.org/wiki/James_Watt">Watt</a>.</p>
   </div>
 
   <!-- ================================================== -->
@@ -325,7 +325,7 @@
 
   <p>\[dH=\sum_j\dot q_j\,dp_j-\sum_j\pder{\Lag}{q_j}dq_j-\pder{\Lag}{t}dt,\]</p>
 
-  <p>e agora entram as equações de Lagrange, na forma
+  <p>e agora entram as equações de <a href="https://pt.wikipedia.org/wiki/Joseph-Louis_Lagrange">Lagrange</a>, na forma
   \(\partial\Lag/\partial q_j=\dot p_j\). Comparando as duas expressões para \(dH\) termo a
   termo:</p>
 
@@ -339,7 +339,7 @@
   <p>São \(2n\) equações de primeira ordem no lugar de \(n\) de segunda ordem. A contagem de
   informação é a mesma, e a forma é muito mais simétrica: trocando \(q\) por \(p\) e \(p\) por
   \(-q\), as duas equações trocam de lugar. Essa simetria, que não existe no formalismo
-  lagrangiano, é o ponto de partida das transformações canônicas e dos parênteses de Poisson,
+  lagrangiano, é o ponto de partida das transformações canônicas e dos parênteses de <a href="https://pt.wikipedia.org/wiki/Sim%C3%A9on_Denis_Poisson">Poisson</a>,
   no módulo 12.</p>
 
   <div class="bloco def">
@@ -352,7 +352,7 @@
     \(\dot\theta=p_\theta/m\ell^2\) e \(\dot p_\theta=-mg\ell\sen\theta\), que combinadas dão
     \(\ddot\theta+\left(g/\ell\right)\sen\theta=0\).</p>
     <p>Em todos os casos a primeira equação é apenas a definição de momento lida ao contrário,
-    e a segunda é a lei de força. O formalismo separa as duas coisas, que em Newton vinham
+    e a segunda é a lei de força. O formalismo separa as duas coisas, que em <a href="https://pt.wikipedia.org/wiki/Isaac_Newton">Newton</a> vinham
     misturadas.</p>
   </div>
 
@@ -447,7 +447,7 @@
     mudanças de variável que preservam a forma das equações e que permitem escolher
     coordenadas em que o problema fica trivial. Daí nascem os <strong>parênteses de
     Poisson</strong>, que empacotam toda a dinâmica numa operação algébrica e que, substituídos
-    por comutadores, viram a mecânica quântica. Daí nasce o <strong>teorema de Liouville</strong>,
+    por comutadores, viram a mecânica quântica. Daí nasce o <strong>teorema de <a href="https://pt.wikipedia.org/wiki/Joseph_Liouville">Liouville</a></strong>,
     que afirma que o fluxo preserva volume no espaço de fase e que é o alicerce da mecânica
     estatística. Nada disso é visível do lado lagrangiano, e tudo isso é o módulo 12.</p>
   </div>
@@ -465,7 +465,7 @@
     <p>Verificando, \(dg/dp=\tfrac34\cdot\tfrac43p^{1/3}=p^{1/3}=x\). Repare no par de
     expoentes: \(f\sim x^4\) com \(g\sim p^{4/3}\), e \(1/4+3/4=1\). Em geral, \(x^a/a\)
     transforma-se em \(p^b/b\) com \(1/a+1/b=1\), que é a mesma relação de conjugação da
-    desigualdade de Young e dos espaços \(L^p\).</p>
+    desigualdade de <a href="https://pt.wikipedia.org/wiki/Thomas_Young">Young</a> e dos espaços \(L^p\).</p>
   </div>
 
   <div class="bloco def">
@@ -571,7 +571,7 @@
 
       <li><b>11.7</b> Átomo de hidrogênio clássico: com \(H=p_r^2/2m+p_\varphi^2/2mr^2-ke^2/r\),
       determine o raio da órbita circular em função de \(p_\varphi\) e a energia
-      correspondente. Impondo \(p_\varphi=n\hbar\), recupere os níveis de Bohr.</li>
+      correspondente. Impondo \(p_\varphi=n\hbar\), recupere os níveis de <a href="https://pt.wikipedia.org/wiki/Niels_Henrick_David_Bohr">Bohr</a>.</li>
 
       <li><b>11.8</b> Para a conta no aro girante, trace \(U_{\rm ef}(\theta)\) para
       \(\Omega\) abaixo e acima do valor crítico, e identifique no gráfico a mudança de
@@ -601,6 +601,6 @@
   Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
 </footer>
 
-<script src="assets/js/widgets.js?v=202611082224"></script>
+<script src="assets/js/widgets.js?v=202611082243"></script>
 </body>
 </html>
