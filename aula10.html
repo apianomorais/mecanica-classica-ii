@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 10: Aplicações do formalismo lagrangiano | Mecânica Clássica II</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611082058">
+<script src="assets/js/comum.js?v=202611082058"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Mecânica Clássica II <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html">Início</a>
+      <span class="grupo">Corpos rígidos</span>
+      <a href="aula01.html" class="num" title="Módulo 1: Cinemática dos corpos rígidos">1</a>
+      <a href="aula02.html" class="num" title="Módulo 2: Centro de massa e momentos de inércia">2</a>
+      <a href="aula03.html" class="num" title="Módulo 3: Momento angular, torque e equações de movimento">3</a>
+      <a href="aula04.html" class="num" title="Módulo 4: Conservação e equilíbrio estático">4</a>
+      <span class="grupo">Referenciais</span>
+      <a href="aula05.html" class="num" title="Módulo 5: Matrizes de rotação e transformações de coordenadas">5</a>
+      <a href="aula06.html" class="num" title="Módulo 6: Referenciais em rotação e forças fictícias">6</a>
+      <span class="grupo">Variacional</span>
+      <a href="aula07.html" class="num" title="Módulo 7: Cálculo variacional: ação e caminhos extremos">7</a>
+      <a href="aula08.html" class="num" title="Módulo 8: A equação de Euler-Lagrange e o princípio de Hamilton">8</a>
+      <span class="grupo">Lagrange e Hamilton</span>
+      <a href="aula09.html" class="num" title="Módulo 9: Coordenadas generalizadas, vínculos e equações de Lagrange">9</a>
+      <a href="aula10.html" class="num ativo" title="Módulo 10: Aplicações do formalismo lagrangiano">10</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+<aside class="lateral">
+  <h4>Neste módulo</h4>
+  <ol>
+    <li><a href="#s1">1. A máquina de Atwood</a></li>
+    <li><a href="#s2">2. O pêndulo duplo</a></li>
+    <li><a href="#s3">3. Caos determinístico</a></li>
+    <li><a href="#s4">4. Coordenadas curvilíneas</a></li>
+    <li><a href="#s5">5. Potenciais centrais</a></li>
+    <li><a href="#s6">6. O potencial efetivo</a></li>
+    <li><a href="#s7">7. As três leis de Kepler</a></li>
+    <li><a href="#s8">8. O pêndulo esférico</a></li>
+    <li><a href="#s9">9. Potencial generalizado</a></li>
+    <li><a href="#s10">10. A força de Lorentz</a></li>
+    <li><a href="#s11">11. Dissipação e a função de Rayleigh</a></li>
+    <li><a href="#s12">12. Exercícios resolvidos</a></li>
+    <li><a href="#s13">13. Exercícios propostos</a></li>
+  </ol>
+</aside>
+
+<main class="conteudo">
+
+  <p class="chapeu">Módulo 10 · Formalismo lagrangiano e hamiltoniano</p>
+  <h1>Aplicações do formalismo lagrangiano</h1>
+  <p class="subtitulo">O módulo anterior montou a maquinaria. Este a põe para trabalhar em
+  sistemas que pela via de Newton seriam penosos ou impossíveis: pêndulos acoplados, órbitas
+  planetárias, cargas em campos magnéticos e osciladores com atrito. Cada seção escolhe
+  coordenadas, monta a lagrangiana e deixa a equação de Lagrange fazer o resto.</p>
+
+  <hr class="linha">
+
+  <!-- ================================================== -->
+  <h2 id="s1">1. A máquina de Atwood</h2>
+
+  <p>Duas massas \(m_1\) e \(m_2\) penduradas por um fio inextensível que passa por uma polia
+  de raio \(R\) e momento de inércia \(I\). O sistema parece ter três coisas se movendo, e tem
+  um só grau de liberdade: o fio é inextensível e não desliza na polia, de modo que a descida
+  de uma massa é a subida da outra e o giro da polia.</p>
+
+  <p>Escolha \(x\), a altura de \(m_1\) medida para baixo a partir do eixo. Então \(m_2\) está
+  a \(\ell-x\) do eixo, as velocidades são \(\dot x\) e \(-\dot x\), e a polia gira com
+  \(\dot\theta=\dot x/R\). A energia cinética soma as três parcelas:</p>
+
+  <p>\[T=\tfrac12m_1\dot x^2+\tfrac12m_2\dot x^2+\tfrac12I\frac{\dot x^2}{R^2}
+  =\tfrac12\left(m_1+m_2+\frac{I}{R^2}\right)\dot x^2.\]</p>
+
+  <p>A energia potencial é \(V=-m_1gx-m_2g\left(\ell-x\right)\), e o termo constante
+  \(-m_2g\ell\) não importa porque derivadas de constantes somem. Com
+  \(\Lag=T-V\),</p>
+
+  <p>\[\pder{\Lag}{\dot x}=\left(m_1+m_2+\frac{I}{R^2}\right)\dot x,\qquad
+  \pder{\Lag}{x}=\left(m_1-m_2\right)g,\]</p>
+
+  <div class="destaque">
+    <span class="anuncio">A aceleração da máquina de Atwood</span>
+    \[\ddot x=\frac{\left(m_1-m_2\right)g}
+    {m_1+m_2+I/R^2}.\]
+  </div>
+
+  <p>As duas trações não apareceram. Pela via de Newton seriam três equações, duas trações
+  incógnitas e um torque, com as trações eliminadas no fim. Aqui foram quatro linhas, e o
+  termo \(I/R^2\) entrou naturalmente como uma <em>massa equivalente</em> da polia: ela
+  resiste à aceleração do sistema como se fosse mais uma massa pendurada, de valor
+  \(I/R^2\).</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Dois limites que valem conferir</span>
+    <p>Com \(m_1=m_2\) a aceleração é nula, qualquer que seja a polia: o sistema fica em
+    equilíbrio indiferente. Com \(m_2=0\) e polia sem inércia, \(\ddot x=g\): queda livre. Com
+    \(I\to\infty\), \(\ddot x\to0\): a polia trava o sistema. Um resultado que não passe nos
+    três limites está errado, e checá-los custa dez segundos.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s2">2. O pêndulo duplo</h2>
+
+  <p>Duas massas, dois fios, movimento no plano. As coordenadas naturais são os dois ângulos
+  com a vertical, \(\theta_1\) e \(\theta_2\), e as posições são</p>
+
+  <p>\[x_1=\ell_1\sen\theta_1,\qquad y_1=-\ell_1\cos\theta_1,\]</p>
+  <p>\[x_2=x_1+\ell_2\sen\theta_2,\qquad y_2=y_1-\ell_2\cos\theta_2.\]</p>
+
+  <p>Derivando e somando os quadrados, o termo cruzado entre \(\dot\theta_1\) e
+  \(\dot\theta_2\) não se cancela, e é dele que vem todo o acoplamento:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Lagrangiana do pêndulo duplo</span>
+    \[T=\tfrac12\left(m_1+m_2\right)\ell_1^2\dot\theta_1^2
+    +\tfrac12m_2\ell_2^2\dot\theta_2^2
+    +m_2\ell_1\ell_2\dot\theta_1\dot\theta_2\cos\left(\theta_1-\theta_2\right),\]
+    \[V=-\left(m_1+m_2\right)g\ell_1\cos\theta_1-m_2g\ell_2\cos\theta_2.\]
+  </div>
+
+  <p>As duas equações de Lagrange saem por derivação direta. Elas são acopladas e não
+  lineares, e resolvê-las analiticamente é impossível no caso geral. Para pequenas oscilações,
+  porém, \(\cos\left(\theta_1-\theta_2\right)\simeq1\) e \(\sen\theta\simeq\theta\), e o
+  sistema se lineariza em duas equações acopladas de coeficientes constantes, cuja solução são
+  dois <strong>modos normais</strong>: um em que as duas massas oscilam em fase, mais lento, e
+  outro em que oscilam em oposição, mais rápido. Qualquer movimento pequeno é uma combinação
+  dos dois.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. Caos determinístico</h2>
+
+  <p>Fora do regime de pequenas oscilações o pêndulo duplo faz algo que nenhum sistema de um
+  grau de liberdade consegue fazer. Duas condições iniciais separadas por um milésimo de grau,
+  integradas pelas mesmas equações e pelo mesmo método, divergem completamente em poucos
+  segundos.</p>
+
+  <div data-widget="duplo"></div>
+
+  <p>O gráfico de separação em escala logarítmica mostra o que caracteriza o fenômeno. Durante
+  uma fase inicial a curva é uma <em>reta</em>, isto é, a separação cresce
+  exponencialmente,</p>
+
+  <p>\[\delta(t)\simeq\delta_0\,e^{\lambda t},\]</p>
+
+  <p>e a inclinação dessa reta é o <strong>expoente de Lyapunov</strong>. Depois a separação
+  satura, porque ela não pode exceder o tamanho da própria região acessível.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Determinístico não quer dizer previsível</span>
+    <p>Nada no sistema é aleatório. As equações são as mesmas para as duas cópias, não há
+    ruído, não há termo estocástico, e o cartão de desvio de energia mostra que o integrador
+    numérico está sob controle. O que existe é sensibilidade às condições iniciais, e a
+    consequência prática é brutal: prever o estado daqui a \(T\) segundos exige conhecer o
+    estado inicial com precisão que melhora como \(e^{-\lambda T}\). Dobrar o horizonte de
+    previsão exige <em>elevar ao quadrado</em> a precisão inicial, e nenhum instrumento
+    acompanha isso por muito tempo.</p>
+    <p>É a mesma razão pela qual a previsão do tempo tem um horizonte de cerca de duas semanas,
+    e por que ele não melhora substancialmente com computadores melhores: o limite não é de
+    cálculo, é de medida.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. Coordenadas curvilíneas</h2>
+
+  <p>O passo que mais custa, na prática, é escrever a energia cinética nas coordenadas
+  escolhidas. Vale ter as três de sempre memorizadas, porque elas resolvem a maioria dos
+  problemas.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Coordenadas</th><th>\(2T/m\)</th><th>Cíclicas quando \(V=V(r)\)</th></tr></thead>
+    <tbody>
+      <tr><td>cartesianas</td><td>\(\dot x^2+\dot y^2+\dot z^2\)</td><td>nenhuma</td></tr>
+      <tr><td>polares</td><td>\(\dot r^2+r^2\dot\varphi^2\)</td><td>\(\varphi\)</td></tr>
+      <tr><td>cilíndricas</td><td>\(\dot\rho^2+\rho^2\dot\varphi^2+\dot z^2\)</td><td>\(\varphi\), e \(z\) se \(V\) não depender de \(z\)</td></tr>
+      <tr><td>esféricas</td><td>\(\dot r^2+r^2\dot\theta^2+r^2\sen^2\theta\,\dot\varphi^2\)</td><td>\(\varphi\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Vale fazer uma verificação instrutiva. Para uma partícula <em>livre</em> em polares,
+  \(\Lag=\tfrac12m\left(\dot r^2+r^2\dot\varphi^2\right)\), e a equação para \(r\) dá</p>
+
+  <p>\[m\ddot r=mr\dot\varphi^2.\]</p>
+
+  <p>Uma partícula livre, sem força nenhuma, tem aceleração radial não nula. Isso não é
+  contradição: é o preço de usar coordenadas curvilíneas. O termo \(mr\dot\varphi^2\) não é
+  força, é o efeito de \(\vers{r}\) mudar de direção ao longo do movimento, e ele aparece
+  sozinho porque a energia cinética em polares contém \(r^2\dot\varphi^2\). O formalismo
+  produz os termos centrífugo e de Coriolis sem que seja preciso postulá-los.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. Potenciais centrais</h2>
+
+  <p>Um potencial que depende só da distância, \(V=V(r)\), tem simetria esférica, e dessa
+  simetria sai tudo o que se segue. Em coordenadas esféricas,</p>
+
+  <p>\[\Lag=\tfrac12m\left(\dot r^2+r^2\dot\theta^2
+  +r^2\sen^2\theta\,\dot\varphi^2\right)-V(r).\]</p>
+
+  <p>A coordenada \(\varphi\) é cíclica, e portanto \(p_\varphi=mr^2\sen^2\theta\,\dot\varphi\)
+  é constante. Mais do que isso: o momento angular \(\vet{L}=\vet{r}\cruz m\vet{v}\) é
+  constante como <em>vetor</em>, porque o torque \(\vet{r}\cruz\vet{F}\) se anula quando
+  \(\vet{F}\) é paralela a \(\vet{r}\).</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O movimento é plano, e isso é um teorema</span>
+    <p>Se \(\vet{L}\) é constante e \(\vet{r}\cdot\vet{L}=0\) por construção, então
+    \(\vet{r}\) permanece sempre no plano perpendicular a \(\vet{L}\). O problema de três
+    coordenadas colapsa para duas antes de qualquer conta. Escolhendo esse plano como
+    \(\theta=\pi/2\),</p>
+    \[\Lag=\tfrac12m\left(\dot r^2+r^2\dot\varphi^2\right)-V(r),\]
+    <p>que é o problema de duas coordenadas da seção anterior. A redução de três para dois
+    graus de liberdade saiu inteiramente de uma simetria.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. O potencial efetivo</h2>
+
+  <p>Com \(\ell=mr^2\dot\varphi\) constante, substitua \(\dot\varphi=\ell/mr^2\) na energia:</p>
+
+  <p>\[E=\tfrac12m\dot r^2+\tfrac12mr^2\dot\varphi^2+V(r)
+  =\tfrac12m\dot r^2+\frac{\ell^2}{2mr^2}+V(r).\]</p>
+
+  <div class="destaque">
+    <span class="anuncio">Potencial efetivo</span>
+    \[U_{\rm ef}(r)=\frac{\ell^2}{2mr^2}+V(r),
+    \qquad E=\tfrac12m\dot r^2+U_{\rm ef}(r).\]
+  </div>
+
+  <p>O problema de duas coordenadas virou um problema de uma só, formalmente idêntico ao de
+  uma partícula deslizando num potencial unidimensional. O primeiro termo é a
+  <strong>barreira centrífuga</strong>: repulsivo, divergente na origem, e é ele que impede
+  uma partícula com \(\ell\neq0\) de cair no centro de força por mais atraída que seja.</p>
+
+  <div data-widget="potefetivo"></div>
+
+  <p>A partir daí o gráfico responde antes de qualquer integração. O movimento radial só
+  acontece onde \(E>U_{\rm ef}\), porque \(\tfrac12m\dot r^2\) não pode ser negativo, e os
+  cruzamentos são os pontos de retorno. Para o potencial de Kepler \(V=-k/r\):</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Energia</th><th>Pontos de retorno</th><th>Órbita</th><th>Excentricidade</th></tr></thead>
+    <tbody>
+      <tr><td>\(E=U_{\rm ef,min}\)</td><td>um só raio</td><td>circular</td><td>\(e=0\)</td></tr>
+      <tr><td>\(U_{\rm ef,min}&lt;E&lt;0\)</td><td>dois</td><td>elíptica</td><td>\(0&lt;e&lt;1\)</td></tr>
+      <tr><td>\(E=0\)</td><td>um</td><td>parabólica</td><td>\(e=1\)</td></tr>
+      <tr><td>\(E>0\)</td><td>um</td><td>hiperbólica</td><td>\(e>1\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. As três leis de Kepler</h2>
+
+  <p>A forma da órbita sai de uma substituição esperta. Da conservação de \(\ell\),</p>
+
+  <p>\[\der{r}{\varphi}=\frac{\dot r}{\dot\varphi}=\frac{mr^2\dot r}{\ell},\]</p>
+
+  <p>e isolando \(\dot r^2\) da energia e substituindo, aparece uma equação em \(r\) com
+  potências de quarta ordem, feia. A troca \(u=1/r\) arruma tudo, porque
+  \(dr/d\varphi=-u^{-2}du/d\varphi\):</p>
+
+  <p>\[\left(\der{u}{\varphi}\right)^2
+  =\frac{2mE}{\ell^2}+\frac{2mk}{\ell^2}u-u^2.\]</p>
+
+  <p>Derivando em \(\varphi\) e dividindo por \(2\,du/d\varphi\), a equação vira linear:</p>
+
+  <div class="destaque">
+    <span class="anuncio">A equação da órbita</span>
+    \[\dder{u}{\varphi}+u=\frac{mk}{\ell^2}.\]
+  </div>
+
+  <p>É um oscilador harmônico em \(\varphi\) com termo de fonte constante. A solução geral é
+  \(u=mk/\ell^2+A\cos\left(\varphi-\varphi_0\right)\), e escolhendo os eixos de modo que
+  \(\varphi_0=0\) e definindo \(e=A\ell^2/mk\),</p>
+
+  <p>\[r(\varphi)=\frac{\ell^2/mk}{1+e\cos\varphi}
+  =\frac{a\left(1-e^2\right)}{1+e\cos\varphi},\]</p>
+
+  <p>que é a equação de uma cônica com foco na origem. As três leis saem daí:</p>
+
+  <div class="bloco def">
+    <span class="rotulo">As três leis, deduzidas</span>
+    <p><strong>Primeira.</strong> As órbitas ligadas são elipses com o centro de força num dos
+    focos, porque a equação acima é a de uma cônica e \(E<0\) dá \(e<1\).</p>
+    <p><strong>Segunda.</strong> A área varrida por unidade de tempo é
+    \(\tfrac12r^2\dot\varphi=\ell/2m\), constante porque \(\varphi\) é cíclica. Áreas iguais em
+    tempos iguais não é uma lei independente: é a conservação do momento angular escrita em
+    linguagem geométrica.</p>
+    <p><strong>Terceira.</strong> Integrando a taxa areal ao longo de um período,
+    \(\pi ab=\left(\ell/2m\right)T\). Com \(b=a\sqrt{1-e^2}\) e
+    \(\ell^2=mka\left(1-e^2\right)\), os fatores de \(e\) se cancelam e sobra</p>
+    \[T^2=\frac{4\pi^2m}{k}\,a^3=\frac{4\pi^2}{GM}\,a^3.\]
+    <p>O período depende só do semieixo maior, e não da excentricidade. Duas órbitas de mesmo
+    \(a\), uma quase circular e outra muito alongada, levam exatamente o mesmo tempo.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. O pêndulo esférico</h2>
+
+  <p>Uma massa presa a um fio de comprimento \(\ell\), livre para se mover em qualquer
+  direção, e não apenas num plano. São duas coordenadas, \(\theta\) medido da vertical para
+  baixo e \(\varphi\) o azimute. Com \(r=\ell\) fixo, a energia cinética em esféricas dá</p>
+
+  <p>\[\Lag=\tfrac12m\ell^2\left(\dot\theta^2+\sen^2\theta\,\dot\varphi^2\right)
+  +mg\ell\cos\theta.\]</p>
+
+  <p>O ângulo \(\varphi\) é cíclico, e portanto</p>
+
+  <p>\[p_\varphi=m\ell^2\sen^2\theta\,\dot\varphi=\text{constante}.\]</p>
+
+  <p>Repetindo o truque da seção 6, substitua \(\dot\varphi\) na energia e o problema de duas
+  coordenadas vira um problema de uma só, agora em \(\theta\):</p>
+
+  <div class="destaque">
+    <span class="anuncio">Potencial efetivo do pêndulo esférico</span>
+    \[U_{\rm ef}(\theta)=\frac{p_\varphi^2}{2m\ell^2\sen^2\theta}-mg\ell\cos\theta.\]
+  </div>
+
+  <p>A leitura é a mesma de antes. O termo centrífugo diverge em \(\theta\to0\) e
+  \(\theta\to\pi\), de modo que um pêndulo com \(p_\varphi\neq0\) <strong>nunca</strong> passa
+  pela vertical, nem por cima nem por baixo. O movimento fica confinado entre dois paralelos,
+  \(\theta_1\le\theta\le\theta_2\), e a massa desenha uma roseta sobre a esfera: oscila em
+  \(\theta\) enquanto avança em \(\varphi\).</p>
+
+  <p>No fundo do poço de \(U_{\rm ef}\) está o <strong>pêndulo cônico</strong>, em que
+  \(\theta\) é constante e a massa percorre um círculo horizontal. Impondo
+  \(dU_{\rm ef}/d\theta=0\),</p>
+
+  <p>\[\dot\varphi^2=\frac{g}{\ell\cos\theta_0},\]</p>
+
+  <p>que é a condição de sempre, e mostra que \(\theta_0\to\pi/2\) exige \(\dot\varphi\to
+  \infty\): não existe pêndulo cônico horizontal.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. Potencial generalizado</h2>
+
+  <p>Até aqui todas as forças vinham de \(\vet{F}=-\nabla V(\vet{r})\), com \(V\) função
+  apenas da posição. Existem forças importantes que não são dessa forma, e a mais importante
+  delas depende da <em>velocidade</em>: a força magnética. Ela não pode vir de um potencial
+  comum, e mesmo assim cabe no formalismo.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Definição · Potencial generalizado</span>
+    <p>Uma função \(U\left(\vet{r},\vet{v},t\right)\) é um potencial generalizado para a força
+    \(\vet{F}\) se</p>
+    \[F_i=-\pder{U}{x_i}+\der{}{t}\left(\pder{U}{\dot x_i}\right).\]
+    <p>Quando \(U\) não depende de velocidades, o segundo termo some e a definição volta a
+    \(\vet{F}=-\nabla U\). Existindo tal \(U\), a lagrangiana continua sendo
+    \(\Lag=T-U\) e as equações de Lagrange continuam valendo sem alteração nenhuma.</p>
+  </div>
+
+  <p>Repare no que o segundo termo faz: ele permite que a força dependa não só de onde a
+  partícula está, mas também de como ela está se movendo. A derivada total \(d/dt\) carrega
+  dentro dela a regra da cadeia completa, com as dependências em \(x_j\), em \(\dot x_j\) e no
+  tempo, e é justamente essa abertura que acomoda a força magnética.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. A força de Lorentz</h2>
+
+  <p>Uma carga \(q\) num campo eletromagnético sofre</p>
+
+  <p>\[\vet{F}=q\left(\vet{E}+\vet{v}\cruz\vet{B}\right).\]</p>
+
+  <p>A parcela magnética é sempre perpendicular a \(\vet{v}\), e portanto não realiza
+  trabalho: ela curva a trajetória sem alterar a rapidez. Mesmo assim, por depender de
+  \(\vet{v}\), ela não vem de \(V(\vet{r})\). Escrevendo os campos pelos potenciais,</p>
+
+  <p>\[\vet{E}=-\nabla\phi-\pder{\vet{A}}{t},\qquad
+  \vet{B}=\nabla\cruz\vet{A},\]</p>
+
+  <p>a função que funciona como potencial generalizado é</p>
+
+  <div class="destaque">
+    <span class="anuncio">Lagrangiana de uma carga em campo eletromagnético</span>
+    \[U=q\phi-q\,\vet{v}\cdot\vet{A}
+    \qquad\Longrightarrow\qquad
+    \Lag=\tfrac12mv^2-q\phi+q\,\vet{v}\cdot\vet{A}.\]
+  </div>
+
+  <p>Aplicando Euler-Lagrange a essa lagrangiana, depois de alguma álgebra com a regra da
+  cadeia em \(dA_x/dt\), sai exatamente
+  \(m\ddot{\vet{r}}=q\left(\vet{E}+\vet{v}\cruz\vet{B}\right)\).</p>
+
+  <div data-widget="lorentz"></div>
+
+  <h3>Momento canônico e momento mecânico</h3>
+
+  <p>A consequência mais profunda está no momento conjugado. Derivando a lagrangiana em
+  \(\dot x\),</p>
+
+  <p>\[p_x=\pder{\Lag}{\dot x}=m\dot x+qA_x
+  \qquad\Longrightarrow\qquad
+  \vet{p}=m\vet{v}+q\vet{A},\]</p>
+
+  <p>que não é o momento mecânico. Os dois diferem por um termo que depende do potencial
+  vetor, e portanto do <strong>calibre</strong> escolhido: trocando
+  \(\vet{A}\to\vet{A}+\nabla\chi\) os campos não mudam, mas \(\vet{p}\) muda. O momento
+  canônico não é observável sozinho; o mecânico é.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Onde isso reaparece</span>
+    <p>A substituição \(\vet{p}\to\vet{p}-q\vet{A}\), chamada acoplamento mínimo, é como o
+    eletromagnetismo entra na equação de Schrödinger e na de Dirac. O efeito Aharonov-Bohm,
+    em que um elétron que nunca passa por região com campo magnético ainda assim sofre um
+    deslocamento de fase, é a demonstração experimental de que \(\vet{A}\) não é mera
+    conveniência matemática. Toda essa linha começa no fato, aparentemente técnico, de que o
+    momento conjugado não coincide com \(m\vet{v}\).</p>
+  </div>
+
+  <h3>O movimento: giro e deriva</h3>
+
+  <p>Com \(\vet{B}\) uniforme e \(\vet{E}=0\), o movimento no plano perpendicular é circular,
+  com raio e frequência</p>
+
+  <p>\[r_L=\frac{mv}{qB},\qquad\omega_c=\frac{qB}{m}.\]</p>
+
+  <p>A frequência de cíclotron não depende da velocidade, e foi isso que tornou possível o
+  cíclotron de Lawrence. Acrescentando \(\vet{E}\) perpendicular a \(\vet{B}\), o centro de
+  giro passa a caminhar com</p>
+
+  <p>\[\vet{v}_d=\frac{\vet{E}\cruz\vet{B}}{B^2},\]</p>
+
+  <p>que não depende nem da carga nem da massa. Íons e elétrons derivam juntos e no mesmo
+  sentido, de modo que a deriva não gera corrente, e é esse o mecanismo que organiza o
+  confinamento em tokamaks e os cinturões de Van Allen.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. Dissipação e a função de Rayleigh</h2>
+
+  <p>Atrito não vem de potencial nenhum, nem comum nem generalizado, porque dissipa energia.
+  Para forças de amortecimento <em>linear</em>, \(\vet{F}_i=-b_i\vet{v}_i\), existe mesmo
+  assim uma maneira econômica de incorporá-lo.</p>
+
+  <div class="destaque">
+    <span class="anuncio">Função de dissipação de Rayleigh</span>
+    \[\mathcal{F}=\tfrac12\sum_ib_iv_i^2,
+    \qquad Q_j^{\rm diss}=-\pder{\mathcal{F}}{\dot q_j},\]
+    \[\der{}{t}\left(\pder{\Lag}{\dot q_j}\right)-\pder{\Lag}{q_j}
+    =-\pder{\mathcal{F}}{\dot q_j}+Q_j^{\rm ext}.\]
+  </div>
+
+  <p>A lagrangiana continua sendo \(T-V\) com as forças conservativas apenas, e toda a
+  dissipação entra por \(\mathcal{F}\). Para a massa presa à mola,
+  \(\Lag=\tfrac12m\dot x^2-\tfrac12kx^2\) e \(\mathcal{F}=\tfrac12b\dot x^2\), de modo que</p>
+
+  <p>\[m\ddot x+b\dot x+kx=0.\]</p>
+
+  <div data-widget="rayleigh"></div>
+
+  <p>O nome da função fica claro quando se calcula a taxa de perda de energia:</p>
+
+  <p>\[\der{E}{t}=-2\mathcal{F}.\]</p>
+
+  <p>A função de Rayleigh é metade da potência dissipada, e o fator dois é convenção, pela
+  mesma razão do meio em \(T=\tfrac12mv^2\): ele deixa a derivada limpa.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O circuito RLC é o mesmo problema</span>
+    <p>Com a carga \(Q\) como coordenada generalizada, a lagrangiana de um circuito é
+    \(\Lag=\tfrac12L\dot Q^2-Q^2/2C\) e a função de Rayleigh é
+    \(\mathcal{F}=\tfrac12R\dot Q^2\). A equação de Lagrange devolve
+    \(L\ddot Q+R\dot Q+Q/C=V(t)\), e \(2\mathcal{F}=RI^2\) é a potência dissipada por efeito
+    Joule. O dicionário é direto: \(m\leftrightarrow L\), \(b\leftrightarrow R\),
+    \(k\leftrightarrow1/C\), \(x\leftrightarrow Q\), \(\dot x\leftrightarrow I\). Não é
+    analogia pedagógica, são as mesmas equações, e é por isso que ressonância, fator de
+    qualidade e amortecimento crítico significam a mesma coisa nos dois contextos.</p>
+  </div>
+
+  <h3>Atrito que não é linear</h3>
+
+  <p>A função de Rayleigh na forma acima vale para arrasto proporcional à velocidade. Para
+  atrito seco, \(\vet{F}=-\mu N\,\vers{v}\), o módulo da força não depende da rapidez e a
+  função de dissipação seria \(\mathcal{F}=\mu N\left|\vet{v}\right|\), que não é quadrática e
+  tem derivada descontínua em \(\vet{v}=0\). O formalismo ainda funciona com
+  \(Q_j=-\partial\mathcal{F}/\partial\dot q_j\), mas o problema passa a ter regimes separados,
+  com o corpo podendo ficar parado. Para arrasto quadrático,
+  \(\mathcal{F}=\tfrac13c\left|\vet{v}\right|^3\).</p>
+
+  <!-- ================================================== -->
+  <h2 id="s12">12. Exercícios resolvidos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 10.1 · Atwood com polia pesada</span>
+    <p>\(m_1=3{,}00\) kg, \(m_2=2{,}00\) kg, polia de \(R=0{,}120\) m e \(I=0{,}0180\) kg·m².
+    Determine a aceleração e as duas trações.</p>
+    <p><strong>Solução.</strong> A massa equivalente da polia é
+    \(I/R^2=0{,}0180/0{,}0144=1{,}250\) kg, de modo que</p>
+    \[\ddot x=\frac{\left(3{,}00-2{,}00\right)\cdot9{,}81}{3{,}00+2{,}00+1{,}250}
+    =\frac{9{,}81}{6{,}250}=1{,}570\ \text{m/s}^2.\]
+    <p>As trações não aparecem na lagrangiana, e para obtê-las volta-se a Newton em cada
+    massa:</p>
+    \[T_1=m_1\left(g-\ddot x\right)=3{,}00\cdot\left(9{,}81-1{,}570\right)=24{,}72\ \text{N},\]
+    \[T_2=m_2\left(g+\ddot x\right)=2{,}00\cdot\left(9{,}81+1{,}570\right)=22{,}76\ \text{N}.\]
+    <p>A diferença \(T_1-T_2=1{,}96\) N é o que acelera a polia, e confere:
+    \(\left(T_1-T_2\right)R=0{,}2355\) N·m contra
+    \(I\ddot x/R=0{,}0180\cdot1{,}570/0{,}120=0{,}2355\) N·m. Sem inércia na polia as trações
+    seriam iguais, que é o caso elementar dos livros de primeiro ano.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 10.2 · Órbita circular e velocidade de escape</span>
+    <p>Para \(V=-k/r\), determine o raio da órbita circular com momento angular \(\ell\), a
+    energia correspondente, e a velocidade de escape a partir dessa órbita.</p>
+    <p><strong>Solução.</strong> A órbita circular está no mínimo de \(U_{\rm ef}\):</p>
+    \[\der{U_{\rm ef}}{r}=-\frac{\ell^2}{mr^3}+\frac{k}{r^2}=0
+    \quad\Longrightarrow\quad r_c=\frac{\ell^2}{mk}.\]
+    <p>A energia vale</p>
+    \[E_c=U_{\rm ef}\left(r_c\right)
+    =\frac{\ell^2}{2mr_c^2}-\frac{k}{r_c}
+    =\frac{k}{2r_c}-\frac{k}{r_c}=-\frac{k}{2r_c}.\]
+    <p>A energia é negativa e vale metade do potencial, que é o teorema do virial para o
+    potencial de Kepler: \(\med{T}=-\tfrac12\med{V}\). Escapar exige levar \(E\) a zero, isto é
+    fornecer \(k/2r_c\). Como a energia cinética na órbita é \(k/2r_c\), é preciso
+    <em>dobrar</em> a energia cinética, e portanto multiplicar a velocidade por
+    \(\sqrt2\):</p>
+    \[v_{\rm esc}=\sqrt2\,v_{\rm circ}.\]
+    <p>É o fator que explica por que a velocidade de escape da Terra, 11,2 km/s, é
+    \(\sqrt2\) vezes a velocidade orbital rasante, 7,9 km/s.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 10.3 · Elétron em campo magnético</span>
+    <p>Um elétron com energia cinética de 1,00 keV entra perpendicularmente num campo de
+    0,0100 T. Determine o raio de Larmor e a frequência de cíclotron.</p>
+    <p><strong>Solução.</strong> Com \(T=1{,}00\) keV \(=1{,}602\cruz10^{-16}\) J e
+    \(m_e=9{,}109\cruz10^{-31}\) kg,</p>
+    \[v=\sqrt{\frac{2T}{m_e}}
+    =\sqrt{\frac{2\cdot1{,}602\cruz10^{-16}}{9{,}109\cruz10^{-31}}}
+    =1{,}875\cruz10^{7}\ \text{m/s},\]
+    <p>cerca de 6% da velocidade da luz, de modo que a aproximação não relativística ainda
+    serve. Então</p>
+    \[r_L=\frac{m_ev}{eB}
+    =\frac{9{,}109\cruz10^{-31}\cdot1{,}875\cruz10^{7}}
+    {1{,}602\cruz10^{-19}\cdot0{,}0100}=1{,}066\cruz10^{-2}\ \text{m},\]
+    \[\omega_c=\frac{eB}{m_e}=\frac{1{,}602\cruz10^{-19}\cdot0{,}0100}
+    {9{,}109\cruz10^{-31}}=1{,}759\cruz10^{9}\ \text{rad/s},\]
+    <p>ou 280 MHz. Repare que \(\omega_c\) não depende da energia do elétron: todos os
+    elétrons giram na mesma frequência, com raios diferentes. É essa propriedade que faz
+    funcionar tanto o cíclotron quanto a ressonância de spin eletrônico.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 10.4 · Amortecimento crítico</span>
+    <p>Um amortecedor deve levar uma massa de 320 kg ao repouso no menor tempo possível, sem
+    ultrapassar o equilíbrio. A mola tem \(k=2{,}00\cruz10^{4}\) N/m. Determine \(b\) e o
+    tempo característico.</p>
+    <p><strong>Solução.</strong> O amortecimento crítico exige \(\gamma=\omega_0\), isto é
+    \(b/2m=\sqrt{k/m}\), de modo que</p>
+    \[b=2\sqrt{km}=2\sqrt{2{,}00\cruz10^{4}\cdot320}
+    =2\cdot2{,}530\cruz10^{3}=5{,}060\cruz10^{3}\ \text{kg/s}.\]
+    <p>A frequência natural é
+    \(\omega_0=\sqrt{2{,}00\cruz10^{4}/320}=7{,}906\) rad/s, e o tempo característico é
+    \(1/\gamma=1/7{,}906=0{,}1265\) s. A suspensão volta ao equilíbrio em algo como três
+    desses tempos, isto é 0,38 s, o que é o comportamento desejado de um carro de passeio.
+    Amortecedores gastos têm \(b\) menor, o sistema fica subamortecido e o carro passa a
+    balançar depois de cada lombada.</p>
+    <p>Vale conferir pela função de Rayleigh. No instante em que a massa passa pelo equilíbrio
+    com \(\dot x=1{,}00\) m/s, a potência dissipada é \(2\mathcal{F}=b\dot x^2=5{,}06\) kW,
+    toda ela convertida em calor no óleo do amortecedor.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s13">13. Exercícios propostos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Para resolver</span>
+    <ol>
+      <li><b>10.1</b> Máquina de Atwood modificada: a polia tem dois raios, \(R_1\) e \(R_2\),
+      com uma massa pendurada em cada. Escreva a lagrangiana numa única coordenada e obtenha a
+      aceleração angular. Discuta a condição de equilíbrio.</li>
+
+      <li><b>10.2</b> Pêndulo duplo com \(m_1=m_2=m\) e \(\ell_1=\ell_2=\ell\). Linearize para
+      pequenas oscilações e determine as duas frequências normais. Mostre que elas valem
+      \(\omega^2=\left(2\pm\sqrt2\right)g/\ell\) e descreva o movimento de cada modo.</li>
+
+      <li><b>10.3</b> Partícula sobre a superfície interna de um cone de meio-ângulo
+      \(\alpha\), sob gravidade. Escreva a lagrangiana em coordenadas cilíndricas, identifique
+      a coordenada cíclica e obtenha o potencial efetivo. Determine o raio da órbita circular
+      horizontal e a frequência das pequenas oscilações radiais em torno dela.</li>
+
+      <li><b>10.4</b> Pêndulo cônico: mostre que a condição de movimento circular é
+      \(\dot\varphi^2=g/\ell\cos\theta_0\) e determine o período em função de \(\theta_0\).
+      Explique por que não existe solução com \(\theta_0=90^\circ\).</li>
+
+      <li><b>10.5</b> Para o problema de Kepler, demonstre a terceira lei a partir da taxa
+      areal \(\ell/2m\) e da área da elipse. Verifique numericamente com a Terra
+      (\(a=1{,}496\cruz10^{11}\) m) e com Marte (\(a=2{,}279\cruz10^{11}\) m).</li>
+
+      <li><b>10.6</b> Oscilador harmônico isotrópico em três dimensões,
+      \(V=\tfrac12kr^2\). Mostre que o potencial efetivo tem mínimo e que as órbitas ligadas
+      são elipses <em>centradas</em> na origem, e não com foco nela. Explique a diferença em
+      relação a Kepler.</li>
+
+      <li><b>10.7</b> Partícula em campos \(\vet{E}\) e \(\vet{B}\) cruzados e uniformes.
+      Mostre, passando para um referencial que se move com \(\vet{v}_d=\vet{E}\cruz
+      \vet{B}/B^2\), que o movimento se reduz a um giro puro. Discuta por que isso falha se
+      \(E>cB\).</li>
+
+      <li><b>10.8</b> Momento canônico e calibre: para \(\vet{B}=B\vers{z}\) uniforme, escreva
+      \(\vet{A}\) no calibre simétrico e no calibre de Landau, e mostre que \(p_x\) difere nos
+      dois casos enquanto \(m\dot x\) não difere. O que isso diz sobre quais quantidades são
+      observáveis?</li>
+
+      <li><b>10.9</b> Bloco de massa \(m\) deslizando num plano inclinado com atrito cinético
+      \(\mu\). Escreva a força generalizada dissipativa e obtenha a equação de movimento.
+      Explique por que a função de Rayleigh quadrática não serve aqui.</li>
+
+      <li><b>10.10</b> Pêndulo com resistência do ar proporcional à velocidade. Escreva a
+      função de Rayleigh, obtenha a equação de movimento e determine quantas oscilações o
+      pêndulo faz antes de a amplitude cair à metade, para \(\ell=1{,}00\) m e
+      \(c/m\ell^2=0{,}100\) s⁻¹.</li>
+    </ol>
+  </div>
+
+  <nav class="nav-aulas">
+    <a href="aula09.html"><small>Módulo anterior</small>← 9. Equações de Lagrange</a>
+    <span class="em-breve"><small>Em preparação</small>11. Equações de Hamilton</span>
+  </nav>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+<script src="assets/js/widgets.js?v=202611082058"></script>
+</body>
+</html>

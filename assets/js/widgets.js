@@ -6444,8 +6444,8 @@
       var d = t1 - t2, s = Math.sin(d), c = Math.cos(d);
       var den = m1 + m2 * s * s;
       var a1 = (-m2 * L1 * w1 * w1 * s * c
-        - m2 * g0 * Math.sin(t2) * c
         - m2 * L2 * w2 * w2 * s
+        + m2 * g0 * Math.sin(t2) * c
         - (m1 + m2) * g0 * Math.sin(t1)) / (L1 * den);
       var a2 = ((m1 + m2) * (L1 * w1 * w1 * s
         - g0 * Math.sin(t2) + g0 * Math.sin(t1) * c)
@@ -6731,7 +6731,7 @@
         + 'pontos de retorno, periélio e afélio.</p>'
         + '<ul><li>\\(E=U_{\\rm ef,min}\\): um único raio possível, órbita '
         + '<strong>circular</strong>;</li>'
-        + '<li>\\(U_{\\rm ef,min}<E<0\\): dois pontos de retorno, órbita '
+        + '<li>\\(U_{\\rm ef,min}&lt;E&lt;0\\): dois pontos de retorno, órbita '
         + '<strong>elíptica</strong>;</li>'
         + '<li>\\(E=0\\): <strong>parabólica</strong>, no limiar do escape;</li>'
         + '<li>\\(E>0\\): um só ponto de retorno, órbita '

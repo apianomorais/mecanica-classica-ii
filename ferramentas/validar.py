@@ -112,6 +112,24 @@ if os.path.exists(js):
                      'ponha um espaco antes da aspa'
                      % (linha, m.group(0).split("'")[0]))
 
+# 13. nos widgets, um "<" solto dentro de texto. O navegador o le como o
+#     inicio de uma tag e engole tudo ate o proximo ">", inclusive a
+#     formula que viesse depois. Escreva &lt;.
+TAGS_OK = {'p', 'ul', 'ol', 'li', 'strong', 'em', 'br', 'span', 'div',
+           'sup', 'sub', 'table', 'thead', 'tbody', 'tr', 'th', 'td',
+           'b', 'i', 'code', 'small', 'a', 'h3', 'h4',
+           'input', 'button', 'label', 'canvas', 'select', 'option',
+           'img', 'hr', 'figure', 'figcaption'}
+SOLTO = re.compile(r"<(/?)([a-zA-Z]+)")
+if os.path.exists(js):
+    tj = open(js, encoding='utf-8').read()
+    for m in SOLTO.finditer(tj):
+        if m.group(2).lower() in TAGS_OK:
+            continue
+        linha = tj[:m.start()].count('\n') + 1
+        erros.append('widgets.js:%d: "%s" parece um "<" solto em texto; '
+                     'escreva &lt;' % (linha, m.group(0)))
+
 if avisos:
     print('avisos (não reprovam):')
     for v in avisos:
