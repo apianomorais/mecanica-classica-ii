@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 11: Transformação de Legendre e equações de Hamilton | Mecânica Clássica II</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611082112">
+<script src="assets/js/comum.js?v=202611082112"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Mecânica Clássica II <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html">Início</a>
+      <span class="grupo">Corpos rígidos</span>
+      <a href="aula01.html" class="num" title="Módulo 1: Cinemática dos corpos rígidos">1</a>
+      <a href="aula02.html" class="num" title="Módulo 2: Centro de massa e momentos de inércia">2</a>
+      <a href="aula03.html" class="num" title="Módulo 3: Momento angular, torque e equações de movimento">3</a>
+      <a href="aula04.html" class="num" title="Módulo 4: Conservação e equilíbrio estático">4</a>
+      <span class="grupo">Referenciais</span>
+      <a href="aula05.html" class="num" title="Módulo 5: Matrizes de rotação e transformações de coordenadas">5</a>
+      <a href="aula06.html" class="num" title="Módulo 6: Referenciais em rotação e forças fictícias">6</a>
+      <span class="grupo">Variacional</span>
+      <a href="aula07.html" class="num" title="Módulo 7: Cálculo variacional: ação e caminhos extremos">7</a>
+      <a href="aula08.html" class="num" title="Módulo 8: A equação de Euler-Lagrange e o princípio de Hamilton">8</a>
+      <span class="grupo">Lagrange e Hamilton</span>
+      <a href="aula09.html" class="num" title="Módulo 9: Coordenadas generalizadas, vínculos e equações de Lagrange">9</a>
+      <a href="aula10.html" class="num" title="Módulo 10: Aplicações do formalismo lagrangiano">10</a>
+      <a href="aula11.html" class="num ativo" title="Módulo 11: Transformação de Legendre e equações de Hamilton">11</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+<aside class="lateral">
+  <h4>Neste módulo</h4>
+  <ol>
+    <li><a href="#s1">1. Por que trocar de variável</a></li>
+    <li><a href="#s2">2. A transformação de Legendre</a></li>
+    <li><a href="#s3">3. Em várias variáveis</a></li>
+    <li><a href="#s4">4. Da lagrangiana à hamiltoniana</a></li>
+    <li><a href="#s5">5. A receita em três passos</a></li>
+    <li><a href="#s6">6. Quando H é a energia</a></li>
+    <li><a href="#s7">7. Quando H não é a energia</a></li>
+    <li><a href="#s8">8. As equações de Hamilton</a></li>
+    <li><a href="#s9">9. Conservação e coordenadas cíclicas</a></li>
+    <li><a href="#s10">10. O fluxo no espaço de fase</a></li>
+    <li><a href="#s11">11. Lagrange ou Hamilton</a></li>
+    <li><a href="#s12">12. Exercícios resolvidos</a></li>
+    <li><a href="#s13">13. Exercícios propostos</a></li>
+  </ol>
+</aside>
+
+<main class="conteudo">
+
+  <p class="chapeu">Módulo 11 · Formalismo lagrangiano e hamiltoniano</p>
+  <h1>Transformação de Legendre e equações de Hamilton</h1>
+  <p class="subtitulo">A lagrangiana descreve o sistema por posição e velocidade, em \(n\)
+  equações de segunda ordem. Trocando a velocidade pelo momento conjugado, as mesmas leis
+  viram \(2n\) equações de primeira ordem, simétricas entre si. A troca tem nome, tem
+  significado geométrico e custa quase nada.</p>
+
+  <hr class="linha">
+
+  <!-- ================================================== -->
+  <h2 id="s1">1. Por que trocar de variável</h2>
+
+  <p>No formalismo lagrangiano as variáveis independentes são \(q\) e \(\dot q\). Isso é
+  natural: \(\dot q\) é a derivada de \(q\), e a lagrangiana é escrita assim desde o começo.
+  Há, porém, um desconforto na escolha, e ele reaparece em toda conta: \(q\) e \(\dot q\) não
+  são realmente independentes, e a equação de movimento é de segunda ordem.</p>
+
+  <p>A sugestão é trocar \(\dot q\) por outra variável, o momento conjugado</p>
+
+  <p>\[p=\pder{\Lag}{\dot q},\]</p>
+
+  <p>que apareceu no módulo 9 e que já se revelou mais fundamental do que \(\dot q\) em várias
+  ocasiões: é ele que se conserva quando a coordenada é cíclica, é ele que difere do momento
+  mecânico numa carga em campo magnético, e é ele que vira operador na mecânica quântica. A
+  operação matemática que faz essa troca de maneira limpa e reversível chama-se transformação
+  de Legendre.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s2">2. A transformação de Legendre</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Definição · Transformação de Legendre em uma variável</span>
+    <p>Dada uma função convexa \(f(x)\), define-se \(p=df/dx\) e</p>
+    \[g(p)=p\,x-f(x),\]
+    <p>com \(x=x(p)\) obtido invertendo \(p=df/dx\). A propriedade fundamental é</p>
+    \[\der{g}{p}=x.\]
+  </div>
+
+  <p>A demonstração da propriedade é curta e vale fazê-la, porque ela mostra por que a
+  construção funciona. Derivando a definição em \(p\), lembrando que \(x\) depende de \(p\),</p>
+
+  <p>\[\der{g}{p}=x+p\der{x}{p}-\der{f}{x}\der{x}{p}
+  =x+\left(p-\der{f}{x}\right)\der{x}{p}=x,\]</p>
+
+  <p>porque o parêntese é nulo pela própria definição de \(p\). É o mesmo cancelamento que
+  aparecerá adiante ao deduzir as equações de Hamilton, e não é coincidência.</p>
+
+  <div data-widget="legendre"></div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A leitura geométrica</span>
+    <p>Uma curva pode ser descrita de duas maneiras equivalentes: pelos pontos
+    \(\left(x,f\right)\) que a formam, ou pela família de tangentes que a envolve. A
+    transformação de Legendre é a tradução entre as duas. Para cada inclinação \(p\), a
+    tangente correspondente corta o eixo vertical em \(f-px=-g(p)\), de modo que a função
+    \(g\) guarda exatamente a informação de onde está cada tangente.</p>
+    <p>Daí vem a exigência de convexidade: numa curva convexa cada inclinação aparece uma vez
+    só, e a correspondência é um para um. Numa curva com inflexão, duas tangentes diferentes
+    poderiam ter a mesma inclinação, e a transformação perderia informação.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exemplo · A parábola</span>
+    <p>Para \(f=\tfrac12ax^2\) com \(a>0\): \(p=ax\), logo \(x=p/a\), e</p>
+    \[g(p)=p\cdot\frac{p}{a}-\tfrac12a\left(\frac{p}{a}\right)^2
+    =\frac{p^2}{a}-\frac{p^2}{2a}=\frac{p^2}{2a}.\]
+    <p>Verificando, \(dg/dp=p/a=x\). A parábola foi levada noutra parábola, com o coeficiente
+    invertido. Essa é a razão de \(T=\tfrac12m\dot x^2\) virar \(p^2/2m\): é a mesma conta com
+    \(a=m\).</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. Em várias variáveis</h2>
+
+  <p>A generalização é direta. Dada \(f\left(x_1,\dots,x_n\right)\), define-se
+  \(p_i=\partial f/\partial x_i\) e</p>
+
+  <p>\[g\left(p_1,\dots,p_n\right)=\sum_ip_ix_i-f\left(x_1,\dots,x_n\right),
+  \qquad\pder{g}{p_i}=x_i.\]</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Quando a transformação existe</span>
+    <p>É preciso poder inverter o sistema \(p_i=\partial f/\partial x_i\) para obter
+    \(x_i(p)\), e a condição para isso é que a matriz hessiana</p>
+    \[\frac{\partial^2f}{\partial x_i\,\partial x_j}\]
+    <p>seja não singular. Em mecânica essa condição está satisfeita sempre que a energia
+    cinética for uma forma quadrática definida positiva nas velocidades, o que é o caso de
+    todos os sistemas tratados neste curso. Sistemas em que ela falha existem, chamam-se
+    <em>singulares</em>, e são a regra em teorias de calibre, onde o tratamento correto exige
+    a maquinaria de vínculos de Dirac.</p>
+  </div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A mesma operação em termodinâmica</span>
+    <p>Partindo da energia interna \(U(S,V)\), com \(T=\partial U/\partial S\), a
+    transformação de Legendre em \(S\) produz a energia livre de Helmholtz
+    \(F=U-TS\), função de \(T\) e \(V\). Trocando \(V\) por \(P\) obtém-se a entalpia, e
+    trocando as duas, a energia livre de Gibbs. O quadro de Born, que os estudantes de
+    termodinâmica memorizam, é um diagrama de transformações de Legendre, e a razão de haver
+    quatro potenciais é que há duas variáveis para trocar.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. Da lagrangiana à hamiltoniana</h2>
+
+  <p>Aplique a construção à lagrangiana, com \(\dot q_j\) no papel de \(x_i\). O conjugado de
+  \(\dot q_j\) é precisamente o momento, e a transformada recebe nome próprio.</p>
+
+  <div class="destaque">
+    <span class="anuncio">A hamiltoniana</span>
+    \[p_j=\pder{\Lag}{\dot q_j},\qquad
+    H\left(q,p,t\right)=\sum_jp_j\dot q_j-\Lag\left(q,\dot q,t\right),\]
+    com todas as \(\dot q_j\) eliminadas em favor das \(p_j\).
+  </div>
+
+  <p>O detalhe que mais causa erro em prova está nessa última frase. Do lado esquerdo,
+  \(H=H\left(q,p,t\right)\); do lado direito, \(\Lag=\Lag\left(q,\dot q,t\right)\). A
+  expressão só está pronta quando nenhuma velocidade sobrou. Uma hamiltoniana escrita com
+  \(\dot q\) dentro não serve para nada, porque as equações de Hamilton derivam em \(p\).</p>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. A receita em três passos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Como montar H</span>
+    <ol>
+      <li>Escreva \(\Lag=T-V\) nas coordenadas generalizadas e calcule
+      \(p_j=\partial\Lag/\partial\dot q_j\) para cada \(j\).</li>
+      <li>Inverta: resolva o sistema para obter cada \(\dot q_j\) em função de \(q\) e
+      \(p\).</li>
+      <li>Substitua em \(H=\sum_jp_j\dot q_j-\Lag\) e simplifique até não restar nenhuma
+      velocidade.</li>
+    </ol>
+  </div>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Sistema</th><th>\(\Lag\)</th><th>\(p\)</th><th>\(H\)</th></tr></thead>
+    <tbody>
+      <tr><td>partícula livre</td><td>\(\tfrac12m\dot x^2\)</td><td>\(m\dot x\)</td><td>\(\dfrac{p^2}{2m}\)</td></tr>
+      <tr><td>queda</td><td>\(\tfrac12m\dot y^2-mgy\)</td><td>\(m\dot y\)</td><td>\(\dfrac{p^2}{2m}+mgy\)</td></tr>
+      <tr><td>oscilador</td><td>\(\tfrac12m\dot x^2-\tfrac12kx^2\)</td><td>\(m\dot x\)</td><td>\(\dfrac{p^2}{2m}+\tfrac12kx^2\)</td></tr>
+      <tr><td>pêndulo</td><td>\(\tfrac12m\ell^2\dot\theta^2+mg\ell\cos\theta\)</td><td>\(m\ell^2\dot\theta\)</td><td>\(\dfrac{p_\theta^2}{2m\ell^2}-mg\ell\cos\theta\)</td></tr>
+      <tr><td>polares</td><td>\(\tfrac12m\left(\dot r^2+r^2\dot\varphi^2\right)-V(r)\)</td><td>\(m\dot r,\;mr^2\dot\varphi\)</td><td>\(\dfrac{p_r^2}{2m}+\dfrac{p_\varphi^2}{2mr^2}+V(r)\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>A última linha merece atenção. O termo \(p_\varphi^2/2mr^2\) é exatamente a barreira
+  centrífuga que apareceu no módulo 10 como \(\ell^2/2mr^2\), e aqui ela não foi introduzida
+  por nenhum artifício: ela é parte da hamiltoniana desde o início. O potencial efetivo não é
+  um truque, é o que sobra de \(H\) quando \(p_\varphi\) é constante.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. Quando H é a energia</h2>
+
+  <p>As quatro primeiras linhas da tabela têm \(H=T+V\), e isso convida à conclusão apressada
+  de que hamiltoniana é sinônimo de energia. Não é, e vale saber exatamente quando os dois
+  coincidem.</p>
+
+  <div class="destaque">
+    <span class="anuncio">Condições para \(H=E\)</span>
+    <ol>
+      <li>as transformações de coordenadas não dependem explicitamente do tempo;</li>
+      <li>\(T\) é uma forma quadrática nas velocidades,
+      \(T=\tfrac12\sum_{j,k}M_{jk}(q)\,\dot q_j\dot q_k\);</li>
+      <li>\(V\) não depende das velocidades.</li>
+    </ol>
+  </div>
+
+  <p>A demonstração usa o teorema de Euler para funções homogêneas. Se \(T\) é homogênea de
+  grau dois nas velocidades, então</p>
+
+  <p>\[\sum_j\pder{T}{\dot q_j}\dot q_j=2T,\]</p>
+
+  <p>e como \(V\) não contribui para os momentos, \(p_j=\partial T/\partial\dot q_j\). Logo</p>
+
+  <p>\[H=\sum_jp_j\dot q_j-\Lag=2T-\left(T-V\right)=T+V=E.\]</p>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. Quando H não é a energia</h2>
+
+  <p>As duas hipóteses da seção anterior podem falhar, e cada falha produz um caso
+  instrutivo.</p>
+
+  <h3>Potenciais que dependem da velocidade</h3>
+
+  <p>Para a carga em campo eletromagnético, \(\Lag=\tfrac12mv^2-q\phi+q\vet{v}\cdot\vet{A}\),
+  o último termo é <em>linear</em> nas velocidades e não quadrático. O momento canônico é
+  \(\vet{p}=m\vet{v}+q\vet{A}\), e invertendo, \(\vet{v}=\left(\vet{p}-q\vet{A}\right)/m\).
+  Substituindo,</p>
+
+  <div class="destaque">
+    <span class="anuncio">Hamiltoniana de uma carga</span>
+    \[H=\frac{\left|\vet{p}-q\vet{A}\right|^2}{2m}+q\phi.\]
+  </div>
+
+  <p>Aqui \(H\) <em>é</em> a energia, mas expressa de maneira nada trivial em \(\vet{p}\): o
+  termo cinético só reaparece depois de subtrair \(q\vet{A}\). É essa a forma que, pela
+  substituição \(\vet{p}\to-i\hbar\nabla\), produz a equação de Schrödinger de uma partícula
+  carregada.</p>
+
+  <h3>Vínculos que dependem do tempo</h3>
+
+  <p>O caso em que \(H\) e \(E\) realmente se separam é o de um vínculo que se move por conta
+  própria. Uma conta num aro de raio \(R\) que um motor obriga a girar a \(\Omega\) constante
+  é o exemplo canônico.</p>
+
+  <div data-widget="naoconserva"></div>
+
+  <p>Com \(\theta\) medido a partir do fundo, a lagrangiana é</p>
+
+  <p>\[\Lag=\tfrac12mR^2\dot\theta^2+\tfrac12mR^2\Omega^2\sen^2\theta+mgR\cos\theta,\]</p>
+
+  <p>e com \(p_\theta=mR^2\dot\theta\) a hamiltoniana fica</p>
+
+  <p>\[H=\frac{p_\theta^2}{2mR^2}-\tfrac12mR^2\Omega^2\sen^2\theta-mgR\cos\theta,\]</p>
+
+  <p>enquanto a energia verdadeira tem o <strong>sinal oposto</strong> no termo central:</p>
+
+  <p>\[E=T+V=\frac{p_\theta^2}{2mR^2}
+  +\tfrac12mR^2\Omega^2\sen^2\theta-mgR\cos\theta.\]</p>
+
+  <p>O widget acompanha as duas: \(H\) é uma reta horizontal, perfeitamente conservada, e não
+  é a energia; \(E\) oscila, é a energia, e não se conserva. O motor que mantém \(\Omega\)
+  constante é quem fornece e retira energia, e vínculos que dependem do tempo realizam
+  trabalho.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Duas afirmações independentes</span>
+    <p>Confundir as duas é o erro mais comum deste assunto, e a distinção cabe em duas
+    linhas. <strong>\(H\) se conserva</strong> quando \(\partial H/\partial t=0\), isto é,
+    quando o tempo não aparece explicitamente. <strong>\(H\) é a energia</strong> quando as
+    condições da seção 6 valem. Há sistemas em que as duas valem, sistemas em que só uma vale,
+    como a conta no aro, e sistemas em que nenhuma vale.</p>
+  </div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Uma bifurcação de brinde</span>
+    <p>O termo negativo em \(H\) é um potencial centrífugo, e
+    \(U_{\rm ef}=-\tfrac12mR^2\Omega^2\sen^2\theta-mgR\cos\theta\) é o potencial efetivo visto
+    do aro. Derivando, o fundo deixa de ser mínimo quando \(\Omega^2>g/R\), e nasce um
+    equilíbrio novo em \(\cos\theta_0=g/R\Omega^2\). Abaixo do \(\Omega\) crítico a conta
+    oscila em torno do fundo; acima dele, ela oscila em torno de um ângulo que cresce com a
+    rotação. É uma bifurcação, e é o princípio do regulador centrífugo de Watt.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. As equações de Hamilton</h2>
+
+  <p>A dedução é uma conta de diferenciais, e o cancelamento central é o mesmo da seção 2.
+  Como \(H=H\left(q,p,t\right)\),</p>
+
+  <p>\[dH=\sum_j\pder{H}{q_j}dq_j+\sum_j\pder{H}{p_j}dp_j+\pder{H}{t}dt.\]</p>
+
+  <p>Por outro lado, diferenciando a definição \(H=\sum_jp_j\dot q_j-\Lag\),</p>
+
+  <p>\[dH=\sum_j\left(\dot q_j\,dp_j+p_j\,d\dot q_j\right)
+  -\sum_j\left(\pder{\Lag}{q_j}dq_j+\pder{\Lag}{\dot q_j}d\dot q_j\right)
+  -\pder{\Lag}{t}dt.\]</p>
+
+  <p>Os termos em \(d\dot q_j\) se cancelam, porque
+  \(p_j=\partial\Lag/\partial\dot q_j\). Resta</p>
+
+  <p>\[dH=\sum_j\dot q_j\,dp_j-\sum_j\pder{\Lag}{q_j}dq_j-\pder{\Lag}{t}dt,\]</p>
+
+  <p>e agora entram as equações de Lagrange, na forma
+  \(\partial\Lag/\partial q_j=\dot p_j\). Comparando as duas expressões para \(dH\) termo a
+  termo:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Equações canônicas de Hamilton</span>
+    \[\dot q_j=\pder{H}{p_j},\qquad
+    \dot p_j=-\pder{H}{q_j},\qquad
+    \pder{H}{t}=-\pder{\Lag}{t}.\]
+  </div>
+
+  <p>São \(2n\) equações de primeira ordem no lugar de \(n\) de segunda ordem. A contagem de
+  informação é a mesma, e a forma é muito mais simétrica: trocando \(q\) por \(p\) e \(p\) por
+  \(-q\), as duas equações trocam de lugar. Essa simetria, que não existe no formalismo
+  lagrangiano, é o ponto de partida das transformações canônicas e dos parênteses de Poisson,
+  no módulo 12.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Três verificações</span>
+    <p><strong>Partícula livre.</strong> \(H=p^2/2m\), de modo que \(\dot x=p/m\) e
+    \(\dot p=0\): o momento é constante e a posição avança linearmente.</p>
+    <p><strong>Oscilador.</strong> \(H=p^2/2m+\tfrac12kx^2\), de modo que \(\dot x=p/m\) e
+    \(\dot p=-kx\). Derivando a primeira e substituindo a segunda, \(m\ddot x=-kx\).</p>
+    <p><strong>Pêndulo.</strong> \(H=p_\theta^2/2m\ell^2-mg\ell\cos\theta\), de modo que
+    \(\dot\theta=p_\theta/m\ell^2\) e \(\dot p_\theta=-mg\ell\sen\theta\), que combinadas dão
+    \(\ddot\theta+\left(g/\ell\right)\sen\theta=0\).</p>
+    <p>Em todos os casos a primeira equação é apenas a definição de momento lida ao contrário,
+    e a segunda é a lei de força. O formalismo separa as duas coisas, que em Newton vinham
+    misturadas.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. Conservação e coordenadas cíclicas</h2>
+
+  <p>Calcule a derivada total de \(H\) ao longo do movimento, usando as próprias equações
+  canônicas:</p>
+
+  <p>\[\der{H}{t}=\sum_j\left(\pder{H}{q_j}\dot q_j+\pder{H}{p_j}\dot p_j\right)+\pder{H}{t}
+  =\sum_j\left(\pder{H}{q_j}\pder{H}{p_j}
+  -\pder{H}{p_j}\pder{H}{q_j}\right)+\pder{H}{t}.\]</p>
+
+  <p>A soma se cancela termo a termo, e sobra</p>
+
+  <div class="destaque">
+    <span class="anuncio">A derivada da hamiltoniana</span>
+    \[\der{H}{t}=\pder{H}{t}.\]
+  </div>
+
+  <p>Se o tempo não aparece explicitamente em \(H\), ela é constante ao longo do movimento. Da
+  mesma maneira, se uma coordenada \(q_k\) não aparece em \(H\), então \(\dot p_k=0\) e o
+  momento conjugado se conserva. A diferença em relação ao formalismo lagrangiano é que aqui a
+  conservação é imediata: a coordenada cíclica simplesmente <em>não está</em> na hamiltoniana,
+  o momento correspondente é um parâmetro constante, e o problema perde um grau de liberdade
+  de vez.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. O fluxo no espaço de fase</h2>
+
+  <p>O conjunto \(\left(q_1,\dots,q_n,p_1,\dots,p_n\right)\) é o <strong>espaço de
+  fase</strong>, de dimensão \(2n\). Um ponto dele determina completamente o estado do
+  sistema, e as equações de Hamilton dizem para onde esse ponto se move:</p>
+
+  <p>\[\vet{v}=\left(\pder{H}{p},\;-\pder{H}{q}\right).\]</p>
+
+  <p>É um campo de velocidades, e o estado escorre ao longo dele como uma partícula de fluido.
+  Por esse ponto passa uma e só uma trajetória, porque o campo é unívoco: duas órbitas no
+  espaço de fase <strong>nunca se cruzam</strong>, ao contrário do que acontece no espaço de
+  configuração.</p>
+
+  <div data-widget="fluxoh"></div>
+
+  <p>Quando \(H\) se conserva, a trajetória fica presa à curva de nível de \(H\) em que
+  começou, e órbita e curva de nível passam a ser a mesma coisa. O campo de velocidades é
+  sempre tangente a essas curvas, e há uma razão: o vetor
+  \(\left(\partial H/\partial p,-\partial H/\partial q\right)\) é o gradiente de \(H\) girado
+  de 90°, e portanto perpendicular a ele.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Sistema</th><th>Retrato de fase</th><th>Equilíbrios</th></tr></thead>
+    <tbody>
+      <tr><td>oscilador</td><td>elipses concêntricas</td><td>um centro na origem</td></tr>
+      <tr><td>queda livre</td><td>parábolas abertas</td><td>nenhum</td></tr>
+      <tr><td>pêndulo</td><td>libração dentro, rotação fora, separatriz entre as duas</td><td>centro em \(q=0\), sela em \(q=\pi\)</td></tr>
+      <tr><td>poço duplo</td><td>dois olhos e um oito</td><td>dois centros e uma sela</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Mínimos de \(H\) produzem <strong>centros</strong>, com órbitas fechadas ao redor; pontos
+  de sela produzem equilíbrios instáveis, com trajetórias que se aproximam por uma direção e
+  se afastam por outra. A separatriz do pêndulo é a órbita que leva tempo infinito para chegar
+  ao ponto mais alto, e é ela que separa o pêndulo que oscila do pêndulo que dá voltas.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. Lagrange ou Hamilton</h2>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th></th><th>Lagrange</th><th>Hamilton</th></tr></thead>
+    <tbody>
+      <tr><td>variáveis</td><td>\(\left(q,\dot q\right)\)</td><td>\(\left(q,p\right)\)</td></tr>
+      <tr><td>função</td><td>\(\Lag=T-V\)</td><td>\(H=\sum p\dot q-\Lag\)</td></tr>
+      <tr><td>equações</td><td>\(n\) de segunda ordem</td><td>\(2n\) de primeira ordem</td></tr>
+      <tr><td>espaço</td><td>configuração, \(n\) dimensões</td><td>fase, \(2n\) dimensões</td></tr>
+      <tr><td>simetria \(q\leftrightarrow p\)</td><td>não existe</td><td>quase perfeita</td></tr>
+      <tr><td>melhor para</td><td>montar as equações de um sistema concreto</td><td>estrutura, conservação, métodos gerais</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Para resolver um problema de prova, o caminho curto costuma ser Lagrange: monta-se
+  \(T-V\), derivam-se duas vezes e pronto. O formalismo hamiltoniano raramente encurta a conta
+  de um problema específico, e às vezes a alonga, porque exige inverter os momentos. O que ele
+  oferece é outra coisa: estrutura.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O que vem depois</span>
+    <p>Da simetria entre \(q\) e \(p\) nascem as <strong>transformações canônicas</strong>,
+    mudanças de variável que preservam a forma das equações e que permitem escolher
+    coordenadas em que o problema fica trivial. Daí nascem os <strong>parênteses de
+    Poisson</strong>, que empacotam toda a dinâmica numa operação algébrica e que, substituídos
+    por comutadores, viram a mecânica quântica. Daí nasce o <strong>teorema de Liouville</strong>,
+    que afirma que o fluxo preserva volume no espaço de fase e que é o alicerce da mecânica
+    estatística. Nada disso é visível do lado lagrangiano, e tudo isso é o módulo 12.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s12">12. Exercícios resolvidos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 11.1 · Transformada de uma potência</span>
+    <p>Calcule a transformada de Legendre de \(f(x)=x^4/4\) e verifique a propriedade
+    \(dg/dp=x\).</p>
+    <p><strong>Solução.</strong> \(p=df/dx=x^3\), logo \(x=p^{1/3}\), e</p>
+    \[g(p)=p\cdot p^{1/3}-\frac{\left(p^{1/3}\right)^4}{4}
+    =p^{4/3}-\frac{p^{4/3}}{4}=\frac{3}{4}p^{4/3}.\]
+    <p>Verificando, \(dg/dp=\tfrac34\cdot\tfrac43p^{1/3}=p^{1/3}=x\). Repare no par de
+    expoentes: \(f\sim x^4\) com \(g\sim p^{4/3}\), e \(1/4+3/4=1\). Em geral, \(x^a/a\)
+    transforma-se em \(p^b/b\) com \(1/a+1/b=1\), que é a mesma relação de conjugação da
+    desigualdade de Young e dos espaços \(L^p\).</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 11.2 · Hamiltoniana do pêndulo duplo</span>
+    <p>Monte \(H\) para o pêndulo duplo com \(m_1=m_2=m\) e \(\ell_1=\ell_2=\ell\).</p>
+    <p><strong>Solução.</strong> Do módulo 10, com essas igualdades,</p>
+    \[\Lag=m\ell^2\dot\theta_1^2+\tfrac12m\ell^2\dot\theta_2^2
+    +m\ell^2\dot\theta_1\dot\theta_2\cos\Delta
+    +2mg\ell\cos\theta_1+mg\ell\cos\theta_2,\]
+    <p>com \(\Delta=\theta_1-\theta_2\). Os momentos são</p>
+    \[p_1=2m\ell^2\dot\theta_1+m\ell^2\dot\theta_2\cos\Delta,\qquad
+    p_2=m\ell^2\dot\theta_2+m\ell^2\dot\theta_1\cos\Delta.\]
+    <p>Este é o ponto em que o problema fica desagradável: é preciso inverter um sistema
+    \(2\times2\) cujos coeficientes dependem de \(\Delta\). O determinante vale
+    \(m^2\ell^4\left(2-\cos^2\Delta\right)\), e resolvendo,</p>
+    \[\dot\theta_1=\frac{p_1-p_2\cos\Delta}{m\ell^2\left(2-\cos^2\Delta\right)},\qquad
+    \dot\theta_2=\frac{2p_2-p_1\cos\Delta}{m\ell^2\left(2-\cos^2\Delta\right)}.\]
+    <p>Substituindo em \(H=\sum p\dot\theta-\Lag\) e usando que \(T\) é quadrática,
+    \(H=T+V\) com \(T\) escrita nos momentos:</p>
+    \[H=\frac{p_1^2+2p_2^2-2p_1p_2\cos\Delta}
+    {2m\ell^2\left(2-\cos^2\Delta\right)}
+    -2mg\ell\cos\theta_1-mg\ell\cos\theta_2.\]
+    <p>Vale a lição metodológica: aqui o formalismo hamiltoniano <em>custou</em> trabalho em
+    vez de poupá-lo, porque a inversão dos momentos foi penosa. Para montar as equações deste
+    sistema, Lagrange é o caminho mais curto. Hamilton compensa quando o que se quer é a
+    estrutura do espaço de fase, por exemplo para estudar o caos que o módulo 10 exibiu.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 11.3 · Hamiltoniana em esféricas</span>
+    <p>Obtenha \(H\) para uma partícula em potencial central \(V(r)\), em coordenadas
+    esféricas.</p>
+    <p><strong>Solução.</strong> Com
+    \(T=\tfrac12m\left(\dot r^2+r^2\dot\theta^2+r^2\sen^2\theta\,\dot\varphi^2\right)\),</p>
+    \[p_r=m\dot r,\qquad p_\theta=mr^2\dot\theta,\qquad
+    p_\varphi=mr^2\sen^2\theta\,\dot\varphi.\]
+    <p>A inversão é imediata porque a matriz é diagonal, e como \(T\) é quadrática,
+    \(H=T+V\):</p>
+    \[H=\frac{p_r^2}{2m}+\frac{p_\theta^2}{2mr^2}
+    +\frac{p_\varphi^2}{2mr^2\sen^2\theta}+V(r).\]
+    <p>Duas coordenadas são cíclicas no sentido útil: \(\varphi\) não aparece, de modo que
+    \(p_\varphi\) é constante; e escolhendo o plano do movimento como \(\theta=\pi/2\), com
+    \(p_\theta=0\), sobra</p>
+    \[H=\frac{p_r^2}{2m}+\frac{p_\varphi^2}{2mr^2}+V(r),\]
+    <p>que é o problema unidimensional do potencial efetivo, reencontrado sem nenhum passo
+    extra. Esta mesma expressão, com \(p\to-i\hbar\nabla\), é o hamiltoniano do átomo de
+    hidrogênio, com \(p_\varphi^2\) virando o autovalor \(\hbar^2m_\ell^2\).</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 11.4 · A conta no aro, numericamente</span>
+    <p>Para \(R=1{,}00\) m, \(m=1{,}00\) kg e \(\Omega=4{,}00\) rad/s, determine o ângulo de
+    equilíbrio fora do fundo e a frequência das pequenas oscilações em torno dele.</p>
+    <p><strong>Solução.</strong> O \(\Omega\) crítico é
+    \(\sqrt{g/R}=\sqrt{9{,}81}=3{,}13\) rad/s, e \(4{,}00>3{,}13\), de modo que o equilíbrio
+    existe:</p>
+    \[\cos\theta_0=\frac{g}{R\Omega^2}=\frac{9{,}81}{16{,}0}=0{,}613
+    \quad\Longrightarrow\quad\theta_0=52{,}2^\circ.\]
+    <p>Para as pequenas oscilações, derive duas vezes o potencial efetivo
+    \(U_{\rm ef}=-\tfrac12mR^2\Omega^2\sen^2\theta-mgR\cos\theta\):</p>
+    \[\dder{U_{\rm ef}}{\theta}\bigg|_{\theta_0}
+    =mR^2\Omega^2\left(\sen^2\theta_0-\cos^2\theta_0\right)+mgR\cos\theta_0
+    =mR^2\Omega^2\sen^2\theta_0,\]
+    <p>onde a última igualdade usou \(\cos\theta_0=g/R\Omega^2\). Como a massa efetiva é
+    \(mR^2\),</p>
+    \[\omega^2=\Omega^2\sen^2\theta_0=16{,}0\cdot\left(0{,}790\right)^2=9{,}99\ \text{s}^{-2},
+    \qquad\omega=3{,}16\ \text{rad/s},\]
+    <p>com período de 1,99 s. Note que \(\omega\to0\) quando \(\Omega\) se aproxima do valor
+    crítico pela direita: perto da bifurcação o sistema fica mole, e o tempo de resposta
+    diverge. Esse amolecimento é um sintoma universal de transições desse tipo, e aparece
+    também em transições de fase.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s13">13. Exercícios propostos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Para resolver</span>
+    <ol>
+      <li><b>11.1</b> Calcule a transformada de Legendre de \(f(x)=e^x\) e verifique que
+      \(g(p)=p\ln p-p\). Mostre que aplicar a transformação a \(g\) devolve \(f\).</li>
+
+      <li><b>11.2</b> Obtenha a hamiltoniana de uma partícula em campo gravitacional uniforme
+      e resolva as equações canônicas. Compare o trabalho com o da via lagrangiana.</li>
+
+      <li><b>11.3</b> Para a carga em campo eletromagnético, mostre explicitamente que
+      \(H=\left|\vet{p}-q\vet{A}\right|^2/2m+q\phi\) é igual a \(T+q\phi\), e explique por que
+      o termo \(q\vet{v}\cdot\vet{A}\) desaparece de \(H\) apesar de estar em \(\Lag\).</li>
+
+      <li><b>11.4</b> Oscilador anarmônico, \(H=p^2/2m+\tfrac12kx^2+\tfrac14\beta x^4\).
+      Escreva as equações canônicas e esboce o retrato de fase. O período depende da
+      amplitude? Justifique sem resolver.</li>
+
+      <li><b>11.5</b> Dois osciladores acoplados,
+      \(\Lag=\tfrac12m\left(\dot x_1^2+\dot x_2^2\right)
+      -\tfrac12k\left(x_1^2+x_2^2\right)-\tfrac12\kappa\left(x_1-x_2\right)^2\).
+      Obtenha \(H\), passe às coordenadas normais \(x_\pm=\left(x_1\pm x_2\right)/\sqrt2\) e
+      mostre que \(H\) se separa em duas parcelas independentes.</li>
+
+      <li><b>11.6</b> Mostre, a partir das equações canônicas, que o campo de velocidades no
+      espaço de fase tem divergência nula. Que consequência isso tem para o volume de uma
+      região que evolui com o fluxo?</li>
+
+      <li><b>11.7</b> Átomo de hidrogênio clássico: com \(H=p_r^2/2m+p_\varphi^2/2mr^2-ke^2/r\),
+      determine o raio da órbita circular em função de \(p_\varphi\) e a energia
+      correspondente. Impondo \(p_\varphi=n\hbar\), recupere os níveis de Bohr.</li>
+
+      <li><b>11.8</b> Para a conta no aro girante, trace \(U_{\rm ef}(\theta)\) para
+      \(\Omega\) abaixo e acima do valor crítico, e identifique no gráfico a mudança de
+      natureza do ponto \(\theta=0\).</li>
+
+      <li><b>11.9</b> Dê um exemplo de sistema em que \(H\) é a energia mas não se conserva, e
+      outro em que \(H\) se conserva mas não é a energia. Justifique cada um pelas condições
+      das seções 6 e 7.</li>
+
+      <li><b>11.10</b> Pêndulo com ponto de suspensão em movimento horizontal imposto,
+      \(x_s=A\cos\Omega t\). Monte \(\Lag\), obtenha \(H\) e discuta se cada uma das duas
+      afirmações, conservação e identidade com a energia, vale neste caso.</li>
+    </ol>
+  </div>
+
+  <nav class="nav-aulas">
+    <a href="aula10.html"><small>Módulo anterior</small>← 10. Aplicações de Lagrange</a>
+    <span class="em-breve"><small>Em preparação</small>12. Liouville</span>
+  </nav>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+<script src="assets/js/widgets.js?v=202611082112"></script>
+</body>
+</html>

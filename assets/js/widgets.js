@@ -7059,6 +7059,564 @@
     registrarRedesenho(desenhar);
   };
 
+  /* =================================================================
+     41. A transformação de Legendre, geometricamente
+     Trocar a variável independente pela inclinação da tangente. O
+     widget mostra que g(p) é menos o corte da tangente no eixo
+     vertical, e que a transformação é involutiva.
+     ================================================================= */
+  REGISTRO.legendre = function (raiz) {
+    var FUNS = {
+      quad: {
+        n: 'f = x²/2', f: function (x) { return x * x / 2; },
+        d: function (x) { return x; }, inv: function (p) { return p; },
+        g: 'g(p) = p²/2', obs: 'a parábola é levada noutra parábola'
+      },
+      quarta: {
+        n: 'f = x⁴/4', f: function (x) { return Math.pow(x, 4) / 4; },
+        d: function (x) { return Math.pow(x, 3); },
+        inv: function (p) { return Math.cbrt(p); },
+        g: 'g(p) = 3p^{4/3}/4', obs: 'expoentes conjugados: 4 e 4/3'
+      },
+      exp: {
+        n: 'f = eˣ', f: function (x) { return Math.exp(x); },
+        d: function (x) { return Math.exp(x); },
+        inv: function (p) { return Math.log(Math.max(p, 1e-9)); },
+        g: 'g(p) = p ln p − p', obs: 'a exponencial vira o logaritmo'
+      }
+    };
+    var est = { k: 'quad', x: 1.1 };
+
+    var corpo = moldura(raiz, 'A transformação de Legendre: de pontos para tangentes');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, Object.keys(FUNS).map(function (k) {
+      return { rot: FUNS[k].n, v: k };
+    }), 0, function (v) { est.k = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'ponto escolhido x', -1.8, 1.8, 0.02, 1.1,
+      function (v) { est.x = v; desenhar(); },
+      function (v) { return F.fmt(v, 2); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'inclinação p = df/dx', k: 'p' },
+      { rot: 'f(x)', k: 'f' },
+      { rot: 'g(p) = p x − f(x)', k: 'g' },
+      { rot: 'corte da tangente em x = 0', k: 'corte' },
+      { rot: 'dg/dp (devolve x)', k: 'dg' },
+      { rot: 'a transformada', k: 'form' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function desenhar() {
+      var C = FUNS[est.k];
+      var x = est.k === 'exp' ? Math.max(est.x, -1.2) : est.x;
+      var p = C.d(x), f = C.f(x), g = p * x - f;
+
+      var alt = 320;
+      var pp = G.preparar(cv, alt), ct = pp.ct, Lp = pp.L;
+      ct.clearRect(0, 0, Lp, alt);
+      var meia = Lp * 0.5;
+
+      var ymax = est.k === 'exp' ? 5 : 2.2, ymin = est.k === 'exp' ? -1.5 : -2.2;
+      var g1 = G.eixos(cv, {
+        altura: alt, xmin: -1.9, xmax: 1.9, ymin: ymin, ymax: ymax,
+        rotX: 'x', rotY: 'f(x)',
+        marcasX: G.marcasLineares(-1.9, 1.9, 6, 1),
+        formataY: function (v) { return F.fmt(v, 1); },
+        margem: { e: 52, d: Lp - meia + 10, c: 16, b: 40 }
+      });
+      G.curva(g1, function () { return 0; }, G.COR.grade, 1.4);
+      G.curva(g1, C.f, G.COR.mestra, 2.8);
+      /* a tangente no ponto, e o seu corte no eixo vertical */
+      G.curva(g1, function (u) { return f + p * (u - x); }, G.COR.vinho, 2);
+      var c1 = g1.ct;
+      c1.beginPath(); c1.arc(g1.X(x), g1.Y(f), 6, 0, 2 * Math.PI);
+      c1.fillStyle = G.COR.mestra; c1.fill();
+      var corte = f - p * x;
+      if (corte > ymin && corte < ymax) {
+        c1.beginPath(); c1.arc(g1.X(0), g1.Y(corte), 6, 0, 2 * Math.PI);
+        c1.fillStyle = G.COR.bronze; c1.fill();
+        c1.beginPath();
+        c1.moveTo(g1.X(0), g1.Y(0)); c1.lineTo(g1.X(0), g1.Y(corte));
+        c1.strokeStyle = G.COR.bronze; c1.lineWidth = 3; c1.stroke();
+        rotulo(c1, '−g(p)', g1.X(0) - 10, g1.Y(corte / 2), G.COR.bronze, 'right');
+      }
+      rotulo(c1, 'tangente de inclinação p', g1.x1 - 6, g1.y0 + 12, G.COR.vinho, 'right');
+
+      /* painel 2: a transformada g(p) */
+      var pmin = -2, pmax = 2;
+      if (est.k === 'exp') { pmin = 0.02; pmax = 5; }
+      if (est.k === 'quarta') { pmin = -5; pmax = 5; }
+      function gg(q) {
+        var xx = C.inv(q);
+        return q * xx - C.f(xx);
+      }
+      var gmin = 0, gmax = 0;
+      for (var i = 0; i <= 60; i++) {
+        var q = pmin + (pmax - pmin) * i / 60;
+        gmax = Math.max(gmax, gg(q)); gmin = Math.min(gmin, gg(q));
+      }
+      var g2 = G.eixos(cv, {
+        altura: alt, xmin: pmin, xmax: pmax,
+        ymin: gmin - 0.2, ymax: gmax * 1.1 + 0.2,
+        rotX: 'p', rotY: 'g(p)',
+        marcasX: G.marcasLineares(pmin, pmax, 5, 1),
+        formataY: function (v) { return F.fmt(v, 1); },
+        limpar: false, margem: { e: meia + 56, d: 16, c: 16, b: 40 }
+      });
+      G.curva(g2, function () { return 0; }, G.COR.grade, 1.4);
+      G.curva(g2, gg, G.COR.bronze, 2.8);
+      var c2 = g2.ct;
+      if (p > pmin && p < pmax) {
+        c2.beginPath(); c2.arc(g2.X(p), g2.Y(g), 6, 0, 2 * Math.PI);
+        c2.fillStyle = G.COR.bronze; c2.fill();
+        G.vertical(g2, p, G.COR.suave, '', true);
+      }
+
+      var h = 1e-4;
+      mostrar({
+        p: F.fmt(p, 4),
+        f: F.fmt(f, 4),
+        g: F.fmt(g, 4),
+        corte: F.fmt(corte, 4),
+        dg: F.fmt((gg(p + h) - gg(p - h)) / (2 * h), 4) + ' contra x = ' + F.fmt(x, 2),
+        form: C.g
+      });
+
+      nota.innerHTML =
+        '<p>A transformação de Legendre troca a variável independente de \\(x\\) pela '
+        + '<strong>inclinação</strong> \\(p=df/dx\\). A definição é</p>'
+        + '\\[g(p)=p\\,x-f(x),\\qquad\\text{com }x=x(p)\\text{ obtido invertendo }'
+        + 'p=\\der{f}{x}.\\]'
+        + '<p>O painel da esquerda mostra o significado geométrico. A reta tangente no ponto '
+        + 'escolhido tem equação \\(y=f(x)+p\\left(u-x\\right)\\), e o seu corte no eixo '
+        + 'vertical vale \\(f(x)-px=-g(p)\\). Em outras palavras: \\(g(p)\\) é menos o '
+        + 'intercepto da tangente de inclinação \\(p\\). O segmento em bronze mede '
+        + 'exatamente isso.</p>'
+        + '<p>As duas descrições guardam a mesma informação. Especificar a curva ponto a '
+        + 'ponto, pelos pares \\(\\left(x,f\\right)\\), ou especificá-la como a envoltória de '
+        + 'suas tangentes, pelos pares \\(\\left(p,g\\right)\\), são maneiras equivalentes de '
+        + 'dizer a mesma coisa. Por isso nada se perde na troca, e o cartão de \\(dg/dp\\) '
+        + 'confirma: derivar a transformada em \\(p\\) devolve \\(x\\).</p>'
+        + '<p>A transformação é <strong>involutiva</strong>: aplicada duas vezes, volta ao '
+        + 'ponto de partida. Ela existe sempre que \\(f\\) for convexa, porque aí '
+        + '\\(p=df/dx\\) é monótona e pode ser invertida. Em várias variáveis, a condição é '
+        + 'que a matriz hessiana \\(\\partial^2f/\\partial x_i\\partial x_j\\) seja '
+        + 'invertível, o que em mecânica está garantido quando a energia cinética é uma forma '
+        + 'quadrática definida positiva nas velocidades.</p>'
+        + '<p>Troque de função e observe os pares conjugados: a parábola vai noutra parábola, '
+        + '\\(x^4/4\\) vai em \\(3p^{4/3}/4\\), e a exponencial vai no logaritmo. ' + C.obs
+        + '. Em termodinâmica a mesma operação leva a energia interna à energia livre de '
+        + 'Helmholtz, trocando \\(S\\) por \\(T\\); em mecânica ela leva a lagrangiana à '
+        + 'hamiltoniana, trocando \\(\\dot q\\) por \\(p\\).</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     42. O fluxo no espaço de fase
+     As equações de Hamilton são um campo de velocidades em (q, p). O
+     widget desenha o campo, integra uma trajetória e mostra as curvas
+     de nível de H, que são as próprias órbitas.
+     ================================================================= */
+  REGISTRO.fluxoh = function (raiz) {
+    var SIS = {
+      osc: {
+        n: 'oscilador', H: function (q, p) { return p * p / 2 + q * q / 2; },
+        dq: function (q, p) { return p; }, dp: function (q) { return -q; },
+        qmax: 2.4, pmax: 2.4, exp: 'H = p²/2 + q²/2'
+      },
+      pend: {
+        n: 'pêndulo', H: function (q, p) { return p * p / 2 + (1 - Math.cos(q)); },
+        dq: function (q, p) { return p; }, dp: function (q) { return -Math.sin(q); },
+        qmax: 7, pmax: 3.2, sep: 2, exp: 'H = p²/2 + (1 − cos q)'
+      },
+      queda: {
+        n: 'queda livre', H: function (q, p) { return p * p / 2 + q; },
+        dq: function (q, p) { return p; }, dp: function () { return -1; },
+        qmax: 3, pmax: 2.6, exp: 'H = p²/2 + q'
+      },
+      poco: {
+        n: 'poço duplo', H: function (q, p) { return p * p / 2 - q * q / 2 + q * q * q * q / 4; },
+        dq: function (q, p) { return p; }, dp: function (q) { return q - q * q * q; },
+        qmax: 2, pmax: 1.6, sep: 0, exp: 'H = p²/2 − q²/2 + q⁴/4'
+      }
+    };
+    var est = { k: 'pend', q0: 0, p0: 1.6, t: 0, rodando: true };
+    var traj = [], s = null;
+
+    var corpo = moldura(raiz, 'As equações de Hamilton são um campo de velocidades em (q, p)');
+
+    var c0 = el('div', { class: 'controles' });
+    corpo.appendChild(c0);
+    opcoes(c0, Object.keys(SIS).map(function (k) {
+      return { rot: SIS[k].n, v: k };
+    }), 1, function (v) { est.k = v; reiniciar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'q inicial', -3, 3, 0.05, 0,
+      function (v) { est.q0 = v; reiniciar(); },
+      function (v) { return F.fmt(v, 2); });
+    deslizante(ctr, 'p inicial', -3, 3, 0.05, 1.6,
+      function (v) { est.p0 = v; reiniciar(); },
+      function (v) { return F.fmt(v, 2); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'hamiltoniana', k: 'exp' },
+      { rot: 'q̇ = ∂H/∂p', k: 'dq' },
+      { rot: 'ṗ = −∂H/∂q', k: 'dp' },
+      { rot: 'H agora', k: 'H' },
+      { rot: 'H no início', k: 'H0' },
+      { rot: 'regime', k: 'reg' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function reiniciar() { s = [est.q0, est.p0]; traj = []; est.t = 0; est.H0 = SIS[est.k].H(s[0], s[1]); }
+    reiniciar();
+
+    function passo(y, h) {
+      var C = SIS[est.k];
+      function d(z) { return [C.dq(z[0], z[1]), C.dp(z[0], z[1])]; }
+      function soma(a, b, f) { return [a[0] + f * b[0], a[1] + f * b[1]]; }
+      var k1 = d(y), k2 = d(soma(y, k1, h / 2));
+      var k3 = d(soma(y, k2, h / 2)), k4 = d(soma(y, k3, h));
+      return [y[0] + h / 6 * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]),
+              y[1] + h / 6 * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1])];
+    }
+
+    function desenhar() {
+      var C = SIS[est.k];
+      var gr = G.eixos(cv, {
+        altura: 340, xmin: -C.qmax, xmax: C.qmax, ymin: -C.pmax, ymax: C.pmax,
+        rotX: 'coordenada q', rotY: 'momento p',
+        marcasX: G.marcasLineares(-C.qmax, C.qmax, 6, 1),
+        formataY: function (v) { return F.fmt(v, 1); }
+      });
+      var ct = gr.ct;
+
+      /* curvas de nível de H, que são as próprias órbitas */
+      function nivel(alvo, cor, esp) {
+        ct.beginPath();
+        var primeiro = true, i;
+        for (i = 0; i <= 320; i++) {
+          var q = -C.qmax + 2 * C.qmax * i / 320;
+          var pot = C.H(q, 0);
+          if (alvo < pot) { primeiro = true; continue; }
+          var pv = Math.sqrt(2 * (alvo - pot));
+          if (!isFinite(pv) || pv > C.pmax) { primeiro = true; continue; }
+          if (primeiro) { ct.moveTo(gr.X(q), gr.Y(pv)); primeiro = false; }
+          else ct.lineTo(gr.X(q), gr.Y(pv));
+        }
+        primeiro = true;
+        for (i = 320; i >= 0; i--) {
+          var q2 = -C.qmax + 2 * C.qmax * i / 320;
+          var pot2 = C.H(q2, 0);
+          if (alvo < pot2) { primeiro = true; continue; }
+          var pv2 = -Math.sqrt(2 * (alvo - pot2));
+          if (!isFinite(pv2) || pv2 < -C.pmax) { primeiro = true; continue; }
+          if (primeiro) { ct.moveTo(gr.X(q2), gr.Y(pv2)); primeiro = false; }
+          else ct.lineTo(gr.X(q2), gr.Y(pv2));
+        }
+        ct.strokeStyle = cor; ct.lineWidth = esp; ct.stroke();
+      }
+      var niveis = 11;
+      for (var n = 0; n < niveis; n++) {
+        nivel(C.H(0, 0) + (n + 0.5) / niveis * C.H(0, C.pmax) * 1.15,
+          'rgba(123,184,171,.55)', 1.2);
+      }
+      /* a separatriz, onde houver: é ela que divide os regimes */
+      if (C.sep !== undefined) {
+        nivel(C.sep - 1e-9, G.COR.bronze, 2.2);
+        rotulo(ct, 'separatriz', gr.x0 + 8, gr.y0 + 14, G.COR.bronze, 'left');
+      }
+
+      /* o campo de velocidades */
+      var nx = 13, ny = 9;
+      for (var a = 0; a < nx; a++) {
+        for (var b = 0; b < ny; b++) {
+          var q3 = -C.qmax + 2 * C.qmax * (a + 0.5) / nx;
+          var p3 = -C.pmax + 2 * C.pmax * (b + 0.5) / ny;
+          var vq = C.dq(q3, p3), vp = C.dp(q3, p3);
+          var mod = Math.hypot(vq, vp) || 1;
+          var L = 13;
+          seta(ct, gr.X(q3), gr.Y(p3),
+            gr.X(q3) + vq / mod * L, gr.Y(p3) - vp / mod * L,
+            'rgba(27,31,36,.33)', 1.2);
+        }
+      }
+
+      /* a trajetória integrada */
+      ct.beginPath();
+      traj.forEach(function (z, i) {
+        (i ? ct.lineTo : ct.moveTo).call(ct, gr.X(z[0]), gr.Y(z[1]));
+      });
+      ct.strokeStyle = G.COR.vinho; ct.lineWidth = 2.6; ct.stroke();
+      ct.beginPath(); ct.arc(gr.X(s[0]), gr.Y(s[1]), 7, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.vinho; ct.fill();
+      ct.strokeStyle = '#fff'; ct.lineWidth = 2; ct.stroke();
+
+      var reg = '—';
+      if (est.k === 'pend') {
+        reg = est.H0 < 2 ? 'oscila (libração)'
+          : (est.H0 > 2 ? 'dá voltas (rotação)' : 'separatriz');
+      } else if (est.k === 'poco') {
+        reg = est.H0 < 0 ? 'preso num dos poços' : 'passeia pelos dois';
+      } else if (est.k === 'osc') {
+        reg = 'elipse fechada';
+      } else {
+        reg = 'parábola aberta';
+      }
+
+      mostrar({
+        exp: C.exp,
+        dq: F.fmt(C.dq(s[0], s[1]), 4),
+        dp: F.fmt(C.dp(s[0], s[1]), 4),
+        H: F.fmt(C.H(s[0], s[1]), 6),
+        H0: F.fmt(est.H0, 6),
+        reg: reg
+      });
+
+      nota.innerHTML =
+        '<p>A transformação de Legendre troca \\(n\\) equações de segunda ordem por '
+        + '\\(2n\\) equações de <strong>primeira</strong> ordem:</p>'
+        + '\\[\\dot q_j=\\pder{H}{p_j},\\qquad\\dot p_j=-\\pder{H}{q_j}.\\]'
+        + '<p>A leitura geométrica é a que o desenho mostra. Em cada ponto do espaço de fase, '
+        + 'as duas derivadas fornecem um <strong>vetor velocidade</strong>, e o estado do '
+        + 'sistema escorre ao longo dele. As setinhas cinzas são esse campo; a curva em vinho '
+        + 'é a trajetória que ele produz a partir do ponto inicial escolhido.</p>'
+        + '<p>As curvas verde-claras são as linhas de nível de \\(H\\). Quando \\(H\\) não '
+        + 'depende do tempo, ela é conservada, e portanto a trajetória nunca sai da curva de '
+        + 'nível em que começou: no espaço de fase, <em>órbita e curva de nível são a mesma '
+        + 'coisa</em>. Repare que o campo de velocidades é sempre tangente a essas curvas, e '
+        + 'isso não é coincidência: o vetor \\(\\left(\\partial H/\\partial p,-\\partial '
+        + 'H/\\partial q\\right)\\) é o gradiente de \\(H\\) girado de 90°, e portanto '
+        + 'perpendicular a ele.</p>'
+        + '<p>Cada sistema tem um retrato próprio. O oscilador dá elipses concêntricas, todas '
+        + 'percorridas no mesmo período. A queda livre dá parábolas abertas. O pêndulo tem '
+        + 'duas regiões separadas por uma curva especial, a <strong>separatriz</strong>: '
+        + 'dentro dela o pêndulo oscila, fora dela ele dá voltas completas, e sobre ela ele '
+        + 'leva tempo infinito para chegar ao ponto mais alto. O poço duplo tem dois centros '
+        + 'e um ponto de sela entre eles, e a energia decide se a partícula fica presa num '
+        + 'poço ou passeia pelos dois.</p>'
+        + '<p>Os pontos onde o campo se anula são os <strong>equilíbrios</strong>. Mínimos de '
+        + '\\(H\\) produzem centros, com órbitas fechadas ao redor; selas produzem '
+        + 'equilíbrios instáveis, com trajetórias que se aproximam por uma direção e se '
+        + 'afastam por outra. No pêndulo, \\(q=0\\) é centro e \\(q=\\pi\\) é sela, que é a '
+        + 'maneira do espaço de fase dizer que o pêndulo de ponta-cabeça não para em pé.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+    (function animar() {
+      if (est.rodando) {
+        for (var i = 0; i < 4; i++) { s = passo(s, 0.012); est.t += 0.012; }
+        traj.push([s[0], s[1]]);
+        if (traj.length > 1600) traj.shift();
+        desenhar();
+      }
+      requestAnimationFrame(animar);
+    })();
+  };
+
+  /* =================================================================
+     43. Quando H não é a energia
+     A conta na conta: um aro que gira com velocidade angular imposta.
+     H se conserva e não é a energia; a energia varia e não se conserva.
+     ================================================================= */
+  REGISTRO.naoconserva = function (raiz) {
+    var g0 = 9.80665, R = 1, mm = 1;
+    var est = { W: 4, th0: 20, t: 0, rodando: true };
+    var s = null, hist = [];
+
+    var corpo = moldura(raiz, 'A conta no aro que gira: H se conserva, a energia não');
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'velocidade angular imposta Ω', 0, 6, 0.1, 4,
+      function (v) { est.W = v; reiniciar(); },
+      function (v) { return F.fmt(v, 1) + ' rad/s'; });
+    deslizante(ctr, 'ângulo inicial', 2, 170, 1, 20,
+      function (v) { est.th0 = v; reiniciar(); }, function (v) { return v + '°'; });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'H (conservada)', k: 'H' },
+      { rot: 'E = T + V (varia)', k: 'E' },
+      { rot: 'diferença E − H', k: 'dif' },
+      { rot: 'Ω crítico √(g/R)', k: 'wc' },
+      { rot: 'equilíbrio fora do fundo', k: 'eq' },
+      { rot: 'potência do motor', k: 'pot' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function reiniciar() {
+      s = [est.th0 * Math.PI / 180, 0];
+      hist = []; est.t = 0;
+    }
+    reiniciar();
+
+    function Hfun(th, w) {
+      return 0.5 * mm * R * R * w * w
+        - 0.5 * mm * R * R * est.W * est.W * Math.pow(Math.sin(th), 2)
+        - mm * g0 * R * Math.cos(th);
+    }
+    function Efun(th, w) {
+      return 0.5 * mm * R * R * w * w
+        + 0.5 * mm * R * R * est.W * est.W * Math.pow(Math.sin(th), 2)
+        - mm * g0 * R * Math.cos(th);
+    }
+    function deriv(y) {
+      return [y[1],
+        est.W * est.W * Math.sin(y[0]) * Math.cos(y[0]) - g0 / R * Math.sin(y[0])];
+    }
+    function passo(y, h) {
+      function soma(a, b, f) { return [a[0] + f * b[0], a[1] + f * b[1]]; }
+      var k1 = deriv(y), k2 = deriv(soma(y, k1, h / 2));
+      var k3 = deriv(soma(y, k2, h / 2)), k4 = deriv(soma(y, k3, h));
+      return [y[0] + h / 6 * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]),
+              y[1] + h / 6 * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1])];
+    }
+
+    function desenhar() {
+      var alt = 330;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      ct.clearRect(0, 0, Lp, alt);
+      var meia = Lp * 0.40;
+
+      /* o aro visto de lado, com a conta */
+      var esc = Math.min(meia * 0.34, alt * 0.30);
+      var ox = meia * 0.5, oy = alt * 0.46;
+      ct.beginPath(); ct.ellipse(ox, oy, esc * 0.42, esc, 0, 0, 2 * Math.PI);
+      ct.strokeStyle = G.COR.clara; ct.lineWidth = 1.6;
+      ct.setLineDash([5, 4]); ct.stroke(); ct.setLineDash([]);
+      ct.beginPath(); ct.arc(ox, oy, esc, 0, 2 * Math.PI);
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 2.6; ct.stroke();
+      ct.beginPath();
+      ct.moveTo(ox, oy - esc * 1.25); ct.lineTo(ox, oy + esc * 1.25);
+      ct.strokeStyle = G.COR.suave; ct.lineWidth = 1.4;
+      ct.setLineDash([6, 4]); ct.stroke(); ct.setLineDash([]);
+      rotulo(ct, 'eixo, girando a Ω', ox, oy - esc * 1.25 - 14, G.COR.suave);
+
+      var bx = ox + esc * Math.sin(s[0]), by = oy + esc * Math.cos(s[0]);
+      ct.beginPath(); ct.arc(bx, by, 9, 0, 2 * Math.PI);
+      ct.fillStyle = G.COR.vinho; ct.fill();
+      ct.strokeStyle = '#fff'; ct.lineWidth = 2; ct.stroke();
+      rotulo(ct, 'θ = ' + F.fmt(s[0] * 180 / Math.PI, 1) + '°', ox, oy + esc * 1.25 + 16,
+        G.COR.suave);
+
+      /* painel 2: H e E ao longo do tempo */
+      hist.push([est.t, Hfun(s[0], s[1]), Efun(s[0], s[1])]);
+      if (hist.length > 1600) hist.shift();
+      var vmin = 1e9, vmax = -1e9;
+      hist.forEach(function (q) {
+        vmin = Math.min(vmin, q[1], q[2]); vmax = Math.max(vmax, q[1], q[2]);
+      });
+      if (vmax - vmin < 1) { vmax += 0.5; vmin -= 0.5; }
+      var g2 = G.eixos(cv, {
+        altura: alt, xmin: Math.max(0, est.t - 12), xmax: Math.max(12, est.t),
+        ymin: vmin - 0.5, ymax: vmax + 0.5,
+        rotX: 't (s)', rotY: 'J por kg',
+        marcasX: G.marcasLineares(Math.max(0, est.t - 12), Math.max(12, est.t), 6, 0),
+        formataY: function (v) { return F.fmt(v, 1); },
+        limpar: false, margem: { e: meia + 60, d: 16, c: 16, b: 40 }
+      });
+      var c2 = g2.ct;
+      [[1, G.COR.mestra, 2.8], [2, G.COR.vinho, 2.2]].forEach(function (par) {
+        c2.beginPath();
+        var primeiro = true;
+        hist.forEach(function (q) {
+          if (q[0] < g2.xmin) { primeiro = true; return; }
+          var X = g2.X(q[0]), Y = g2.Y(q[par[0]]);
+          if (primeiro) { c2.moveTo(X, Y); primeiro = false; } else c2.lineTo(X, Y);
+        });
+        c2.strokeStyle = par[1]; c2.lineWidth = par[2]; c2.stroke();
+      });
+      G.legenda(g2, [
+        { texto: 'H', cor: G.COR.mestra },
+        { texto: 'E = T + V', cor: G.COR.vinho }
+      ]);
+
+      var wc = Math.sqrt(g0 / R);
+      var temEq = est.W * est.W > g0 / R;
+      mostrar({
+        H: F.fmt(Hfun(s[0], s[1]), 5),
+        E: F.fmt(Efun(s[0], s[1]), 5),
+        dif: F.fmt(Efun(s[0], s[1]) - Hfun(s[0], s[1]), 5),
+        wc: F.fmt(wc, 3) + ' rad/s',
+        eq: temEq ? F.fmt(Math.acos(g0 / (R * est.W * est.W)) * 180 / Math.PI, 1) + '°'
+          : 'não existe (Ω pequeno demais)',
+        pot: F.fmt(mm * R * R * est.W * est.W * Math.sin(s[0]) * Math.cos(s[0]) * s[1], 4)
+          + ' W por kg'
+      });
+
+      nota.innerHTML =
+        '<p>Uma conta desliza sem atrito num aro de raio \\(R\\) que um motor obriga a girar '
+        + 'com velocidade angular <strong>constante</strong> \\(\\Omega\\) em torno de um '
+        + 'diâmetro vertical. Com \\(\\theta\\) medido a partir do fundo, a posição depende '
+        + 'explicitamente do tempo, porque o aro gira:</p>'
+        + '\\[x=R\\sen\\theta\\cos\\Omega t,\\quad y=R\\sen\\theta\\sen\\Omega t,'
+        + '\\quad z=-R\\cos\\theta.\\]'
+        + '<p>Mesmo assim a lagrangiana não contém \\(t\\) explicitamente, porque o giro entra '
+        + 'apenas pelo quadrado:</p>'
+        + '\\[\\Lag=\\tfrac12mR^2\\dot\\theta^2+\\tfrac12mR^2\\Omega^2\\sen^2\\theta'
+        + '+mgR\\cos\\theta.\\]'
+        + '<p>Com \\(p_\\theta=mR^2\\dot\\theta\\), a hamiltoniana fica</p>'
+        + '\\[H=\\frac{p_\\theta^2}{2mR^2}-\\tfrac12mR^2\\Omega^2\\sen^2\\theta'
+        + '-mgR\\cos\\theta,\\]'
+        + '<p>enquanto a energia verdadeira é</p>'
+        + '\\[E=T+V=\\frac{p_\\theta^2}{2mR^2}+\\tfrac12mR^2\\Omega^2\\sen^2\\theta'
+        + '-mgR\\cos\\theta.\\]'
+        + '<p>Repare no sinal do termo central: ele é o <em>mesmo</em> termo com sinais '
+        + 'opostos. O gráfico mostra a consequência, e ela é desconcertante na primeira vez: '
+        + '\\(H\\) é uma reta horizontal, perfeitamente conservada, e não é a energia; '
+        + '\\(E\\) oscila, é a energia de verdade, e não se conserva.</p>'
+        + '<p>A razão física é que o motor realiza trabalho. Para manter \\(\\Omega\\) '
+        + 'constante enquanto a conta sobe e desce, ele precisa fornecer ou retirar energia, '
+        + 'e o cartão da potência mede isso. O vínculo depende do tempo, e vínculos que '
+        + 'dependem do tempo realizam trabalho.</p>'
+        + '<p>A moral vale guardar: \\(H\\) se conserva quando \\(\\partial H/\\partial t=0\\), '
+        + 'e \\(H\\) é a energia quando as transformações de coordenadas não dependem do tempo '
+        + 'e \\(T\\) é quadrática nas velocidades. São duas condições <strong>independentes</strong>, '
+        + 'e aqui a primeira vale e a segunda falha.</p>'
+        + '<p>O termo negativo em \\(H\\) tem leitura própria: ele é um potencial '
+        + 'centrífugo, e \\(U_{\\rm ef}=-\\tfrac12mR^2\\Omega^2\\sen^2\\theta-mgR\\cos\\theta\\) '
+        + 'é o potencial efetivo visto do aro. Derivando, o fundo deixa de ser equilíbrio '
+        + 'estável quando \\(\\Omega^2>g/R\\), e aparece um equilíbrio novo em '
+        + '\\(\\cos\\theta_0=g/R\\Omega^2\\). Aumente o \\(\\Omega\\) além de '
+        + F.fmt(Math.sqrt(g0 / R), 2) + ' rad/s e veja a conta passar a oscilar em torno de '
+        + 'um ângulo que não é o fundo: é uma bifurcação, e é o mesmo mecanismo do regulador '
+        + 'centrífugo das máquinas a vapor.</p>';
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+    (function animar() {
+      if (est.rodando) {
+        for (var i = 0; i < 5; i++) { s = passo(s, 0.004); est.t += 0.004; }
+        desenhar();
+      }
+      requestAnimationFrame(animar);
+    })();
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {
