@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 11: Aplicações do formalismo lagrangiano | Mecânica Clássica II</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611201036">
-<script src="assets/js/comum.js?v=202611201036"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611201101">
+<script src="assets/js/comum.js?v=202611201101"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -57,15 +57,13 @@
     <li><a href="#s2">2. O pêndulo duplo</a></li>
     <li><a href="#s3">3. Caos determinístico</a></li>
     <li><a href="#s4">4. Coordenadas curvilíneas</a></li>
-    <li><a href="#s5">5. Potenciais centrais</a></li>
-    <li><a href="#s6">6. O potencial efetivo</a></li>
-    <li><a href="#s7">7. As três leis de Kepler</a></li>
-    <li><a href="#s8">8. O pêndulo esférico</a></li>
-    <li><a href="#s9">9. Potencial generalizado</a></li>
-    <li><a href="#s10">10. A força de Lorentz</a></li>
-    <li><a href="#s11">11. Dissipação e a função de Rayleigh</a></li>
-    <li><a href="#s12">12. Exercícios resolvidos</a></li>
-    <li><a href="#s13">13. Exercícios propostos</a></li>
+    <li><a href="#s5">5. Forças centrais</a></li>
+    <li><a href="#s6">6. O pêndulo esférico</a></li>
+    <li><a href="#s7">7. Potencial generalizado</a></li>
+    <li><a href="#s8">8. A força de Lorentz</a></li>
+    <li><a href="#s9">9. Dissipação e Rayleigh</a></li>
+    <li><a href="#s10">10. Exercícios resolvidos</a></li>
+    <li><a href="#s11">11. Exercícios propostos</a></li>
   </ol>
 </aside>
 
@@ -214,115 +212,74 @@
   produz os termos centrífugo e de <a href="https://pt.wikipedia.org/wiki/Gaspard-Gustave_Coriolis">Coriolis</a> sem que seja preciso postulá-los.</p>
 
   <!-- ================================================== -->
-  <h2 id="s5">5. Potenciais centrais</h2>
+  <h2 id="s5">5. Forças centrais, em meia página</h2>
 
-  <p>Um potencial que depende só da distância, \(V=V(r)\), tem simetria esférica, e dessa
-  simetria sai tudo o que se segue. Em coordenadas esféricas,</p>
+  <p>Um potencial que depende só da distância, \(V=V(r)\), tem simetria esférica. Vale
+  escrever a lagrangiana em coordenadas esféricas e ver quanto dessa simetria o formalismo
+  cobra de graça:</p>
 
-  <p>\[\Lag=\tfrac12m\left(\dot r^2+r^2\dot\theta^2
-  +r^2\sen^2\theta\,\dot\varphi^2\right)-V(r).\]</p>
+  \[\Lag=\tfrac12m\left(\dot r^2+r^2\dot\theta^2
+  +r^2\sen^2\theta\,\dot\varphi^2\right)-V(r).\]
 
-  <p>A coordenada \(\varphi\) é cíclica, e portanto \(p_\varphi=mr^2\sen^2\theta\,\dot\varphi\)
-  é constante. Mais do que isso: o momento angular \(\vet{L}=\vet{r}\cruz m\vet{v}\) é
-  constante como <em>vetor</em>, porque o torque \(\vet{r}\cruz\vet{F}\) se anula quando
-  \(\vet{F}\) é paralela a \(\vet{r}\).</p>
+  <p>A coordenada \(\varphi\) não aparece, apenas \(\dot\varphi\). Ela é cíclica, e portanto
+  \(p_\varphi=mr^2\sen^2\theta\,\dot\varphi\) se conserva. Mais do que isso, o momento
+  angular \(\vet{L}=\vet{r}\cruz m\vet{v}\) se conserva como <em>vetor</em>, porque o torque
+  \(\vet{r}\cruz\vet{F}\) se anula quando a força é paralela a \(\vet{r}\).</p>
 
-  <div class="bloco fisica">
-    <span class="rotulo">O movimento é plano, e isso é um teorema</span>
+  <div class="destaque">
+    <span class="anuncio">O movimento é plano, e isso é um teorema</span>
     <p>Se \(\vet{L}\) é constante e \(\vet{r}\cdot\vet{L}=0\) por construção, então
-    \(\vet{r}\) permanece sempre no plano perpendicular a \(\vet{L}\). O problema de três
-    coordenadas colapsa para duas antes de qualquer conta. Escolhendo esse plano como
+    \(\vet{r}\) permanece para sempre no plano perpendicular a \(\vet{L}\). O problema de
+    três coordenadas colapsa para duas antes de qualquer conta. Escolhendo esse plano como
     \(\theta=\pi/2\),</p>
-    \[\Lag=\tfrac12m\left(\dot r^2+r^2\dot\varphi^2\right)-V(r),\]
-    <p>que é o problema de duas coordenadas da seção anterior. A redução de três para dois
-    graus de liberdade saiu inteiramente de uma simetria.</p>
+    <p>\[\Lag=\tfrac12m\left(\dot r^2+r^2\dot\varphi^2\right)-V(r).\]</p>
   </div>
 
-  <!-- ================================================== -->
-  <h2 id="s6">6. O potencial efetivo</h2>
-
-  <p>Com \(\ell=mr^2\dot\varphi\) constante, substitua \(\dot\varphi=\ell/mr^2\) na energia:</p>
-
-  <p>\[E=\tfrac12m\dot r^2+\tfrac12mr^2\dot\varphi^2+V(r)
-  =\tfrac12m\dot r^2+\frac{\ell^2}{2mr^2}+V(r).\]</p>
+  <p>Na lagrangiana que sobrou, \(\varphi\) continua cíclica, e agora
+  \(p_\varphi=mr^2\dot\varphi\) é o próprio momento angular. Substituindo
+  \(\dot\varphi=p_\varphi/mr^2\) na energia, o último grau de liberdade também se separa:</p>
 
   <div class="destaque">
     <span class="anuncio">Potencial efetivo</span>
-    \[U_{\rm ef}(r)=\frac{\ell^2}{2mr^2}+V(r),
-    \qquad E=\tfrac12m\dot r^2+U_{\rm ef}(r).\]
+    \[U_{\rm ef}(r)=\frac{p_\varphi^2}{2mr^2}+V(r),
+      \qquad E=\tfrac12m\dot r^2+U_{\rm ef}(r).\]
   </div>
 
-  <p>O problema de duas coordenadas virou um problema de uma só, formalmente idêntico ao de
-  uma partícula deslizando num potencial unidimensional. O primeiro termo é a
-  <strong>barreira centrífuga</strong>: repulsivo, divergente na origem, e é ele que impede
-  uma partícula com \(\ell\neq0\) de cair no centro de força por mais atraída que seja.</p>
+  <p>O problema de três coordenadas virou um problema de uma, formalmente idêntico ao de uma
+  partícula deslizando num potencial unidimensional. O termo novo é a
+  <strong>barreira centrífuga</strong>: repulsiva, divergente na origem, e é ela que impede
+  uma partícula com \(p_\varphi\neq0\) de cair no centro de força por mais atraída que
+  seja.</p>
 
-  <div data-widget="potefetivo"></div>
+  <p>Daqui em diante é conta, e ela está feita por inteiro no
+  <a href="https://apianomorais.github.io/mecanica-classica-i/aula12.html">módulo 12 de
+  Mecânica Clássica I</a>: a classificação das órbitas pelo gráfico de \(U_{\rm ef}\), a
+  substituição \(u=1/r\) que transforma a equação da órbita num oscilador harmônico em
+  \(\varphi\), as três leis de Kepler com a correção da massa total, o teorema de Bertrand, a
+  precessão do periélio de Mercúrio e o teorema do virial. Repeti-la aqui seria copiar.</p>
 
-  <p>A partir daí o gráfico responde antes de qualquer integração. O movimento radial só
-  acontece onde \(E>U_{\rm ef}\), porque \(\tfrac12m\dot r^2\) não pode ser negativo, e os
-  cruzamentos são os pontos de retorno. Para o potencial de <a href="https://pt.wikipedia.org/wiki/Johannes_Kepler">Kepler</a> \(V=-k/r\):</p>
-
-  <div class="tabela-rolavel">
-  <table>
-    <thead><tr><th>Energia</th><th>Pontos de retorno</th><th>Órbita</th><th>Excentricidade</th></tr></thead>
-    <tbody>
-      <tr><td>\(E=U_{\rm ef,min}\)</td><td>um só raio</td><td>circular</td><td>\(e=0\)</td></tr>
-      <tr><td>\(U_{\rm ef,min}&lt;E&lt;0\)</td><td>dois</td><td>elíptica</td><td>\(0&lt;e&lt;1\)</td></tr>
-      <tr><td>\(E=0\)</td><td>um</td><td>parabólica</td><td>\(e=1\)</td></tr>
-      <tr><td>\(E>0\)</td><td>um</td><td>hiperbólica</td><td>\(e>1\)</td></tr>
-    </tbody>
-  </table>
-  </div>
-
-  <!-- ================================================== -->
-  <h2 id="s7">7. As três leis de Kepler</h2>
-
-  <p>A forma da órbita sai de uma substituição esperta. Da conservação de \(\ell\),</p>
-
-  <p>\[\der{r}{\varphi}=\frac{\dot r}{\dot\varphi}=\frac{mr^2\dot r}{\ell},\]</p>
-
-  <p>e isolando \(\dot r^2\) da energia e substituindo, aparece uma equação em \(r\) com
-  potências de quarta ordem, feia. A troca \(u=1/r\) arruma tudo, porque
-  \(dr/d\varphi=-u^{-2}du/d\varphi\):</p>
-
-  <p>\[\left(\der{u}{\varphi}\right)^2
-  =\frac{2mE}{\ell^2}+\frac{2mk}{\ell^2}u-u^2.\]</p>
-
-  <p>Derivando em \(\varphi\) e dividindo por \(2\,du/d\varphi\), a equação vira linear:</p>
-
-  <div class="destaque">
-    <span class="anuncio">A equação da órbita</span>
-    \[\dder{u}{\varphi}+u=\frac{mk}{\ell^2}.\]
-  </div>
-
-  <p>É um oscilador harmônico em \(\varphi\) com termo de fonte constante. A solução geral é
-  \(u=mk/\ell^2+A\cos\left(\varphi-\varphi_0\right)\), e escolhendo os eixos de modo que
-  \(\varphi_0=0\) e definindo \(e=A\ell^2/mk\),</p>
-
-  <p>\[r(\varphi)=\frac{\ell^2/mk}{1+e\cos\varphi}
-  =\frac{a\left(1-e^2\right)}{1+e\cos\varphi},\]</p>
-
-  <p>que é a equação de uma cônica com foco na origem. As três leis saem daí:</p>
-
-  <div class="bloco def">
-    <span class="rotulo">As três leis, deduzidas</span>
-    <p><strong>Primeira.</strong> As órbitas ligadas são elipses com o centro de força num dos
-    focos, porque a equação acima é a de uma cônica e \(E<0\) dá \(e<1\).</p>
-    <p><strong>Segunda.</strong> A área varrida por unidade de tempo é
-    \(\tfrac12r^2\dot\varphi=\ell/2m\), constante porque \(\varphi\) é cíclica. Áreas iguais em
-    tempos iguais não é uma lei independente: é a conservação do momento angular escrita em
-    linguagem geométrica.</p>
-    <p><strong>Terceira.</strong> Integrando a taxa areal ao longo de um período,
-    \(\pi ab=\left(\ell/2m\right)T\). Com \(b=a\sqrt{1-e^2}\) e
-    \(\ell^2=mka\left(1-e^2\right)\), os fatores de \(e\) se cancelam e sobra</p>
-    \[T^2=\frac{4\pi^2m}{k}\,a^3=\frac{4\pi^2}{GM}\,a^3.\]
-    <p>O período depende só do semieixo maior, e não da excentricidade. Duas órbitas de mesmo
-    \(a\), uma quase circular e outra muito alongada, levam exatamente o mesmo tempo.</p>
+  <div class="bloco fisica">
+    <span class="rotulo">O que o formalismo poupou</span>
+    <p>O que esta meia página tem a dizer é justamente a comparação. Em Mecânica Clássica I o
+    mesmo ponto de partida custou um módulo inteiro, porque lá se começa de
+    \(\vet{F}=m\vet{a}\) e é preciso construir tudo à mão. Aqui:</p>
+    <ul>
+      <li>a aceleração em coordenadas polares nunca foi escrita. O termo
+      \(-mr\dot\varphi^2\) da equação radial aparece sozinho ao derivar \(\Lag\), e com ele
+      some a fonte mais comum de erro de sinal do assunto;</li>
+      <li>a conservação do momento angular não precisou de argumento de torque na forma
+      componente a componente: saiu de \(\partial\Lag/\partial\varphi=0\), que é uma
+      inspeção visual;</li>
+      <li>a redução de três coordenadas para uma foi <em>lida</em> de duas simetrias, em vez
+      de imposta por escolha esperta de eixos.</li>
+    </ul>
+    <p>Essa economia não é cosmética. Ela é o que torna tratáveis problemas em que a escolha
+    esperta de eixos não existe, e o pêndulo esférico da próxima seção é o primeiro
+    deles.</p>
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s8">8. O pêndulo esférico</h2>
+  <h2 id="s6">6. O pêndulo esférico</h2>
 
   <p>Uma massa presa a um fio de comprimento \(\ell\), livre para se mover em qualquer
   direção, e não apenas num plano. São duas coordenadas, \(\theta\) medido da vertical para
@@ -335,7 +292,7 @@
 
   <p>\[p_\varphi=m\ell^2\sen^2\theta\,\dot\varphi=\text{constante}.\]</p>
 
-  <p>Repetindo o truque da seção 6, substitua \(\dot\varphi\) na energia e o problema de duas
+  <p>Repetindo o truque da seção 5, substitua \(\dot\varphi\) na energia e o problema de duas
   coordenadas vira um problema de uma só, agora em \(\theta\):</p>
 
   <div class="destaque">
@@ -359,7 +316,7 @@
   \infty\): não existe pêndulo cônico horizontal.</p>
 
   <!-- ================================================== -->
-  <h2 id="s9">9. Potencial generalizado</h2>
+  <h2 id="s7">7. Potencial generalizado</h2>
 
   <p>Até aqui todas as forças vinham de \(\vet{F}=-\nabla V(\vet{r})\), com \(V\) função
   apenas da posição. Existem forças importantes que não são dessa forma, e a mais importante
@@ -382,7 +339,7 @@
   tempo, e é justamente essa abertura que acomoda a força magnética.</p>
 
   <!-- ================================================== -->
-  <h2 id="s10">10. A força de Lorentz</h2>
+  <h2 id="s8">8. A força de Lorentz</h2>
 
   <p>Uma carga \(q\) num campo eletromagnético sofre</p>
 
@@ -452,7 +409,7 @@
   confinamento em <a href="https://pt.wikipedia.org/wiki/Tokamak">tokamaks</a> e os <a href="https://pt.wikipedia.org/wiki/Cintur%C3%A3o_de_Van_Allen">cinturões de Van Allen</a>.</p>
 
   <!-- ================================================== -->
-  <h2 id="s11">11. Dissipação e a função de Rayleigh</h2>
+  <h2 id="s9">9. Dissipação e a função de Rayleigh</h2>
 
   <p>Atrito não vem de potencial nenhum, nem comum nem generalizado, porque dissipa energia.
   Para forças de amortecimento <em>linear</em>, \(\vet{F}_i=-b_i\vet{v}_i\), existe mesmo
@@ -504,7 +461,7 @@
   \(\mathcal{F}=\tfrac13c\left|\vet{v}\right|^3\).</p>
 
   <!-- ================================================== -->
-  <h2 id="s12">12. Exercícios resolvidos</h2>
+  <h2 id="s10">10. Exercícios resolvidos</h2>
 
   <div class="bloco def">
     <span class="rotulo">Exercício resolvido 11.1 · Atwood com polia pesada</span>
@@ -526,14 +483,15 @@
 
   <div class="bloco def">
     <span class="rotulo">Exercício resolvido 11.2 · Órbita circular e velocidade de escape</span>
-    <p>Para \(V=-k/r\), determine o raio da órbita circular com momento angular \(\ell\), a
-    energia correspondente, e a velocidade de escape a partir dessa órbita.</p>
+    <p>Para \(V=-k/r\), determine o raio da órbita circular com momento angular
+    \(p_\varphi\), a energia correspondente, e a velocidade de escape a partir dessa
+    órbita.</p>
     <p><strong>Solução.</strong> A órbita circular está no mínimo de \(U_{\rm ef}\):</p>
-    \[\der{U_{\rm ef}}{r}=-\frac{\ell^2}{mr^3}+\frac{k}{r^2}=0
-    \quad\Longrightarrow\quad r_c=\frac{\ell^2}{mk}.\]
+    \[\der{U_{\rm ef}}{r}=-\frac{p_\varphi^2}{mr^3}+\frac{k}{r^2}=0
+    \quad\Longrightarrow\quad r_c=\frac{p_\varphi^2}{mk}.\]
     <p>A energia vale</p>
     \[E_c=U_{\rm ef}\left(r_c\right)
-    =\frac{\ell^2}{2mr_c^2}-\frac{k}{r_c}
+    =\frac{p_\varphi^2}{2mr_c^2}-\frac{k}{r_c}
     =\frac{k}{2r_c}-\frac{k}{r_c}=-\frac{k}{2r_c}.\]
     <p>A energia é negativa e vale metade do potencial, que é o teorema do virial para o
     potencial de Kepler: \(\med{T}=-\tfrac12\med{V}\). Escapar exige levar \(E\) a zero, isto é
@@ -587,7 +545,7 @@
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s13">13. Exercícios propostos</h2>
+  <h2 id="s11">11. Exercícios propostos</h2>
 
   <div class="bloco def">
     <span class="rotulo">Para resolver</span>
@@ -610,7 +568,7 @@
       Explique por que não existe solução com \(\theta_0=90^\circ\).</li>
 
       <li><b>11.5</b> Para o problema de Kepler, demonstre a terceira lei a partir da taxa
-      areal \(\ell/2m\) e da área da elipse. Verifique numericamente com a Terra
+      areal \(p_\varphi/2m\) e da área da elipse. Verifique numericamente com a Terra
       (\(a=1{,}496\cruz10^{11}\) m) e com Marte (\(a=2{,}279\cruz10^{11}\) m).</li>
 
       <li><b>11.6</b> Oscilador harmônico isotrópico em três dimensões,
@@ -654,6 +612,6 @@
   <!--PORTAL--><p><small><a href="https://apianomorais.github.io/">Todas as disciplinas e a pesquisa em apianomorais.github.io</a></small></p><!--/PORTAL-->
 </footer>
 
-<script src="assets/js/widgets.js?v=202611201036"></script>
+<script src="assets/js/widgets.js?v=202611201101"></script>
 </body>
 </html>
