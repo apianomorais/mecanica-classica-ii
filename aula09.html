@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo 9: Coordenadas generalizadas, vínculos e equações de Lagrange | Mecânica Clássica II</title>
+<title>Módulo 9: A equação de Euler-Lagrange e o princípio de Hamilton | Mecânica Clássica II</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611082243">
-<script src="assets/js/comum.js?v=202611082243"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611201036">
+<script src="assets/js/comum.js?v=202611201036"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -21,17 +21,18 @@
       <a href="aula02.html" class="num" title="Módulo 2: Centro de massa e momentos de inércia">2</a>
       <a href="aula03.html" class="num" title="Módulo 3: Momento angular, torque e equações de movimento">3</a>
       <a href="aula04.html" class="num" title="Módulo 4: Conservação e equilíbrio estático">4</a>
+      <a href="aula05.html" class="num" title="Módulo 5: Vigas: cortante, momento fletor, linha elástica e torção">5</a>
       <span class="grupo">Referenciais</span>
-      <a href="aula05.html" class="num" title="Módulo 5: Matrizes de rotação e transformações de coordenadas">5</a>
-      <a href="aula06.html" class="num" title="Módulo 6: Referenciais em rotação e forças fictícias">6</a>
+      <a href="aula06.html" class="num" title="Módulo 6: Matrizes de rotação e transformações de coordenadas">6</a>
+      <a href="aula07.html" class="num" title="Módulo 7: Referenciais em rotação e forças fictícias">7</a>
       <span class="grupo">Variacional</span>
-      <a href="aula07.html" class="num" title="Módulo 7: Cálculo variacional: ação e caminhos extremos">7</a>
-      <a href="aula08.html" class="num" title="Módulo 8: A equação de Euler-Lagrange e o princípio de Hamilton">8</a>
+      <a href="aula08.html" class="num" title="Módulo 8: Cálculo variacional: ação e caminhos extremos">8</a>
+      <a href="aula09.html" class="num ativo" title="Módulo 9: A equação de Euler-Lagrange e o princípio de Hamilton">9</a>
       <span class="grupo">Lagrange e Hamilton</span>
-      <a href="aula09.html" class="num ativo" title="Módulo 9: Coordenadas generalizadas, vínculos e equações de Lagrange">9</a>
-      <a href="aula10.html" class="num" title="Módulo 10: Aplicações do formalismo lagrangiano">10</a>
-      <a href="aula11.html" class="num" title="Módulo 11: Transformação de Legendre e equações de Hamilton">11</a>
-      <a href="aula12.html" class="num" title="Módulo 12: Espaço de fase e o teorema de Liouville">12</a>
+      <a href="aula10.html" class="num" title="Módulo 10: Coordenadas generalizadas, vínculos e equações de Lagrange">10</a>
+      <a href="aula11.html" class="num" title="Módulo 11: Aplicações do formalismo lagrangiano">11</a>
+      <a href="aula12.html" class="num" title="Módulo 12: Transformação de Legendre e equações de Hamilton">12</a>
+      <a href="aula13.html" class="num" title="Módulo 13: Espaço de fase e o teorema de Liouville">13</a>
     </nav>
   </div>
 </header>
@@ -52,621 +53,658 @@
 <aside class="lateral">
   <h4>Neste módulo</h4>
   <ol>
-    <li><a href="#s1">1. Várias funções desconhecidas</a></li>
-    <li><a href="#s2">2. Derivadas de ordem superior</a></li>
-    <li><a href="#s3">3. Várias variáveis independentes</a></li>
-    <li><a href="#s4">4. Coordenadas generalizadas</a></li>
-    <li><a href="#s5">5. Vínculos</a></li>
-    <li><a href="#s6">6. As equações de Lagrange</a></li>
-    <li><a href="#s7">7. O pêndulo, com e sem tração</a></li>
-    <li><a href="#s8">8. Momento generalizado</a></li>
-    <li><a href="#s9">9. Forças generalizadas</a></li>
-    <li><a href="#s10">10. Multiplicadores e forças de vínculo</a></li>
-    <li><a href="#s11">11. Receita de trabalho</a></li>
-    <li><a href="#s12">12. Exercícios resolvidos</a></li>
-    <li><a href="#s13">13. Exercícios propostos</a></li>
+    <li><a href="#s1">1. O problema geral</a></li>
+    <li><a href="#s2">2. Dedução da equação</a></li>
+    <li><a href="#s3">3. A equação de Euler-Lagrange</a></li>
+    <li><a href="#s4">4. Dois casos especiais</a></li>
+    <li><a href="#s5">5. A braquistócrona resolvida</a></li>
+    <li><a href="#s6">6. A catenária e a catenoide</a></li>
+    <li><a href="#s7">7. Fermat e a lei de Snell</a></li>
+    <li><a href="#s8">8. Resumo dos três problemas</a></li>
+    <li><a href="#s9">9. O princípio de Hamilton</a></li>
+    <li><a href="#s10">10. Estacionária, não mínima</a></li>
+    <li><a href="#s11">11. Exercícios resolvidos</a></li>
+    <li><a href="#s12">12. Exercícios propostos</a></li>
   </ol>
 </aside>
 
 <main class="conteudo">
 
-  <p class="chapeu">Módulo 9 · Formalismo lagrangiano e hamiltoniano</p>
-  <h1>Coordenadas generalizadas, vínculos e equações de Lagrange</h1>
-  <p class="subtitulo">A equação de Euler-Lagrange do módulo anterior trata de uma função de
-  uma variável. Sistemas mecânicos reais têm muitos graus de liberdade, barras rígidas, fios
-  inextensíveis e rodas que não derrapam. Este módulo estende a equação ao que for preciso e
-  mostra por que a escolha das coordenadas é metade do trabalho.</p>
+  <p class="chapeu">Módulo 9 · Noções de cálculo variacional</p>
+  <h1>A equação de Euler-Lagrange e o princípio de Hamilton</h1>
+  <p class="subtitulo">O módulo anterior montou o vocabulário e parou na véspera da conta. Aqui
+  a condição \(\delta J=0\), que é uma afirmação sobre o caminho inteiro, vira uma equação
+  diferencial ponto a ponto. Com ela os três problemas clássicos caem em poucas linhas, e a
+  mecânica inteira ganha uma formulação nova.</p>
 
   <hr class="linha">
 
   <!-- ================================================== -->
-  <h2 id="s1">1. Várias funções desconhecidas</h2>
+  <h2 id="s1">1. O problema geral</h2>
 
-  <p>O funcional passa a depender de \(n\) funções da mesma variável,</p>
+  <p>O objeto de estudo é o funcional</p>
 
-  <p>\[J\left[y_1,\dots,y_n\right]=\int_{x_1}^{x_2}
-  f\left(x,\;y_1,\dots,y_n,\;y_1',\dots,y_n'\right)dx,\]</p>
+  <p>\[J[y]=\int_{x_1}^{x_2}f\left(x,y,y'\right)dx,\]</p>
 
-  <p>e a dedução não muda em nada de essencial. Deforme uma função de cada vez,
-  \(y_i\to y_i+\varepsilon\eta_i\), mantendo as outras fixas: o cálculo do módulo 8 se repete
-  palavra por palavra e devolve uma equação para cada função. Como as \(\eta_i\) são
-  arbitrárias e independentes, as equações têm de valer todas ao mesmo tempo.</p>
-
-  <div class="destaque">
-    <span class="anuncio">Sistema de equações de Euler-Lagrange</span>
-    \[\pder{f}{y_i}-\der{}{x}\left(\pder{f}{y_i'}\right)=0,
-    \qquad i=1,2,\dots,n.\]
-  </div>
-
-  <div class="bloco def">
-    <span class="rotulo">Exemplo · Duas massas e uma mola</span>
-    <p>Duas partículas de massas \(m_1\) e \(m_2\), sobre uma reta, ligadas por uma mola de
-    constante \(k\). As posições são \(x_1(t)\) e \(x_2(t)\), e</p>
-    \[\Lag=\tfrac12m_1\dot x_1^2+\tfrac12m_2\dot x_2^2
-    -\tfrac12k\left(x_2-x_1\right)^2.\]
-    <p>As duas equações de <a href="https://pt.wikipedia.org/wiki/Joseph-Louis_Lagrange">Lagrange</a> ficam</p>
-    \[m_1\ddot x_1=-k\left(x_1-x_2\right),\qquad
-    m_2\ddot x_2=-k\left(x_2-x_1\right),\]
-    <p>acopladas. Somando-as, o lado direito se cancela e aparece
-    \(m_1\ddot x_1+m_2\ddot x_2=0\), isto é, \(\ddot X=0\) para o centro de massa
-    \(X=\left(m_1x_1+m_2x_2\right)/\left(m_1+m_2\right)\): ele viaja com velocidade
-    constante. Subtraindo-as, com \(r=x_2-x_1\),</p>
-    \[\ddot r=-k\left(\frac{1}{m_1}+\frac{1}{m_2}\right)r=-\frac{k}{\mu}r,
-    \qquad\mu=\frac{m_1m_2}{m_1+m_2},\]
-    <p>com \(\mu\) a massa reduzida. A coordenada relativa oscila harmonicamente com
-    \(\omega=\sqrt{k/\mu}\), e a solução geral é</p>
-    \[x_1=V_0t+X_0-\frac{m_2}{m_1+m_2}A\cos\left(\omega t+\varphi\right),\qquad
-    x_2=V_0t+X_0+\frac{m_1}{m_1+m_2}A\cos\left(\omega t+\varphi\right).\]
-    <p>O passo decisivo foi trocar \(\left(x_1,x_2\right)\) por \(\left(X,r\right)\). Nessas
-    coordenadas as equações desacoplam, e o problema de duas equações acopladas vira dois
-    problemas de uma equação cada. Guardar essa ideia vale mais do que guardar a resposta: a
-    escolha das coordenadas generalizadas é, muitas vezes, a solução inteira.</p>
-  </div>
-
-  <!-- ================================================== -->
-  <h2 id="s2">2. Derivadas de ordem superior</h2>
-
-  <p>Quando o integrando contém \(y''\), a dedução ganha uma rodada a mais de integração por
-  partes. Partindo de \(J[y]=\int f\left(x,y,y',y''\right)dx\), a primeira variação é</p>
-
-  <p>\[\delta J=\int_{x_1}^{x_2}\left(\pder{f}{y}\eta
-  +\pder{f}{y'}\eta'+\pder{f}{y''}\eta''\right)dx.\]</p>
-
-  <p>O termo em \(\eta'\) integra-se por partes uma vez, como antes. O termo em \(\eta''\)
-  precisa de duas: a primeira o transforma num termo em \(\eta'\), a segunda num termo em
-  \(\eta\), e cada integração troca o sinal, de modo que o resultado final volta com sinal
-  positivo. Os termos de fronteira exigem agora que tanto \(\eta\) quanto \(\eta'\) se anulem
-  nas duas pontas.</p>
-
-  <div class="destaque">
-    <span class="anuncio">Equação de Euler-Poisson</span>
-    \[\pder{f}{y}-\der{}{x}\left(\pder{f}{y'}\right)
-    +\dder{}{x}\left(\pder{f}{y''}\right)=0.\]
-  </div>
-
-  <p>A equação é de quarta ordem e exige <strong>quatro</strong> condições de contorno, duas
-  em cada ponta. Quais são elas depende do apoio, e a própria dedução indica a regra: ou se
-  prende o valor de \(y\) e de \(y'\), ou se deixa o termo de fronteira correspondente se
-  anular por conta própria, produzindo uma <em>condição natural</em>.</p>
-
-  <div data-widget="viga"></div>
-
-  <!-- ================================================== -->
-  <h2 id="s3">3. Várias variáveis independentes</h2>
-
-  <p>A terceira generalização troca a curva por uma superfície. Com \(u=u(x,y)\) e</p>
-
-  <p>\[J[u]=\iint_D f\left(x,y,u,u_x,u_y\right)dx\,dy,\]</p>
-
-  <p>a mesma dedução, agora com o teorema da divergência no lugar da integração por partes,
-  devolve</p>
-
-  <div class="destaque">
-    <span class="anuncio">Euler-Lagrange em duas dimensões</span>
-    \[\pder{f}{u}-\pder{}{x}\left(\pder{f}{u_x}\right)
-    -\pder{}{y}\left(\pder{f}{u_y}\right)=0.\]
-  </div>
-
-  <p>Tome o caso mais simples, \(f=\tfrac12\left(u_x^2+u_y^2\right)\), que é a energia elástica
-  de uma membrana esticada. Com \(\partial f/\partial u=0\),
-  \(\partial f/\partial u_x=u_x\) e \(\partial f/\partial u_y=u_y\), a equação vira</p>
-
-  <p>\[u_{xx}+u_{yy}=0,\]</p>
-
-  <p>que é a <strong>equação de <a href="https://pt.wikipedia.org/wiki/Pierre-Simon_de_Laplace">Laplace</a></strong>. A forma de uma película de sabão presa a um
-  aro torto, a distribuição de temperatura em regime estacionário e o potencial eletrostático
-  numa região sem cargas satisfazem todos a mesma equação, e pelo mesmo motivo: todos
-  minimizam uma integral quadrática do gradiente.</p>
+  <p>em que \(y=y(x)\) é a função procurada, \(y'=dy/dx\) e \(f\) é uma função dada de três
+  argumentos, chamada <strong>integrando</strong>. Os extremos estão presos: \(y(x_1)=y_1\) e
+  \(y(x_2)=y_2\). A pergunta é qual \(y(x)\) torna \(J\) extremo.</p>
 
   <div class="bloco fisica">
-    <span class="rotulo">Daqui sai a teoria de campos</span>
-    <p>Troque \((x,y)\) pelas quatro coordenadas do espaço-tempo e \(u\) por um campo
-    \(\phi\), e a mesma equação passa a ser a equação de movimento do campo. Com
-    \(f=\tfrac12\left(\partial_t\phi\right)^2-\tfrac12\left(\nabla\phi\right)^2
-    -\tfrac12m^2\phi^2\) sai a <a href="https://pt.wikipedia.org/wiki/Equa%C3%A7%C3%A3o_de_Klein%E2%80%93Gordon">equação de Klein-Gordon</a>; com a densidade lagrangiana de
-    <a href="https://pt.wikipedia.org/wiki/James_Clerk_Maxwell">Maxwell</a> saem as equações de Maxwell. A mecânica lagrangiana não é um capítulo isolado da
-    mecânica clássica: é a linguagem em que a física moderna escreve as suas leis, e a
-    diferença entre os casos está apenas na escolha da densidade lagrangiana.</p>
+    <span class="rotulo">Por que essa forma e não outra</span>
+    <p>O integrando depende de \(x\), de \(y\) e de \(y'\), e não de \(y''\) nem de valores de
+    \(y\) em outros pontos. Essa restrição não é arbitrária: ela cobre a esmagadora maioria
+    dos problemas físicos, porque as leis da mecânica são de segunda ordem no tempo, e uma
+    lagrangiana com \(\dot q\) produz exatamente isso. Integrandos com \(y''\) existem, e
+    levam a equações de quarta ordem. O caso geral aparece no módulo 9.</p>
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s4">4. Coordenadas generalizadas</h2>
+  <h2 id="s2">2. Dedução da equação</h2>
 
-  <div class="bloco def">
-    <span class="rotulo">Definição · Coordenadas generalizadas</span>
-    <p>Um conjunto \(\left\{q_1,q_2,\dots,q_n\right\}\) de variáveis independentes que
-    especifica completamente a configuração do sistema. Não precisam ser comprimentos, não
-    precisam ser ortogonais, não precisam sequer ter a mesma unidade: ângulos, distâncias,
-    áreas, combinações quaisquer, tudo serve, desde que cada configuração possível
-    corresponda a um e só um conjunto de valores.</p>
+  <h3>Passo 1: parametrizar as curvas vizinhas</h3>
+
+  <p>Tome a curva candidata \(y(x)\) e deforme-a de maneira controlada,</p>
+
+  <p>\[y(x)\;\longrightarrow\;y(x)+\varepsilon\,\eta(x),\]</p>
+
+  <p>com \(\varepsilon\ll1\) e \(\eta\) uma função arbitrária que se anula nas pontas,
+  \(\eta(x_1)=\eta(x_2)=0\), para que as condições de contorno não sejam violadas. A função
+  \(\eta\) escolhe a <em>direção</em> da perturbação, e \(\varepsilon\) mede o quanto se anda
+  nessa direção. O funcional vira uma função comum de uma variável:</p>
+
+  <p>\[J(\varepsilon)=\int_{x_1}^{x_2}
+  f\left(x,\;y+\varepsilon\eta,\;y'+\varepsilon\eta'\right)dx.\]</p>
+
+  <p>Com isso o problema de dimensão infinita foi reduzido, ao longo de cada direção, a um
+  problema de cálculo de uma variável. É o truque central da dedução.</p>
+
+  <h3>Passo 2: derivar e avaliar em \(\varepsilon=0\)</h3>
+
+  <p>Se \(y\) é extremante, \(J(\varepsilon)\) tem extremo em \(\varepsilon=0\) qualquer que
+  seja \(\eta\). Pela regra da cadeia,</p>
+
+  <p>\[\der{J}{\varepsilon}=\int_{x_1}^{x_2}\left(\pder{f}{y}\,\eta
+  +\pder{f}{y'}\,\eta'\right)dx,\]</p>
+
+  <p>e a condição de extremo é que essa integral se anule em \(\varepsilon=0\).</p>
+
+  <h3>Passo 3: integrar por partes</h3>
+
+  <p>A integral tem \(\eta\) no primeiro termo e \(\eta'\) no segundo, e enquanto isso durar
+  não há como fatorar \(\eta\). A integração por partes resolve:</p>
+
+  <p>\[\int_{x_1}^{x_2}\pder{f}{y'}\,\eta'\,dx
+  =\left[\pder{f}{y'}\,\eta\right]_{x_1}^{x_2}
+  -\int_{x_1}^{x_2}\der{}{x}\left(\pder{f}{y'}\right)\eta\,dx.\]</p>
+
+  <p>O colchete é avaliado nos extremos, onde \(\eta\) foi construída para se anular, de modo
+  que o termo de fronteira desaparece. É aqui que a hipótese de extremos fixos entra de fato
+  na conta, e é por isso que problemas de extremos livres têm condições adicionais: o colchete
+  sobrevive e precisa ser anulado de outra maneira.</p>
+
+  <h3>Passo 4: aplicar o lema fundamental</h3>
+
+  <p>Juntando as duas parcelas, a condição de extremo fica</p>
+
+  <p>\[\der{J}{\varepsilon}\bigg|_{\varepsilon=0}
+  =\int_{x_1}^{x_2}\left[\pder{f}{y}
+  -\der{}{x}\left(\pder{f}{y'}\right)\right]\eta(x)\,dx=0,\]</p>
+
+  <p>e isso tem de valer para <em>toda</em> \(\eta\) admissível. O lema fundamental, provado no
+  módulo anterior, converte essa condição integral numa condição ponto a ponto: o colchete tem
+  de ser identicamente nulo.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. A equação de Euler-Lagrange</h2>
+
+  <div class="destaque">
+    <span class="anuncio">Equação de Euler-Lagrange</span>
+    \[\pder{f}{y}-\der{}{x}\left(\pder{f}{y'}\right)=0.\]
+    Condição necessária para que \(y(x)\) torne extremo o funcional
+    \(J[y]=\int f\left(x,y,y'\right)dx\).
   </div>
 
-  <p>O número \(n\) de coordenadas independentes é o número de <strong>graus de
-  liberdade</strong>. Uma partícula livre no espaço tem três; duas partículas livres têm seis;
-  um corpo rígido tem seis, três de translação e três de orientação, como o módulo 5
-  estabeleceu. Cada vínculo holônomo tira um.</p>
+  <p>Abrindo a derivada total do segundo termo,</p>
+
+  <p>\[\der{}{x}\left(\pder{f}{y'}\right)
+  =\frac{\partial^2f}{\partial x\,\partial y'}
+  +\frac{\partial^2f}{\partial y\,\partial y'}\,y'
+  +\frac{\partial^2f}{\partial y'^2}\,y'',\]</p>
+
+  <p>de modo que a equação é, em geral, uma equação diferencial ordinária de <strong>segunda
+  ordem</strong> para \(y(x)\). As duas constantes de integração que ela traz são fixadas
+  pelas duas condições de contorno, e o problema fecha.</p>
+
+  <div data-widget="residuoel"></div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exemplo · A menor distância, enfim demonstrada</span>
+    <p>Para \(L[y]=\int\sqrt{1+y'^2}\,dx\) o integrando não depende de \(y\), e</p>
+    \[\pder{f}{y}=0,\qquad\pder{f}{y'}=\frac{y'}{\sqrt{1+y'^2}}.\]
+    <p>A equação de Euler-Lagrange reduz-se a dizer que essa segunda derivada é constante:</p>
+    \[\frac{y'}{\sqrt{1+y'^2}}=C\quad\Longrightarrow\quad
+    y'^2\left(1-C^2\right)=C^2\quad\Longrightarrow\quad
+    y'=\frac{C}{\sqrt{1-C^2}}=m,\]
+    <p>com \(m\) constante. Integrando, \(y=mx+b\): a reta. O resultado era esperado, e o que
+    se ganha é confiança no método para os casos em que a resposta não é óbvia.</p>
+  </div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Geodésicas</span>
+    <p>O mesmo funcional, escrito sobre uma superfície curva, define as geodésicas dela. Na
+    esfera a resposta são os círculos máximos, que é o motivo de um voo de São Paulo a Tóquio
+    passar perto do Alasca: a rota que parece torta no mapa plano é a mais curta sobre a
+    Terra. Em relatividade geral a trajetória de uma partícula livre é a geodésica do
+    espaço-tempo, e a equação acima, escrita com a métrica, é a equação do movimento.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. Dois casos especiais</h2>
+
+  <h3>Quando \(f\) não depende de \(y\)</h3>
+
+  <p>Se \(f=f(x,y')\), então \(\partial f/\partial y=0\) e a equação diz que a derivada total
+  de \(\partial f/\partial y'\) é nula. Integrando de uma vez,</p>
+
+  <div class="destaque">
+    <span class="anuncio">Primeira integral</span>
+    \[\pder{f}{y'}=\text{constante}.\]
+  </div>
+
+  <p>Uma equação de segunda ordem foi trocada por uma de primeira. Foi exatamente isso que
+  aconteceu no exemplo da reta, e é o que acontece sempre que a coordenada \(y\) é
+  <strong>cíclica</strong>, isto é, não aparece explicitamente. No módulo 11 esse mesmo fato
+  reaparece com outro nome: a quantidade conservada é o momento conjugado, e a conservação vem
+  de uma simetria.</p>
+
+  <h3>Quando \(f\) não depende de \(x\)</h3>
+
+  <p>Se \(f=f(y,y')\) há outra quantidade conservada, menos evidente. Tome a derivada total de
+  \(f\) ao longo da curva,</p>
+
+  <p>\[\der{f}{x}=\pder{f}{y}\,y'+\pder{f}{y'}\,y'',\]</p>
+
+  <p>e substitua \(\partial f/\partial y\) pela equação de Euler-Lagrange, isto é por
+  \(\frac{d}{dx}(\partial f/\partial y')\):</p>
+
+  <p>\[\der{f}{x}=\der{}{x}\left(\pder{f}{y'}\right)y'
+  +\pder{f}{y'}\,y''=\der{}{x}\left(y'\pder{f}{y'}\right).\]</p>
+
+  <p>Os dois lados são derivadas totais, e subtrair um do outro dá uma constante:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Integral de <a href="https://en.wikipedia.org/wiki/Eugenio_Beltrami">Beltrami</a></span>
+    \[f-y'\,\pder{f}{y'}=\text{constante}.\]
+  </div>
+
+  <p>Essa é a ferramenta que resolve a braquistócrona, a catenária e as geodésicas de várias
+  superfícies, e todas pelo mesmo motivo: nenhuma delas tem \(x\) aparecendo explicitamente no
+  integrando. Guarde a forma dessa combinação, porque ela voltará no módulo 11 como a
+  <strong>energia</strong>, quando a variável independente for o tempo.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. A braquistócrona resolvida</h2>
+
+  <p>O funcional montado no módulo 7 era</p>
+
+  <p>\[T[y]=\int_0^{x_B}\frac{\sqrt{1+y'^2}}{\sqrt{2gy}}\,dx
+  =\frac{1}{\sqrt{2g}}\int_0^{x_B}\sqrt{\frac{1+y'^2}{y}}\;dx,\]</p>
+
+  <p>com \(y\) medido para baixo a partir de A. O integrando
+  \(f=\sqrt{(1+y'^2)/y}\) não contém \(x\), e Beltrami se aplica. Calculando a derivada
+  parcial,</p>
+
+  <p>\[\pder{f}{y'}=\frac{y'}{\sqrt{y\left(1+y'^2\right)}},\]</p>
+
+  <p>e substituindo na combinação de Beltrami, os dois termos se juntam sobre o mesmo
+  denominador e o numerador colapsa:</p>
+
+  <p>\[\frac{\sqrt{1+y'^2}}{\sqrt{y}}-\frac{y'^2}{\sqrt{y\left(1+y'^2\right)}}
+  =\frac{\left(1+y'^2\right)-y'^2}{\sqrt{y\left(1+y'^2\right)}}
+  =\frac{1}{\sqrt{y\left(1+y'^2\right)}}=C.\]</p>
+
+  <p>Logo</p>
+
+  <div class="destaque">
+    <span class="anuncio">A equação da braquistócrona</span>
+    \[y\left(1+y'^2\right)=\frac{1}{C^2}=K,\qquad\text{ou}\qquad
+    y'=\sqrt{\frac{K-y}{y}}.\]
+  </div>
+
+  <p>Essa equação de primeira ordem é separável, e a substituição que a resolve é
+  \(y=\frac{K}{2}\left(1-\cos\theta\right)\). Com ela, \(dy=\frac{K}{2}\sen\theta\,d\theta\)
+  e \(y'=\cotg(\theta/2)\), de modo que</p>
+
+  <p>\[x=\int\frac{dy}{y'}
+  =\int\frac{\frac{K}{2}\sen\theta}{\cotg(\theta/2)}\,d\theta
+  =\frac{K}{2}\left(\theta-\sen\theta\right)+\text{const}.\]</p>
+
+  <p>A condição \(x(0)=y(0)=0\) zera a constante, e escrevendo \(a=K/2\),</p>
+
+  <div class="destaque">
+    <span class="anuncio">A ciclóide</span>
+    \[x=a\left(\theta-\sen\theta\right),\qquad
+    y=a\left(1-\cos\theta\right).\]
+  </div>
+
+  <p>São as equações paramétricas da curva traçada por um ponto fixo de uma roda que rola sem
+  deslizar sobre uma reta. O parâmetro \(a\) é determinado pela exigência de que a curva passe
+  pelo ponto B.</p>
+
+  <div data-widget="cicloide"></div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que mergulhar compensa</span>
+    <p>A conta não explica, ela calcula. A explicação é a seguinte: a conta parte do repouso, e
+    cada metro de queda inicial compra velocidade que será usada no resto do percurso. Um
+    caminho que mergulhe cedo é mais longo, e percorre esse comprimento extra depressa; um
+    caminho reto é curto e é percorrido devagar no começo, quando a velocidade ainda é pequena.
+    O ótimo negocia os dois efeitos, e a negociação tem nome: ciclóide. Quem esquia sabe disso
+    por experiência: desce-se rápido primeiro e atravessa-se depois.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. A catenária e a catenoide</h2>
+
+  <p>Uma corrente flexível e inextensível de densidade linear \(\varrho\), pendurada por duas
+  pontas, assume a forma que minimiza a energia potencial</p>
+
+  <p>\[U[y]=\varrho g\int_{x_1}^{x_2}y\sqrt{1+y'^2}\;dx.\]</p>
+
+  <p>De novo o integrando \(f=y\sqrt{1+y'^2}\) ignora \(x\), e de novo Beltrami corta caminho.
+  Com \(\partial f/\partial y'=yy'/\sqrt{1+y'^2}\),</p>
+
+  <p>\[y\sqrt{1+y'^2}-\frac{y\,y'^2}{\sqrt{1+y'^2}}
+  =\frac{y\left[\left(1+y'^2\right)-y'^2\right]}{\sqrt{1+y'^2}}
+  =\frac{y}{\sqrt{1+y'^2}}=C.\]</p>
+
+  <p>Isolando \(y'=\sqrt{y^2-C^2}/C\) e integrando,</p>
+
+  <p>\[x=C\int\frac{dy}{\sqrt{y^2-C^2}}=C\,\mathrm{arccosh}\frac{y}{C}+K,\]</p>
+
+  <div class="destaque">
+    <span class="anuncio">A catenária</span>
+    \[y(x)=C\cosh\left(\frac{x-K}{C}\right).\]
+  </div>
+
+  <p>Para apoios na mesma altura a simetria impõe \(K=0\), o ponto mais baixo fica em \(x=0\)
+  com \(y(0)=C\), e o comprimento sai de uma conta limpa, porque
+  \(\sqrt{1+\mathrm{senh}^2u}=\cosh u\):</p>
+
+  <p>\[L=\int_{-a}^{a}\cosh\frac{x}{C}\,dx=2C\,\mathrm{senh}\frac{a}{C}.\]</p>
+
+  <div data-widget="catenaria"></div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Catenária ou parábola</span>
+    <p>As duas curvas se parecem o bastante para terem sido confundidas por <a href="https://pt.wikipedia.org/wiki/Galileu_Galilei">Galileu</a>, que
+    apostou na parábola em 1638. A diferença está em como o peso se distribui. Se a carga
+    acompanha o <em>arco</em>, como no próprio peso de um cabo, a forma é a catenária
+    \(y=C\cosh(x/C)\); se a carga se distribui uniformemente na <strong>horizontal</strong>,
+    como o tabuleiro de uma ponte pênsil pendurado no cabo, a forma é a parábola. Um cabo de
+    transmissão entre duas torres é catenária; o cabo principal da <a href="https://pt.wikipedia.org/wiki/Ponte_Herc%C3%ADlio_Luz">ponte Hercílio Luz</a> é, com
+    boa aproximação, parábola.</p>
+  </div>
+
+  <h3>A superfície mínima de revolução</h3>
+
+  <p>Gire uma curva \(y(x)\) em torno do eixo \(x\) e a superfície gerada tem área</p>
+
+  <p>\[A[y]=2\pi\int_{x_1}^{x_2}y\sqrt{1+y'^2}\;dx,\]</p>
+
+  <p>que é, a menos do fator \(2\pi\varrho g\), o mesmo funcional da catenária. A resposta,
+  portanto, é a mesma curva, e a superfície que ela gera chama-se <strong>catenoide</strong>.
+  Vale a pena ver a conta também pela via direta, sem Beltrami. Com</p>
+
+  <p>\[\pder{f}{y}=\sqrt{1+y'^2},\qquad
+  \pder{f}{y'}=\frac{y\,y'}{\sqrt{1+y'^2}},\]</p>
+
+  <p>a equação de Euler-Lagrange, depois de derivar o quociente e multiplicar por
+  \(\left(1+y'^2\right)^{3/2}\), fica</p>
+
+  <p>\[\left(1+y'^2\right)^2=y'^2\left(1+y'^2\right)+y\,y''
+  \quad\Longrightarrow\quad y\,y''=1+y'^2,\]</p>
+
+  <p>equação de segunda ordem cuja solução é a mesma catenária. A via de Beltrami produz
+  \(y/\sqrt{1+y'^2}=C\) em três linhas, e é por isso que vale a pena verificar, antes de
+  derivar qualquer coisa, se o integrando contém \(x\).</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A película de sabão entre dois anéis</span>
+    <p>Mergulhe dois anéis coaxiais em água com sabão e retire-os: a película que se forma
+    entre eles é uma catenoide, porque a tensão superficial torna a energia proporcional à
+    área e a película procura o mínimo. Afaste os anéis devagar e, passado certo limite, a
+    película estoura: além de uma separação crítica não existe mais catenoide ligando os dois
+    anéis, e o mínimo absoluto passa a ser a solução degenerada, dois discos separados. É um
+    exemplo concreto de que a equação de Euler-Lagrange dá condição necessária e não garante a
+    existência do extremo.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. Fermat e a lei de Snell</h2>
+
+  <p>A luz percorre, entre dois pontos, o caminho que torna estacionário o tempo de percurso.
+  Como \(v=c/n\), o tempo é proporcional ao <strong>caminho óptico</strong>
+  \(\Lambda=\int n\,ds\), e minimizar um é minimizar o outro.</p>
+
+  <p>No caso de dois meios homogêneos separados por um plano, o problema não precisa de
+  cálculo variacional. A trajetória é reta em cada meio, de modo que a única incógnita é a
+  abscissa \(x\) do ponto de cruzamento. Com \(A=(0,a)\) e \(B=(b,-c)\),</p>
+
+  <p>\[\Lambda(x)=n_1\sqrt{x^2+a^2}+n_2\sqrt{\left(b-x\right)^2+c^2},\]</p>
+
+  <p>e derivar em \(x\) é cálculo de uma variável:</p>
+
+  <p>\[\der{\Lambda}{x}=n_1\frac{x}{\sqrt{x^2+a^2}}
+  -n_2\frac{b-x}{\sqrt{\left(b-x\right)^2+c^2}}=0.\]</p>
+
+  <p>Os dois quocientes são, pela geometria da figura, os senos dos ângulos com a normal, de
+  modo que a condição de estacionariedade é</p>
+
+  <div class="destaque">
+    <span class="anuncio">Lei de <a href="https://pt.wikipedia.org/wiki/Willebrord_Snel_van_Royen">Snell</a></span>
+    \[n_1\sen\theta_1=n_2\sen\theta_2.\]
+  </div>
+
+  <div data-widget="snell"></div>
+
+  <p>Para a reflexão num espelho basta pôr \(n_1=n_2\), e a mesma condição dá
+  \(\theta_1=\theta_2\): o ângulo de incidência é o de reflexão.</p>
+
+  <h3>Meios estratificados</h3>
+
+  <p>Quando o índice varia continuamente com a altura, \(n=n(y)\), não há ponto de cruzamento
+  a determinar e a curva inteira é a incógnita. Aí o problema é variacional de verdade, com
+  integrando</p>
+
+  <p>\[f\left(y,y'\right)=n(y)\sqrt{1+y'^2},\]</p>
+
+  <p>que não depende de \(x\). Beltrami devolve</p>
+
+  <p>\[f-y'\pder{f}{y'}
+  =n(y)\sqrt{1+y'^2}-n(y)\frac{y'^2}{\sqrt{1+y'^2}}
+  =\frac{n(y)}{\sqrt{1+y'^2}}=\text{constante},\]</p>
+
+  <p>e reconhecendo \(1/\sqrt{1+y'^2}=dx/ds=\sen\theta\), com \(\theta\) medido a partir da
+  vertical,</p>
+
+  <div class="destaque">
+    <span class="anuncio">Invariante de Snell</span>
+    \[n(y)\,\sen\theta=\text{constante ao longo de todo o raio}.\]
+  </div>
+
+  <p>É a lei de Snell em forma contínua, e dela saem as miragens. Perto do asfalto quente o ar
+  é menos denso e \(n\) cai; para manter \(n\sen\theta\) constante, \(\sen\theta\) tem de
+  crescer, o raio vai ficando mais horizontal até rasar o chão e voltar a subir. O observador
+  recebe luz do céu vinda de baixo e vê uma poça que não existe.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. Resumo dos três problemas</h2>
 
   <div class="tabela-rolavel">
   <table>
-    <thead><tr><th>Sistema</th><th>Coordenadas naturais</th><th>Graus de liberdade</th></tr></thead>
+    <thead><tr><th>Problema</th><th>Funcional</th><th>Ferramenta</th><th>Solução</th></tr></thead>
     <tbody>
-      <tr><td>pêndulo simples</td><td>\(\theta\)</td><td>1</td></tr>
-      <tr><td>pêndulo duplo no plano</td><td>\(\theta_1,\theta_2\)</td><td>2</td></tr>
-      <tr><td>conta num aro que gira</td><td>\(\theta\)</td><td>1</td></tr>
-      <tr><td>partícula sobre uma esfera</td><td>\(\theta,\varphi\)</td><td>2</td></tr>
-      <tr><td>máquina de Atwood</td><td>\(x\) de um dos blocos</td><td>1</td></tr>
-      <tr><td>corpo rígido livre</td><td>3 do centro de massa, 3 de <a href="https://pt.wikipedia.org/wiki/Leonhard_Euler">Euler</a></td><td>6</td></tr>
-      <tr><td>pião com ponta fixa</td><td>ângulos de Euler \(\varphi,\theta,\psi\)</td><td>3</td></tr>
+      <tr><td>menor distância</td><td>\(\int\sqrt{1+y'^2}\,dx\)</td><td>primeira integral</td><td>reta \(y=mx+b\)</td></tr>
+      <tr><td>braquistócrona</td><td>\(\int\sqrt{\dfrac{1+y'^2}{y}}\,dx\)</td><td>Beltrami</td><td>ciclóide</td></tr>
+      <tr><td>catenária e catenoide</td><td>\(\int y\sqrt{1+y'^2}\,dx\)</td><td>Beltrami</td><td>\(y=C\cosh(x/C)\)</td></tr>
+      <tr><td><a href="https://pt.wikipedia.org/wiki/Pierre_de_Fermat">Fermat</a>, dois meios</td><td>\(n_1d_1+n_2d_2\)</td><td>cálculo ordinário</td><td>\(n_1\sen\theta_1=n_2\sen\theta_2\)</td></tr>
+      <tr><td>Fermat, meio estratificado</td><td>\(\int n(y)\sqrt{1+y'^2}\,dx\)</td><td>Beltrami</td><td>\(n\sen\theta\) constante</td></tr>
     </tbody>
   </table>
   </div>
 
-  <p>A escolha certa economiza trabalho de duas maneiras. Primeiro, reduz o número de
-  equações: o pêndulo tem uma coordenada em vez de duas. Segundo, e mais importante, faz
-  desaparecer as forças de vínculo, que em coordenadas cartesianas seriam incógnitas
-  adicionais.</p>
+  <p>Três das cinco linhas foram resolvidas pela mesma observação: o integrando não continha a
+  variável independente. Vale fazer disso um hábito, porque em mecânica a variável
+  independente é o tempo, e um sistema cuja lagrangiana não depende explicitamente do tempo é
+  precisamente um sistema que conserva energia.</p>
 
   <!-- ================================================== -->
-  <h2 id="s5">5. Vínculos</h2>
+  <h2 id="s9">9. O princípio de Hamilton</h2>
 
-  <p>Um <strong>vínculo</strong> é uma condição que restringe os movimentos admissíveis. A
-  distinção que organiza todo o assunto é entre os que podem ser integrados e os que não
-  podem.</p>
+  <p>Toda a maquinaria construída até aqui trata de curvas \(y(x)\). Troque \(x\) pelo tempo
+  \(t\), troque \(y\) pela coordenada \(q\) do sistema e troque o integrando pela diferença
+  entre as energias cinética e potencial. O funcional que aparece é a <strong>ação</strong>:</p>
 
-  <div class="tabela-rolavel">
-  <table>
-    <thead><tr><th></th><th>Holônomo</th><th>Não-holônomo</th></tr></thead>
-    <tbody>
-      <tr><td>forma geral</td><td>\(g\left(q_1,\dots,q_n,t\right)=0\)</td><td>envolve \(\dot q_i\) e não é integrável</td></tr>
-      <tr><td>efeito</td><td>reduz os graus de liberdade</td><td>não reduz os graus de liberdade</td></tr>
-      <tr><td>tratamento</td><td>eliminar coordenadas, ou multiplicador</td><td>só com multiplicador</td></tr>
-      <tr><td>exemplo</td><td>partícula sobre a superfície \(g(x,y,z)=0\)</td><td>roda que rola sem deslizar</td></tr>
-    </tbody>
-  </table>
+  <div class="destaque">
+    <span class="anuncio">Princípio de <a href="https://pt.wikipedia.org/wiki/William_Rowan_Hamilton">Hamilton</a></span>
+    \[\Acao[q]=\int_{t_1}^{t_2}\Lag\left(q,\dot q,t\right)dt,\qquad
+    \Lag=T-V,\qquad\delta\Acao=0.\]
+    Entre todas as histórias possíveis ligando dois estados em tempos dados, o sistema percorre
+    aquela que torna a ação estacionária.
   </div>
 
-  <p>O exemplo da roda merece cuidado, porque ele costuma ser mal contado. Uma roda vertical
-  que rola sem deslizar <em>ao longo de uma reta</em> satisfaz \(\dot x=R\dot\theta\), e essa
-  relação <strong>pode</strong> ser integrada: \(x=R\theta+\)const. Nesse caso o vínculo é
-  holônomo, apesar de ter sido escrito com velocidades. O caso genuinamente não-holônomo é a
-  roda que pode também girar em torno da vertical, ou o disco que rola sobre um plano: aí a
-  relação entre velocidades depende do caminho percorrido, e não existe nenhuma função das
-  coordenadas cuja derivada total a reproduza.</p>
+  <p>A equação de Euler-Lagrange, aplicada a essa ação, não muda de forma: só muda o nome das
+  letras. Ela passa a ser</p>
 
-  <div data-widget="estacionar"></div>
+  <p>\[\der{}{t}\left(\pder{\Lag}{\dot q}\right)-\pder{\Lag}{q}=0.\]</p>
+
+  <p>Vale testar no caso mais simples possível. Uma partícula em queda tem
+  \(\Lag=\tfrac{1}{2}m\dot y^2-mgy\), de modo que</p>
+
+  <p>\[\pder{\Lag}{\dot y}=m\dot y,\qquad\pder{\Lag}{y}=-mg,\]</p>
+
+  <p>e a equação devolve \(\frac{d}{dt}\left(m\dot y\right)+mg=0\), isto é \(m\ddot y=-mg\). A
+  segunda lei de <a href="https://pt.wikipedia.org/wiki/Isaac_Newton">Newton</a> saiu de um princípio que não menciona forças em momento algum.</p>
+
+  <div data-widget="acao"></div>
 
   <div class="bloco fisica">
-    <span class="rotulo">O teste da integrabilidade</span>
-    <p>Dado um vínculo na forma \(\sum_i a_i\left(q\right)\dot q_i=0\), a pergunta é se existe
-    \(g(q)\) com \(\partial g/\partial q_i=\mu a_i\) para algum fator integrante \(\mu\). Se
-    existir, o vínculo é holônomo disfarçado; se não existir, é não-holônomo de verdade. O
-    teste é o mesmo das formas diferenciais exatas, e a condição é a igualdade das derivadas
-    cruzadas. Para o carro da figura, com \(a=\left(\sen\theta,-\cos\theta,0\right)\), a
-    condição falha, e é por isso que estacionar exige manobra.</p>
-  </div>
-
-  <!-- ================================================== -->
-  <h2 id="s6">6. As equações de Lagrange</h2>
-
-  <p>Com coordenadas generalizadas \(q_i\) escolhidas de modo a já respeitar os vínculos
-  holônomos, aplique o princípio de <a href="https://pt.wikipedia.org/wiki/William_Rowan_Hamilton">Hamilton</a> à ação</p>
-
-  <p>\[\Acao\left[q_1,\dots,q_n\right]
-  =\int_{t_1}^{t_2}\Lag\left(q_1,\dots,q_n,\dot q_1,\dots,\dot q_n,t\right)dt,
-  \qquad\Lag=T-V,\]</p>
-
-  <p>e use o sistema de equações da seção 1, com \(t\) no lugar de \(x\):</p>
-
-  <div class="destaque">
-    <span class="anuncio">Equações de Lagrange</span>
-    \[\der{}{t}\left(\pder{\Lag}{\dot q_i}\right)-\pder{\Lag}{q_i}=0,
-    \qquad i=1,2,\dots,n.\]
-  </div>
-
-  <p>A matemática é exatamente a mesma dos módulos 7 e 8. O que mudou foram os nomes: a
-  variável independente agora é o tempo, as funções desconhecidas são as coordenadas
-  generalizadas, e o integrando é a lagrangiana.</p>
-
-  <h3>Três verificações</h3>
-
-  <div class="bloco def">
-    <span class="rotulo">Partícula livre em uma dimensão</span>
-    <p>Com \(T=\tfrac12m\dot x^2\) e \(V=0\), temos \(\Lag=\tfrac12m\dot x^2\),
-    \(\partial\Lag/\partial x=0\) e \(\partial\Lag/\partial\dot x=m\dot x\). A equação devolve
-    \(m\ddot x=0\), isto é \(x=x_0+v_0t\): a primeira lei de <a href="https://pt.wikipedia.org/wiki/Isaac_Newton">Newton</a>.</p>
-  </div>
-
-  <div class="bloco def">
-    <span class="rotulo">Queda sob gravidade</span>
-    <p>Com \(\Lag=\tfrac12m\dot y^2-mgy\), vem \(\partial\Lag/\partial y=-mg\) e
-    \(\partial\Lag/\partial\dot y=m\dot y\), de modo que \(m\ddot y=-mg\). A segunda lei.</p>
-  </div>
-
-  <div class="bloco def">
-    <span class="rotulo">Oscilador harmônico</span>
-    <p>Com \(\Lag=\tfrac12m\dot x^2-\tfrac12kx^2\), a equação dá \(m\ddot x+kx=0\), ou
-    \(\ddot x+\omega^2x=0\) com \(\omega=\sqrt{k/m}\). A lei de <a href="https://pt.wikipedia.org/wiki/Robert_Hooke">Hooke</a>, sem que se tenha
-    escrito \(\vet{F}=-k\vet{x}\) em momento algum.</p>
-  </div>
-
-  <p>Os três casos reproduzem resultados conhecidos, e é isso que se espera deles: antes de
-  usar um formalismo novo em problema difícil, convém vê-lo acertar os fáceis. O ganho real
-  aparece no exemplo seguinte.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s7">7. O pêndulo, com e sem tração</h2>
-
-  <p>Uma massa \(m\) presa a um fio inextensível de comprimento \(\ell\). Pela via de Newton é
-  preciso escrever as duas forças, a tração \(\vet{T}\) e o peso \(m\vet{g}\), projetar na
-  direção tangencial, projetar na radial, e depois reconhecer que a equação radial não é
-  equação de movimento nenhuma: ela apenas determina o valor de \(T\).</p>
-
-  <p>Pela via de Lagrange, escolha \(\theta\). O vínculo \(x^2+y^2=\ell^2\) está incorporado
-  por construção, porque</p>
-
-  <p>\[x=\ell\sen\theta,\qquad y=-\ell\cos\theta
-  \quad\Longrightarrow\quad
-  \dot x=\ell\dot\theta\cos\theta,\quad\dot y=\ell\dot\theta\sen\theta.\]</p>
-
-  <p>A energia cinética colapsa, porque \(\cos^2+\sen^2=1\):</p>
-
-  <p>\[T=\tfrac12m\left(\dot x^2+\dot y^2\right)=\tfrac12m\ell^2\dot\theta^2,
-  \qquad V=mgy=-mg\ell\cos\theta,\]</p>
-
-  <p>de modo que \(\Lag=\tfrac12m\ell^2\dot\theta^2+mg\ell\cos\theta\). As duas derivadas
-  são</p>
-
-  <p>\[\pder{\Lag}{\dot\theta}=m\ell^2\dot\theta,\qquad
-  \pder{\Lag}{\theta}=-mg\ell\sen\theta,\]</p>
-
-  <div class="destaque">
-    <span class="anuncio">A equação do pêndulo</span>
-    \[\ddot\theta+\frac{g}{\ell}\sen\theta=0.\]
-  </div>
-
-  <p>A tração não apareceu. Duas linhas de álgebra substituíram a decomposição vetorial, e a
-  incógnita que não interessava simplesmente não entrou na conta. Para pequenas oscilações,
-  \(\sen\theta\simeq\theta\) e \(\omega=\sqrt{g/\ell}\).</p>
-
-  <div data-widget="pendulolag"></div>
-
-  <!-- ================================================== -->
-  <h2 id="s8">8. Momento generalizado</h2>
-
-  <div class="bloco def">
-    <span class="rotulo">Definição · Momento conjugado</span>
-    <p>O momento generalizado associado à coordenada \(q_i\) é</p>
-    \[p_i=\pder{\Lag}{\dot q_i}.\]
-    <p>Com ele, as equações de Lagrange se escrevem na forma compacta \(\dot p_i=\partial
-    \Lag/\partial q_i\), que é a generalização de \(\vet{F}=\dot{\vet{p}}\) para coordenadas
-    arbitrárias.</p>
-  </div>
-
-  <p>O nome engana um pouco. O momento conjugado não é sempre massa vezes velocidade: é o que
-  a derivada da lagrangiana produzir, e as unidades acompanham a coordenada escolhida.</p>
-
-  <div class="tabela-rolavel">
-  <table>
-    <thead><tr><th>Sistema</th><th>Coordenada</th><th>Momento conjugado</th><th>É o quê</th></tr></thead>
-    <tbody>
-      <tr><td>partícula em 1D</td><td>\(x\)</td><td>\(m\dot x\)</td><td>momento linear</td></tr>
-      <tr><td>pêndulo</td><td>\(\theta\)</td><td>\(m\ell^2\dot\theta\)</td><td>momento angular</td></tr>
-      <tr><td>polares</td><td>\(\varphi\)</td><td>\(mr^2\dot\varphi\)</td><td>momento angular</td></tr>
-      <tr><td>carga em campo magnético</td><td>\(x\)</td><td>\(m\dot x+qA_x\)</td><td>momento canônico</td></tr>
-    </tbody>
-  </table>
-  </div>
-
-  <p>A última linha é a mais instrutiva, e volta no módulo 11: numa partícula carregada o
-  momento conjugado difere do momento mecânico por um termo que depende do potencial vetor. É
-  a distinção entre momento canônico e momento cinético, que importa em magnetismo e em
-  mecânica quântica.</p>
-
-  <h3>Coordenadas cíclicas</h3>
-
-  <p>Se uma coordenada \(q_k\) não aparece explicitamente na lagrangiana, apenas a sua
-  derivada, então \(\partial\Lag/\partial q_k=0\) e a equação correspondente diz que o momento
-  conjugado é constante. A coordenada chama-se <strong>cíclica</strong>, e a conservação sai de
-  graça: basta olhar para a lagrangiana e notar uma ausência.</p>
-
-  <div data-widget="ciclica"></div>
-
-  <!-- ================================================== -->
-  <h2 id="s9">9. Forças generalizadas</h2>
-
-  <p>Quando há forças que não derivam de potencial, como atrito, ou quando se prefere não
-  escrever um potencial, as equações de Lagrange ganham um lado direito. Partindo do princípio
-  dos trabalhos virtuais, o trabalho de todas as forças aplicadas num deslocamento virtual
-  \(\delta q_i\) define</p>
-
-  <div class="destaque">
-    <span class="anuncio">Força generalizada</span>
-    \[Q_i=\sum_k\vet{F}_k\cdot\pder{\vet{r}_k}{q_i},
-    \qquad
-    \der{}{t}\left(\pder{T}{\dot q_i}\right)-\pder{T}{q_i}=Q_i.\]
-  </div>
-
-  <p>Quando as forças derivam de um potencial, \(Q_i=-\partial V/\partial q_i\), e a equação
-  volta à forma de sempre com \(\Lag=T-V\). A versão com \(Q_i\) é a mais geral das duas, e é
-  a que se usa com atrito viscoso, com forças de arrasto ou com forças de controle.</p>
-
-  <p>As unidades de \(Q_i\) seguem a coordenada. Se \(q_i\) é um comprimento, \(Q_i\) é uma
-  força em newtons; se \(q_i\) é um ângulo, \(Q_i\) é um torque em newton-metro. O produto
-  \(Q_i\,\delta q_i\) é sempre um trabalho, e essa é a maneira segura de conferir uma conta.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s10">10. Multiplicadores e forças de vínculo</h2>
-
-  <p>Eliminar coordenadas faz as forças de vínculo sumirem, e isso é ótimo enquanto elas não
-  interessam. Mas às vezes interessam: querer saber quando o fio arrebenta, ou a que altura a
-  conta descola da esfera, é querer saber exatamente a força que se fez desaparecer. O método
-  dos multiplicadores recupera as duas coisas de uma vez.</p>
-
-  <p>Em vez de eliminar o vínculo \(g\left(q,t\right)=0\), some-o à lagrangiana com um
-  coeficiente a determinar:</p>
-
-  <div class="destaque">
-    <span class="anuncio">Lagrangiana aumentada</span>
-    \[\tilde\Lag=\Lag+\lambda(t)\,g\left(q,t\right).\]
-  </div>
-
-  <p>Trate agora todas as coordenadas <em>e</em> o próprio \(\lambda\) como independentes. A
-  variação em \(\lambda\) devolve \(g=0\), que é o vínculo de volta; a variação em cada
-  \(q_i\) devolve</p>
-
-  <p>\[\der{}{t}\left(\pder{\Lag}{\dot q_i}\right)-\pder{\Lag}{q_i}
-  =\lambda\,\pder{g}{q_i}.\]</p>
-
-  <p>Em forma vetorial, para uma partícula sobre a superfície \(g(x,y,z)=0\),</p>
-
-  <p>\[m\ddot{\vet{r}}=\vet{F}+\lambda\nabla g.\]</p>
-
-  <p>O termo extra é paralelo a \(\nabla g\), que é normal à superfície. O multiplicador
-  deixou de ser um truque algébrico: ele <strong>é</strong> a força de vínculo, medida em
-  newtons.</p>
-
-  <div data-widget="multiplicador"></div>
-
-  <div class="bloco def">
-    <span class="rotulo">A conta na esfera, passo a passo</span>
-    <p>Com \(g=x^2+y^2+z^2-R^2\) e \(\nabla g=2\vet{r}\), a equação de movimento de uma
-    partícula livre presa à esfera é \(m\ddot{\vet{r}}=2\lambda\vet{r}\). Para achar
-    \(\lambda\), derive o vínculo duas vezes no tempo:</p>
-    \[\vet{r}\cdot\dot{\vet{r}}=0,\qquad
-    \left|\dot{\vet{r}}\right|^2+\vet{r}\cdot\ddot{\vet{r}}=0.\]
-    <p>Substituindo a equação de movimento na segunda,</p>
-    \[\left|\dot{\vet{r}}\right|^2+\frac{2\lambda}{m}R^2=0
-    \quad\Longrightarrow\quad
-    \lambda=-\frac{m}{2R^2}\left|\dot{\vet{r}}\right|^2,\]
-    <p>e a força de vínculo vale</p>
-    \[\vet{F}_{\rm vinc}=2\lambda\vet{r}=-\frac{mv^2}{R}\,\vers{r}.\]
-    <p>É a força centrípeta, com o módulo de sempre, apontando para dentro. Em nenhum momento
-    se supôs movimento circular: o resultado saiu do formalismo.</p>
-  </div>
-
-  <div class="bloco def">
-    <span class="rotulo">A conta no parabolóide</span>
-    <p>Com \(g=z-x^2-y^2\) e gravidade presente, \(\nabla g=\left(-2x,-2y,1\right)\) e as
-    equações ficam</p>
-    \[m\ddot x=-2\lambda x,\qquad m\ddot y=-2\lambda y,\qquad m\ddot z=-mg+\lambda.\]
-    <p>Derivando o vínculo duas vezes e substituindo,</p>
-    \[\lambda=\frac{m\left[2\left(\dot x^2+\dot y^2\right)+g\right]}{1+4z}.\]
-    <p>As duas parcelas do numerador têm origens distintas: a primeira é centrípeta e cresce
-    com a velocidade tangencial, a segunda sustenta o peso. As duas diminuem com a altura,
-    porque a superfície vai ficando mais íngreme e a normal perde componente vertical. No
-    vértice, com a partícula em repouso, sobra \(\vet{F}=mg\vers{z}\): a normal de uma mesa
-    horizontal.</p>
+    <span class="rotulo">Por que \(T-V\) e não \(T+V\)</span>
+    <p>A pergunta é natural e a resposta é instrutiva. A energia total \(T+V\) é constante ao
+    longo do movimento real, e um funcional construído com ela daria o mesmo número para uma
+    família inteira de caminhos: não serviria para distinguir nenhum. A diferença \(T-V\), ao
+    contrário, varia de caminho para caminho, e varia do jeito certo: ela penaliza demorar-se
+    onde \(V\) é grande e penaliza correr à toa onde \(V\) é pequeno. O movimento real é o
+    compromisso entre as duas penalidades.</p>
   </div>
 
   <div class="bloco fisica">
-    <span class="rotulo">Vínculos integrais</span>
-    <p>O mesmo método serve para vínculos da forma \(\int g\,dx=C\), que foram batizados de
-    isoperimétricos no módulo 7. A diferença é que ali o multiplicador é uma
-    <em>constante</em>, e não uma função do tempo, porque o vínculo é um só para a curva
-    inteira. Minimizando \(\int f\,dx\) com \(\int g\,dx\) fixo, aplica-se Euler-Lagrange a
-    \(f+\lambda g\), e o problema de <a href="https://en.wikipedia.org/wiki/Dido">Dido</a> devolve o círculo.</p>
+    <span class="rotulo">O que se ganha</span>
+    <p>A formulação variacional parece, a esta altura, um rodeio para chegar onde Newton já
+    estava. A vantagem aparece quando o sistema tem vínculos, que é o assunto do módulo 9. A
+    ação é um <em>escalar</em>, e escalares não se importam com a escolha de coordenadas: a
+    mesma equação funciona em cartesianas, polares, esféricas ou em qualquer conjunto de
+    parâmetros que descreva a configuração. Forças de vínculo, que em Newton exigem decompor
+    normais e trações desconhecidas, simplesmente não aparecem. Além disso, o formalismo se
+    estende sem mudanças a campos, à relatividade e à mecânica quântica, enquanto a noção de
+    força não.</p>
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s11">11. Receita de trabalho</h2>
+  <h2 id="s10">10. Estacionária, não mínima</h2>
 
-  <p>Reduzido ao essencial, o procedimento tem seis passos, e vale a pena executá-los sempre
-  na mesma ordem.</p>
+  <p>O nome popular do princípio, "mínima ação", promete mais do que o teorema entrega. A
+  condição \(\delta\Acao=0\) diz que a ação é <strong>estacionária</strong>, e isso inclui
+  mínimos, máximos e pontos de sela, exatamente como \(f'(x)=0\) inclui os três casos no
+  cálculo de uma variável.</p>
 
-  <div class="bloco def">
-    <span class="rotulo">Como montar e resolver</span>
-    <ol>
-      <li>Conte os graus de liberdade: coordenadas livres menos vínculos holônomos.</li>
-      <li>Escolha coordenadas generalizadas que já respeitem os vínculos. Ângulos costumam ser
-      melhores que distâncias quando há rotação.</li>
-      <li>Escreva \(T\) e \(V\) nessas coordenadas, em geral partindo das cartesianas e
-      derivando-as. É aqui que se erra mais: \(T\) precisa ser escrita em função de
-      \(\dot q_i\), não de \(\dot x\).</li>
-      <li>Monte \(\Lag=T-V\) e calcule, para cada \(i\),
-      \(\partial\Lag/\partial q_i\) e \(\partial\Lag/\partial\dot q_i\).</li>
-      <li>Antes de derivar no tempo, confira se alguma coordenada é cíclica. Cada uma delas dá
-      uma constante de movimento de graça e poupa uma integração.</li>
-      <li>Escreva as \(n\) equações e resolva. Se for preciso conhecer uma força de vínculo,
-      volte ao passo 2, mantenha a coordenada redundante e use um multiplicador.</li>
-    </ol>
+  <p>Em alguns sistemas a ação é mínima sempre. A queda livre é um deles: com
+  \(\Lag=\tfrac{1}{2}m\dot y^2-mgy\), uma deformação \(\eta(t)\) que se anule nas
+  pontas muda a ação em</p>
+
+  <p>\[\delta^2\Acao=\frac{m}{2}\int_{t_1}^{t_2}\dot\eta^2\,dt>0,\]</p>
+
+  <p>porque o potencial é linear em \(y\) e não contribui para a segunda variação. Por mais
+  longo que seja o percurso, o caminho real é mínimo.</p>
+
+  <p>Basta o potencial ser quadrático para a conclusão mudar. No oscilador harmônico,
+  \(\Lag=\tfrac{1}{2}m\dot y^2-\tfrac{1}{2}m\omega^2y^2\), a segunda variação ganha um
+  termo negativo,</p>
+
+  <p>\[\delta^2\Acao=\frac{m}{2}\int_{t_1}^{t_2}
+  \left(\dot\eta^2-\omega^2\eta^2\right)dt,\]</p>
+
+  <p>e basta escolher uma deformação lenta para torná-la negativa. Com
+  \(\eta=\sen\left(\pi t/T\right)\) sobre um percurso de duração \(T\), as duas
+  integrais valem \(T/2\) vezes \(\left(\pi/T\right)^2\) e \(\omega^2\), de modo
+  que</p>
+
+  <div class="destaque">
+    <span class="anuncio">Onde o mínimo deixa de ser mínimo</span>
+    \[\delta^2\Acao=\frac{mT}{4}\left[\left(\frac{\pi}{T}\right)^2-\omega^2\right],
+    \qquad\text{negativa para}\qquad T>\frac{\pi}{\omega}.\]
   </div>
+
+  <p>Meio período é o limite. Passado ele, o caminho real continua estacionário e deixa de ser
+  mínimo, e o instante em que isso acontece tem nome próprio: <strong>ponto
+  conjugado</strong>. A interpretação geométrica é bonita: meio período depois de passar pela
+  origem, <em>todas</em> as trajetórias do oscilador que partiram de lá se reencontram no
+  mesmo ponto, independentemente da amplitude. Famílias de extremantes que se cruzam são
+  exatamente o sintoma da perda de minimalidade.</p>
+
+  <p>O mesmo fenômeno aparece na esfera. Entre dois pontos próximos, o arco de círculo máximo
+  que os liga é o caminho mais curto; entre dois pontos separados por mais de meia volta, o
+  arco complementar continua sendo geodésica e não é mínimo de nada. Os polos de uma esfera
+  são pontos conjugados um do outro, e por eles passam infinitas geodésicas.</p>
 
   <div class="bloco fisica">
-    <span class="rotulo">Erros que aparecem toda semana</span>
-    <ul>
-      <li>Escrever \(\Lag=T+V\). A lagrangiana é a diferença; a soma é a energia, que é outra
-      coisa e serve para outra coisa.</li>
-      <li>Esquecer que \(V\) pode depender do tempo, ou que \(T\) pode depender das
-      coordenadas, como em \(T=\tfrac12m\left(\dot r^2+r^2\dot\varphi^2\right)\), em que o
-      termo \(r^2\dot\varphi^2\) gera a força centrífuga sem que ela tenha sido postulada.</li>
-      <li>Derivar \(\partial\Lag/\partial\dot q\) e esquecer que \(q\) e \(\dot q\) dependem do
-      tempo ao aplicar \(d/dt\).</li>
-      <li>Contar graus de liberdade descontando vínculos não-holônomos. Eles não descontam
-      nada do espaço de configuração.</li>
-      <li>Usar coordenadas que não são independentes, por exemplo \(x\) e \(\theta\) de uma
-      roda que rola em linha reta. Uma das duas é redundante.</li>
-    </ul>
+    <span class="rotulo">Verifique no simulador</span>
+    <p>No widget da seção 9, troque o potencial de queda livre para oscilador harmônico e
+    aumente a duração do percurso. Com \(\omega=2\) rad/s a troca acontece em
+    \(T=\pi/2=1{,}57\) s: abaixo disso o ponto \(a=0\) é fundo de vale, acima dele é topo
+    de morro ao longo dessa deformação. O cartão da natureza do extremo acusa a mudança.
+    Nenhuma física mudou no caminho real, apenas o adjetivo.</p>
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s12">12. Exercícios resolvidos</h2>
+  <h2 id="s11">11. Exercícios resolvidos</h2>
 
   <div class="bloco def">
-    <span class="rotulo">Exercício resolvido 9.1 · Partícula no plano inclinado</span>
-    <p>Um bloco de massa \(m\) desliza sem atrito num plano inclinado de ângulo \(\alpha\).
-    Obtenha a equação de movimento e a força normal.</p>
-    <p><strong>Solução.</strong> A coordenada natural é \(s\), a distância percorrida ao longo
-    do plano, medida para baixo. A altura cai de \(s\sen\alpha\), de modo que</p>
-    \[T=\tfrac12m\dot s^2,\qquad V=-mgs\sen\alpha,
-    \qquad\Lag=\tfrac12m\dot s^2+mgs\sen\alpha.\]
-    <p>Com \(\partial\Lag/\partial\dot s=m\dot s\) e \(\partial\Lag/\partial s=mg\sen\alpha\),
-    a equação devolve \(\ddot s=g\sen\alpha\). A normal não aparece, porque a escolha de \(s\)
-    já incorporou o vínculo.</p>
-    <p>Para obtê-la, volte às cartesianas e mantenha o vínculo explícito. Com os eixos
-    alinhados ao plano, \(g=z=0\) descreve a superfície e \(\nabla g=\vers{z}\), de modo
-    que</p>
-    \[m\ddot z=-mg\cos\alpha+\lambda=0
-    \quad\Longrightarrow\quad\lambda=mg\cos\alpha,\]
-    <p>que é a normal de sempre. O multiplicador paga o preço de uma coordenada a mais e
-    entrega a informação que a escolha esperta havia descartado.</p>
+    <span class="rotulo">Exercício resolvido 9.1 · A parábola</span>
+    <p>Mostre que \(y=x^2\) é extremante do funcional
+    \(J[y]=\displaystyle\int_0^1\left[\left(y'\right)^2+4y\right]dx\), com \(y(0)=0\)
+    e \(y(1)=1\).</p>
+    <p><strong>Solução.</strong> O integrando é \(f=\left(y'\right)^2+4y\), e</p>
+    \[\pder{f}{y}=4,\qquad\pder{f}{y'}=2y'.\]
+    <p>A equação de Euler-Lagrange fica</p>
+    \[4-\der{}{x}\left(2y'\right)=0\quad\Longrightarrow\quad y''=2,\]
+    <p>cuja solução geral é \(y=x^2+Ax+B\). As condições de contorno dão \(B=0\) e
+    \(1=1+A\), portanto \(A=0\) e \(y=x^2\), como se queria.</p>
+    <p>Vale notar o que o termo linear em \(y\) faz. Ele age como uma fonte constante, e a
+    equação \(y''=2\) é a mesma de uma partícula sob aceleração uniforme, com \(x\) no
+    papel do tempo. Trocando a fonte por \(-4xy\) o lado direito vira \(-2x\) e a
+    extremante passa a ser cúbica: a forma do termo em \(y\) determina a ordem do
+    polinômio.</p>
+    <span class="rotulo">Exercício resolvido 9.2 · O oscilador harmônico</span>
+    <p>Encontre a equação de Euler-Lagrange do funcional
+    \(J[y]=\displaystyle\int_0^{T}\left[\tfrac{1}{2}\left(\dot y\right)^2
+    -\tfrac{k}{2}y^2\right]dt\) e identifique o resultado.</p>
+    <p><strong>Solução.</strong> Com \(f=\tfrac{1}{2}\dot y^2-\tfrac{k}{2}y^2\),</p>
+    \[\pder{f}{y}=-ky,\qquad\pder{f}{\dot y}=\dot y,\]
+    <p>de modo que a equação é</p>
+    \[\der{}{t}\left(\dot y\right)+ky=0\quad\Longrightarrow\quad\ddot y+ky=0.\]
+    <p>É o oscilador harmônico de frequência \(\omega=\sqrt{k}\), com solução
+    \(y=A\cos\left(\omega t+\varphi\right)\). Note que o integrando é exatamente a lagrangiana
+    \(\Lag=T-V\) de uma massa unitária presa a uma mola de constante \(k\): a equação de
+    Euler-Lagrange aplicada a ela reproduz a lei de <a href="https://pt.wikipedia.org/wiki/Robert_Hooke">Hooke</a> sem nunca escrever
+    \(\vet{F}=-k\vet{x}\).</p>
   </div>
 
   <div class="bloco def">
-    <span class="rotulo">Exercício resolvido 9.2 · Pêndulo duplo</span>
-    <p>Monte a lagrangiana de um pêndulo duplo plano, com massas \(m_1\) e \(m_2\) e
-    comprimentos \(\ell_1\) e \(\ell_2\).</p>
-    <p><strong>Solução.</strong> Duas coordenadas bastam, \(\theta_1\) e \(\theta_2\), medidas
-    a partir da vertical. As posições são</p>
-    \[x_1=\ell_1\sen\theta_1,\qquad y_1=-\ell_1\cos\theta_1,\]
-    \[x_2=x_1+\ell_2\sen\theta_2,\qquad y_2=y_1-\ell_2\cos\theta_2.\]
-    <p>Derivando e somando os quadrados, o termo cruzado não se cancela, e é dele que vem todo
-    o acoplamento:</p>
-    \[T=\tfrac12\left(m_1+m_2\right)\ell_1^2\dot\theta_1^2
-    +\tfrac12m_2\ell_2^2\dot\theta_2^2
-    +m_2\ell_1\ell_2\dot\theta_1\dot\theta_2\cos\left(\theta_1-\theta_2\right),\]
-    \[V=-\left(m_1+m_2\right)g\ell_1\cos\theta_1-m_2g\ell_2\cos\theta_2.\]
-    <p>Com \(\Lag=T-V\), as duas equações de Lagrange saem por derivação direta. Elas são
-    acopladas e não lineares, e o sistema é o exemplo de laboratório mais conhecido de
-    <strong>caos</strong> em mecânica clássica: duas condições iniciais separadas por um
-    milésimo de grau divergem completamente em poucos segundos. Vale notar o que o formalismo
-    poupou: pela via de Newton seriam necessárias as duas trações, com quatro equações e duas
-    incógnitas a eliminar.</p>
+    <span class="rotulo">Exercício resolvido 9.3 · A catenária de 12 m</span>
+    <p>Uma corrente de 12,0 m é pendurada entre dois postes separados de 10,0 m e de mesma
+    altura. Determine \(C\) e a flecha.</p>
+    <p><strong>Solução.</strong> Com \(a=5{,}00\) m e \(L=12{,}0\) m, resolve-se</p>
+    \[12{,}0=2C\,\mathrm{senh}\frac{5{,}00}{C}.\]
+    <p>A equação é transcendental, e o lado direito decresce monotonamente com \(C\): basta
+    uma bisseção. Testando, \(C=6{,}0\) dá
+    \(12{,}0\cdot\mathrm{senh}\left(0{,}833\right)=11{,}1\) m, pouco;
+    \(C=4{,}5\) dá \(9{,}0\cdot\mathrm{senh}\left(1{,}111\right)=12{,}4\) m, demais.
+    Refinando entre os dois,</p>
+    \[C=4{,}695\ \text{m}.\]
+    <p>A flecha é a diferença entre a altura dos apoios e a do ponto mais baixo,</p>
+    \[\Delta=C\cosh\frac{a}{C}-C
+    =4{,}695\left[\cosh\left(1{,}065\right)-1\right]=2{,}92\ \text{m}.\]
+    <p>Uma folga de 2,0 m no comprimento, sobre um vão de 10 m, produz quase 3 m de
+    barrigão. A sensibilidade é alta, e é por isso que linhas de transmissão são tensionadas
+    com cuidado: o vão varia com a temperatura, e a flecha varia muito mais do que o
+    comprimento.</p>
   </div>
 
   <div class="bloco def">
-    <span class="rotulo">Exercício resolvido 9.3 · Coordenadas polares</span>
-    <p>Obtenha as equações de movimento de uma partícula sob força central \(V(r)\) em
-    coordenadas polares, e identifique cada termo.</p>
-    <p><strong>Solução.</strong> Com \(x=r\cos\varphi\) e \(y=r\sen\varphi\),
-    \(\dot x^2+\dot y^2=\dot r^2+r^2\dot\varphi^2\), de modo que</p>
-    \[\Lag=\tfrac12m\left(\dot r^2+r^2\dot\varphi^2\right)-V(r).\]
-    <p>A coordenada \(\varphi\) é cíclica, e portanto</p>
-    \[p_\varphi=mr^2\dot\varphi=\ell=\text{constante}.\]
-    <p>Para \(r\),
-    \(\partial\Lag/\partial\dot r=m\dot r\) e
-    \(\partial\Lag/\partial r=mr\dot\varphi^2-V'(r)\), de modo que</p>
-    \[m\ddot r=mr\dot\varphi^2-V'(r)=\frac{\ell^2}{mr^3}-V'(r).\]
-    <p>O primeiro termo do lado direito é a <strong>força centrífuga</strong>, e repare de onde
-    ela veio: do termo \(r^2\dot\varphi^2\) da energia cinética, e não de um postulado sobre
-    referenciais girantes. Escrevendo \(V_{\rm ef}(r)=V(r)+\ell^2/2mr^2\), o problema de duas
-    coordenadas vira um problema unidimensional em \(r\), que é exatamente o que torna o
-    problema de <a href="https://pt.wikipedia.org/wiki/Johannes_Kepler">Kepler</a> solúvel.</p>
-  </div>
-
-  <div class="bloco def">
-    <span class="rotulo">Exercício resolvido 9.4 · A conta que descola da esfera</span>
-    <p>Uma conta parte do repouso no topo de uma esfera lisa de raio \(R\) e escorrega. A que
-    ângulo ela perde o contato?</p>
-    <p><strong>Solução.</strong> Enquanto houver contato, o vínculo é \(r=R\) e a coordenada
-    livre é \(\theta\), medido do topo. A conservação da energia dá</p>
-    \[\tfrac12mR^2\dot\theta^2=mgR\left(1-\cos\theta\right)
-    \quad\Longrightarrow\quad
-    v^2=2gR\left(1-\cos\theta\right).\]
-    <p>A força de vínculo é a normal, e o método dos multiplicadores a entrega. Projetando na
-    radial, a resultante centrípeta vale \(mg\cos\theta-N=mv^2/R\), de modo que</p>
-    \[N=mg\cos\theta-\frac{mv^2}{R}=mg\left(3\cos\theta-2\right).\]
-    <p>A conta descola quando \(N=0\), isto é quando</p>
-    \[\cos\theta=\frac{2}{3}\quad\Longrightarrow\quad\theta=48{,}19^\circ,\]
-    <p>a uma altura \(R\cos\theta=2R/3\) acima do centro. Note que a resposta não depende nem
-    da massa nem de \(R\): é puro ângulo. Note também que a escolha de coordenadas de novo
-    decidiu o método: para responder "quando descola" era <em>preciso</em> manter a normal
-    visível, e por isso o multiplicador foi a ferramenta certa.</p>
+    <span class="rotulo">Exercício resolvido 9.4 · Snell numérico</span>
+    <p>Luz vai de \(A=(0;\,1{,}20)\) m no ar até \(B=(3{,}00;\,-1{,}60)\) m dentro d'água
+    (\(n_1=1{,}00\), \(n_2=1{,}33\)). Determine o ponto de cruzamento e verifique a lei de
+    Snell.</p>
+    <p><strong>Solução.</strong> O caminho óptico em função da abscissa do cruzamento é</p>
+    \[\Lambda(x)=\sqrt{x^2+1{,}44}
+    +1{,}33\sqrt{\left(3{,}00-x\right)^2+2{,}56},\]
+    <p>e a condição de estacionariedade é</p>
+    \[\frac{x}{\sqrt{x^2+1{,}44}}
+    =1{,}33\,\frac{3{,}00-x}{\sqrt{\left(3{,}00-x\right)^2+2{,}56}}.\]
+    <p>Resolvendo numericamente, \(x=1{,}739\) m, com \(\Lambda=4{,}822\) m. Nesse
+    ponto</p>
+    \[\sen\theta_1=\frac{1{,}739}{\sqrt{1{,}739^2+1{,}20^2}}=0{,}8231,\qquad
+    \sen\theta_2=\frac{1{,}261}{\sqrt{1{,}261^2+1{,}60^2}}=0{,}6189,\]
+    <p>isto é \(\theta_1=55{,}4^\circ\) e \(\theta_2=38{,}2^\circ\). A verificação
+    fecha:</p>
+    \[n_1\sen\theta_1=0{,}8231,\qquad
+    n_2\sen\theta_2=1{,}33\cdot0{,}6189=0{,}8231.\]
+    <p>Duas conferências de bom senso valem sempre. Primeira: o ângulo maior fica no meio de
+    <em>menor</em> índice, e aqui \(\theta_1\) é maior que \(\theta_2\) com \(n_1\) menor que \(n_2\), como
+    deve ser.
+    Segunda: o ponto de cruzamento fica deslocado em direção a B em relação ao que a reta
+    \(AB\) daria, porque a luz "prefere" encurtar o trecho dentro da água, onde anda mais
+    devagar. A reta \(AB\) cruzaria o plano em \(x=1{,}29\) m, e o caminho real cruza em
+    1,74 m.</p>
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s13">13. Exercícios propostos</h2>
+  <h2 id="s12">12. Exercícios propostos</h2>
 
   <div class="bloco def">
     <span class="rotulo">Para resolver</span>
     <ol>
-      <li><b>9.1</b> Conte os graus de liberdade: (a) três partículas ligadas por barras
-      rígidas formando um triângulo, no espaço; (b) uma haste rígida com uma ponta presa a um
-      ponto fixo; (c) duas partículas unidas por um fio inextensível que passa por um furo numa
-      mesa; (d) um disco que rola sem deslizar sobre um plano, mantendo-se vertical.</li>
+      <li><b>9.1</b> Para \(J[y]=\int_0^1\left(y'\right)^2dx\) com \(y(0)=y(1)=0\), obtenha a
+      equação de Euler-Lagrange e mostre que a única extremante é \(y\equiv0\). Interprete o
+      resultado em termos da corda esticada.</li>
 
-      <li><b>9.2</b> Para a máquina de Atwood com polia de momento de inércia \(I\), escreva a
-      lagrangiana em função de uma única coordenada e obtenha a aceleração. Compare com o
-      resultado newtoniano com duas trações.</li>
+      <li><b>9.2</b> Mostre, aplicando a integral de Beltrami ao funcional comprimento, que a
+      reta é recuperada sem resolver equação diferencial nenhuma. Compare o trabalho com o da
+      via direta feita na seção 3.</li>
 
-      <li><b>9.3</b> Uma conta desliza sem atrito num aro de raio \(R\) que gira com velocidade
-      angular constante \(\Omega\) em torno de um diâmetro vertical. Escreva a lagrangiana em
-      função de \(\theta\) e mostre que existe uma posição de equilíbrio fora do fundo quando
-      \(\Omega^2>g/R\). Determine o ângulo.</li>
+      <li><b>9.3</b> Obtenha a equação diferencial da superfície mínima de revolução pelas duas
+      vias (Euler-Lagrange direta e Beltrami) e mostre que \(y\,y''=1+y'^2\) e
+      \(y/\sqrt{1+y'^2}=C\) são equivalentes. Verifique que \(y=C\cosh\left[(x-x_0)/C\right]\)
+      satisfaz as duas.</li>
 
-      <li><b>9.4</b> Mostre que somar à lagrangiana a derivada total de uma função qualquer,
-      \(\Lag\to\Lag+dF\left(q,t\right)/dt\), não altera as equações de movimento. Explique por
-      que, em termos do que acontece com a ação.</li>
+      <li><b>9.4</b> Braquistócrona numérica: para A na origem e B em \((1;1)\) m, determine o
+      ângulo final \(\theta_1\) e o parâmetro \(a\) da ciclóide. Calcule o tempo de descida com
+      \(g=10\) m/s² e compare com o da reta.</li>
 
-      <li><b>9.5</b> Partícula em coordenadas esféricas sob potencial central. Escreva \(T\),
-      identifique as coordenadas cíclicas e obtenha as quantidades conservadas
-      correspondentes.</li>
+      <li><b>9.5</b> Mostre que, para a ciclóide da braquistócrona, a combinação
+      \(y\left(1+y'^2\right)\) vale \(2a\) em todo ponto. Sugestão: calcule \(y'\) a partir das
+      equações paramétricas usando \(dy/dx=\left(dy/d\theta\right)/\left(dx/d\theta\right)\).</li>
 
-      <li><b>9.6</b> Uma viga biapoiada de 6,00 m, com \(EI=1200\) kN·m², sob carga uniforme de
-      5,00 kN/m. Determine a flecha máxima e compare com a mesma viga biengastada. Explique a
-      razão entre as duas em termos das condições de contorno.</li>
+      <li><b>9.6</b> Uma corrente de comprimento \(L\) pende entre \(x=-a\) e \(x=+a\) à mesma
+      altura. Mostre que \(L=2C\,\mathrm{senh}(a/C)\) e discuta os dois limites: \(L\to2a\) e
+      \(L\gg2a\). O que acontece com \(C\) em cada caso?</li>
 
-      <li><b>9.7</b> Deduza a equação de Euler-Poisson a partir da primeira variação,
-      explicitando as duas integrações por partes e os termos de fronteira. Identifique quais
-      condições de contorno podem ser naturais.</li>
+      <li><b>9.7</b> Fibra óptica de índice \(n(r)=n_0\left(1-\alpha r^2\right)\). Usando o
+      invariante \(n\sen\theta\), mostre que, para raios próximos ao eixo, as trajetórias são
+      senoidais, e determine o período espacial em função de \(\alpha\).</li>
 
-      <li><b>9.8</b> Um pêndulo cujo ponto de suspensão oscila verticalmente com
-      \(y_s=A\cos\Omega t\). Escreva a lagrangiana e mostre que a equação de movimento é a de
-      um pêndulo com gravidade efetiva variável. Discuta qualitativamente o pêndulo de
-      Kapitza, em que a posição invertida se torna estável para \(\Omega\) alto.</li>
+      <li><b>9.8</b> Meio estratificado com \(n(y)=n_0\left(1-\beta y\right)\), modelo grosseiro
+      do ar quente sobre o asfalto. Obtenha a trajetória do raio e determine a que distância
+      um observador de 1,70 m de altura vê a miragem, com
+      \(\beta=2{,}0\cruz10^{-6}\) m⁻¹.</li>
 
-      <li><b>9.9</b> Mostre que o vínculo \(\dot x\sen\theta-\dot y\cos\theta=0\) não é
-      integrável, verificando que não existe fator integrante que o torne uma diferencial
-      exata.</li>
+      <li><b>9.9</b> Discuta em meia página por que o princípio de Hamilton usa \(T-V\) e não
+      \(T+V\), e construa um exemplo numérico que mostre que a ação de dois caminhos distintos
+      com os mesmos extremos pode ser igual se o integrando for a energia total.</li>
 
-      <li><b>9.10</b> Partícula sobre o cone \(z=\alpha\sqrt{x^2+y^2}\) sob gravidade. Use um
-      multiplicador para obter a força de vínculo e determine a condição para que exista uma
-      órbita circular horizontal estável.</li>
+      <li><b>9.10</b> Ponto conjugado: para o oscilador harmônico de frequência \(\omega\),
+      mostre que a ação deixa de ser mínima quando o intervalo de tempo excede meio período, e
+      relacione isso com o fato de que todas as trajetórias que partem de um ponto se
+      reencontram ali depois de meio período.</li>
     </ol>
   </div>
 
   <nav class="nav-aulas">
-    <a href="aula08.html"><small>Módulo anterior</small>← 8. Euler-Lagrange</a>
-    <a class="prox" href="aula10.html"><small>Próximo módulo</small>10. Aplicações de Lagrange →</a>
+    <a href="aula08.html"><small>Módulo anterior</small>← 8. Cálculo variacional</a>
+    <a class="prox" href="aula10.html"><small>Próximo módulo</small>10. Equações de Lagrange →</a>
   </nav>
 
 </main>
@@ -679,6 +717,6 @@
   <!--PORTAL--><p><small><a href="https://apianomorais.github.io/">Todas as disciplinas e a pesquisa em apianomorais.github.io</a></small></p><!--/PORTAL-->
 </footer>
 
-<script src="assets/js/widgets.js?v=202611082243"></script>
+<script src="assets/js/widgets.js?v=202611201036"></script>
 </body>
 </html>

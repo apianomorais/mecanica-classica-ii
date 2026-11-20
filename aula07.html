@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo 7: Cálculo variacional: ação e caminhos extremos | Mecânica Clássica II</title>
+<title>Módulo 7: Referenciais em rotação e forças fictícias | Mecânica Clássica II</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611082243">
-<script src="assets/js/comum.js?v=202611082243"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611201036">
+<script src="assets/js/comum.js?v=202611201036"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -21,17 +21,18 @@
       <a href="aula02.html" class="num" title="Módulo 2: Centro de massa e momentos de inércia">2</a>
       <a href="aula03.html" class="num" title="Módulo 3: Momento angular, torque e equações de movimento">3</a>
       <a href="aula04.html" class="num" title="Módulo 4: Conservação e equilíbrio estático">4</a>
+      <a href="aula05.html" class="num" title="Módulo 5: Vigas: cortante, momento fletor, linha elástica e torção">5</a>
       <span class="grupo">Referenciais</span>
-      <a href="aula05.html" class="num" title="Módulo 5: Matrizes de rotação e transformações de coordenadas">5</a>
-      <a href="aula06.html" class="num" title="Módulo 6: Referenciais em rotação e forças fictícias">6</a>
+      <a href="aula06.html" class="num" title="Módulo 6: Matrizes de rotação e transformações de coordenadas">6</a>
+      <a href="aula07.html" class="num ativo" title="Módulo 7: Referenciais em rotação e forças fictícias">7</a>
       <span class="grupo">Variacional</span>
-      <a href="aula07.html" class="num ativo" title="Módulo 7: Cálculo variacional: ação e caminhos extremos">7</a>
-      <a href="aula08.html" class="num" title="Módulo 8: A equação de Euler-Lagrange e o princípio de Hamilton">8</a>
+      <a href="aula08.html" class="num" title="Módulo 8: Cálculo variacional: ação e caminhos extremos">8</a>
+      <a href="aula09.html" class="num" title="Módulo 9: A equação de Euler-Lagrange e o princípio de Hamilton">9</a>
       <span class="grupo">Lagrange e Hamilton</span>
-      <a href="aula09.html" class="num" title="Módulo 9: Coordenadas generalizadas, vínculos e equações de Lagrange">9</a>
-      <a href="aula10.html" class="num" title="Módulo 10: Aplicações do formalismo lagrangiano">10</a>
-      <a href="aula11.html" class="num" title="Módulo 11: Transformação de Legendre e equações de Hamilton">11</a>
-      <a href="aula12.html" class="num" title="Módulo 12: Espaço de fase e o teorema de Liouville">12</a>
+      <a href="aula10.html" class="num" title="Módulo 10: Coordenadas generalizadas, vínculos e equações de Lagrange">10</a>
+      <a href="aula11.html" class="num" title="Módulo 11: Aplicações do formalismo lagrangiano">11</a>
+      <a href="aula12.html" class="num" title="Módulo 12: Transformação de Legendre e equações de Hamilton">12</a>
+      <a href="aula13.html" class="num" title="Módulo 13: Espaço de fase e o teorema de Liouville">13</a>
     </nav>
   </div>
 </header>
@@ -52,645 +53,721 @@
 <aside class="lateral">
   <h4>Neste módulo</h4>
   <ol>
-    <li><a href="#s1">1. Do cálculo diferencial ao variacional</a></li>
-    <li><a href="#s2">2. Funcionais</a></li>
-    <li><a href="#s3">3. Funcionais da física</a></li>
-    <li><a href="#s4">4. A variação de um funcional</a></li>
-    <li><a href="#s5">5. A condição de extremo</a></li>
-    <li><a href="#s6">6. A menor distância</a></li>
-    <li><a href="#s7">7. A braquistócrona</a></li>
-    <li><a href="#s8">8. A catenária</a></li>
-    <li><a href="#s9">9. O problema de Dido</a></li>
-    <li><a href="#s10">10. Tipos de problemas variacionais</a></li>
-    <li><a href="#s11">11. O lema fundamental</a></li>
-    <li><a href="#s12">12. Exercícios resolvidos</a></li>
-    <li><a href="#s13">13. Exercícios propostos</a></li>
-    <li><a href="#s14">14. Apêndice histórico</a></li>
+    <li><a href="#s1">1. Referenciais que transladam</a></li>
+    <li><a href="#s2">2. O pêndulo no trem acelerado</a></li>
+    <li><a href="#s3">3. A força de maré</a></li>
+    <li><a href="#s4">4. Sizígia, quadratura e marés extremas</a></li>
+    <li><a href="#s5">5. O teorema do transporte</a></li>
+    <li><a href="#s6">6. Velocidade e aceleração no girante</a></li>
+    <li><a href="#s7">7. As quatro forças de inércia</a></li>
+    <li><a href="#s8">8. A centrífuga</a></li>
+    <li><a href="#s9">9. Coriolis</a></li>
+    <li><a href="#s10">10. A Terra como referencial girante</a></li>
+    <li><a href="#s11">11. Desvios: queda livre e projéteis</a></li>
+    <li><a href="#s12">12. O pêndulo de Foucault</a></li>
+    <li><a href="#s13">13. Exercícios resolvidos</a></li>
+    <li><a href="#s14">14. Exercícios propostos</a></li>
   </ol>
 </aside>
 
 <main class="conteudo">
 
-  <p class="chapeu">Módulo 7 · Noções de cálculo variacional</p>
-  <h1>Cálculo variacional: ação e caminhos extremos</h1>
-  <p class="subtitulo">Até aqui a mecânica foi escrita com forças e acelerações. Este módulo
-  prepara uma reformulação inteiramente diferente, em que a trajetória real de um sistema é
-  selecionada por uma condição de extremo sobre todos os caminhos imagináveis. A ferramenta
-  matemática para isso tem trezentos anos e nome próprio.</p>
+  <p class="chapeu">Módulo 7 · Sistemas de coordenadas em movimento</p>
+  <h1>Referenciais em rotação e forças fictícias</h1>
+  <p class="subtitulo">A segunda lei de <a href="https://pt.wikipedia.org/wiki/Isaac_Newton">Newton</a> vale em referenciais inerciais, e o laboratório
+  onde ela é ensinada gira junto com a Terra. Este módulo mostra o preço dessa trapaça: quatro
+  termos extras, que não são forças mas se comportam como se fossem, e que explicam desde o
+  giro de um furacão até as marés dos oceanos, passando pelos seis minutos de arco que a vertical
+  de um prédio não aponta para o centro do planeta.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Objetivos</span>
+    <ul>
+      <li>Montar a gravidade efetiva num referencial que acelera em translação;</li>
+      <li>Obter a força de maré como resíduo e expandi-la em polinômios de <a href="https://pt.wikipedia.org/wiki/Adrien-Marie_Legendre">Legendre</a>;</li>
+      <li>Aplicar o teorema do transporte para derivar num referencial girante;</li>
+      <li>Obter a aceleração relativa com os quatro termos de inércia;</li>
+      <li>Distinguir centrífuga, <a href="https://pt.wikipedia.org/wiki/Gaspard-Gustave_Coriolis">Coriolis</a>, <a href="https://pt.wikipedia.org/wiki/Leonhard_Euler">Euler</a> e a translação da origem;</li>
+      <li>Calcular \(g\) efetivo e o desvio do fio de prumo com a latitude;</li>
+      <li>Estimar o desvio para leste de um corpo em queda;</li>
+      <li>Explicar o pêndulo de <a href="https://pt.wikipedia.org/wiki/Jean_Bernard_L%C3%A9on_Foucault">Foucault</a> e o papel do \(\sen\lambda\).</li>
+    </ul>
+  </div>
 
   <hr class="linha">
 
   <!-- ================================================== -->
-  <h2 id="s1">1. Do cálculo diferencial ao variacional</h2>
+  <h2 id="s1">1. Referenciais que transladam</h2>
 
-  <p>Encontrar o mínimo de \(f(x)=x^2-4x+5\) é exercício de primeiro semestre: deriva-se,
-  iguala-se a zero, acha-se \(x=2\), e a segunda derivada \(f''=2>0\) confirma que o ponto é
-  mínimo. Para uma função de várias variáveis o procedimento se repete componente a
-  componente, e a condição de extremo passa a ser</p>
+  <p>Comece pelo caso mais simples, em que o referencial \(S'\) apenas translada em relação
+  ao inercial \(S\), sem girar. Com \(\vet{R}_0\) a posição da origem de \(S'\), as posições
+  se somam, \(\vet{r}=\vet{R}_0+\vet{r}\,'\), e derivando duas vezes,
+  \(\vet{a}=\vet{A}_0+\vet{a}\,'\). Levando à segunda lei,</p>
 
-  <p>\[\pder{f}{x_i}=0,\qquad i=1,2,\dots,n.\]</p>
+  <p>\[m\vet{a}\,'=\vet{F}-m\vet{A}_0.\]</p>
 
-  <p>Em todos esses casos o que se procura é um <em>número</em>, ou no máximo uma lista de
-  números, porque a função que se otimiza é uma aplicação de \(\R^n\) em \(\R\): entram
-  números, sai um número.</p>
+  <p>Quem está dentro de \(S'\) e insiste em usar \(\vet{F}=m\vet{a}\) precisa acrescentar o
+  termo \(-m\vet{A}_0\) à lista de forças. É o que se sente num elevador que arranca ou num
+  ônibus que freia: nada empurra o passageiro para trás, mas tudo se passa como se
+  empurrasse.</p>
 
   <div class="bloco fisica">
-    <span class="rotulo">Três perguntas que esse cálculo não responde</span>
-    <ul>
-      <li>Qual é a curva de menor comprimento entre dois pontos?</li>
-      <li>Qual é a trajetória que minimiza o tempo de descida de uma partícula sob gravidade?</li>
-      <li>Qual é a forma de uma corda suspensa sob o próprio peso?</li>
-    </ul>
-    <p>Nenhuma delas pede um número. Todas pedem uma <strong>função inteira</strong>, e o
-    conjunto onde a busca acontece não é \(\R^n\) mas um espaço de curvas, de dimensão
-    infinita.</p>
+    <span class="rotulo">Por que chamá-las de fictícias</span>
+    <p>Uma força de verdade tem um agente. Identifica-se quem a exerce, e a terceira lei
+    garante uma reação em algum lugar. As forças de inércia não têm nada disso: não há agente,
+    não há reação, e elas desaparecem inteiramente quando se muda de referencial. São um
+    artefato de contabilidade, o preço de usar uma equação fora do domínio em que ela
+    vale.</p>
+    <p>Isso não as torna irrelevantes. Para quem está dentro do referencial girante, elas
+    produzem efeitos perfeitamente mensuráveis, e qualquer previsão feita sem elas estará
+    errada. <a href="https://pt.wikipedia.org/wiki/Albert_Einstein">Einstein</a> levou essa observação ao limite ao notar que a força de inércia de um
+    referencial acelerado é localmente indistinguível da gravidade, o que virou o princípio
+    de equivalência da relatividade geral.</p>
   </div>
 
-  <p>Para atacar perguntas desse tipo é preciso derivar com respeito a uma função, e não com
-  respeito a um número. O ramo da matemática que faz isso de maneira sistemática se chama
-  <strong>cálculo variacional</strong>, e o objeto que ele otimiza se chama funcional.</p>
 
   <!-- ================================================== -->
-  <h2 id="s2">2. Funcionais</h2>
+  <h2 id="s2">2. O pêndulo no trem acelerado</h2>
 
-  <div class="bloco def">
-    <span class="rotulo">Definição · Funcional</span>
-    <p>Um <strong>funcional</strong> é uma aplicação que associa um número real a cada função
-    de um certo conjunto de funções admissíveis:</p>
-    \[J:\mathcal{C}\longrightarrow\R,\qquad y(x)\longmapsto J[y].\]
-    <p>Os colchetes são deliberados. Eles avisam que \(J\) depende da função \(y\) <em>como um
-    todo</em>, e não do valor dela num ponto: mudar \(y\) numa vizinhança qualquer de
-    \([x_1,x_2]\) muda o número \(J[y]\).</p>
-  </div>
+  <p>Um pêndulo simples de massa \(m\) e comprimento \(\ell\) está pendurado dentro de um
+  vagão que acelera com \(\vet{A}\) constante. Visto de fora, as únicas forças sobre a massa
+  são a tração \(\vet{T}\) e o peso \(m\vet{g}\). Visto de dentro, entra também a força de
+  inércia \(-m\vet{A}\), e a equação de movimento fica</p>
 
-  <p>O exemplo mais limpo é o comprimento de arco. Entre dois pontos fixos \((x_1,y_1)\) e
-  \((x_2,y_2)\) passam infinitas curvas suaves, e cada uma tem o seu comprimento</p>
+  <p>\[m\vet{a}_{\rm rel}=\vet{T}+m\vet{g}-m\vet{A}.\]</p>
 
-  <p>\[L[y]=\int_{x_1}^{x_2}\sqrt{1+\left(\der{y}{x}\right)^{2}}\,dx.\]</p>
-
-  <p>Troque a curva e o número muda. Dois outros exemplos, ainda mais simples, serão úteis
-  adiante: a área sob a curva,</p>
-
-  <p>\[A[y]=\int_{x_1}^{x_2}y(x)\,dx,\]</p>
-
-  <p>que é <em>linear</em> em \(y\) e portanto o funcional mais elementar que existe, e a
-  energia potencial de uma corda esticada de tensão \(T\) e extremos fixos,</p>
-
-  <p>\[U[y]=\frac{T}{2}\int_0^{\ell}\left(\der{y}{x}\right)^{2}dx,\]</p>
-
-  <p>cuja minimização determina a configuração de repouso da corda.</p>
-
-  <div data-widget="funcional"></div>
-
-  <p>A máquina do simulador recebe uma curva e devolve um número, e é exatamente isso que um
-  funcional faz. Repare numa coisa que o simulador deixa evidente e que a notação esconde: o
-  mesmo conjunto de curvas, submetido a funcionais diferentes, tem minimizantes diferentes. A
-  reta vence o comprimento, a parábola certa vence a energia da corda sob carga, e não há
-  nenhuma curva universalmente boa. Quem decide o minimizante é o funcional, não a curva.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s3">3. Funcionais da física</h2>
-
-  <h3>Tempo de percurso e o princípio de Fermat</h3>
-
-  <p>A luz que atravessa um meio de índice de refração \(n(x,y,z)\) viaja com velocidade
-  \(v=c/n\), de modo que o tempo gasto entre dois pontos \(A\) e \(B\) ao longo de um caminho
-  dado vale</p>
-
-  <p>\[T[\vet{r}]=\int_A^B\frac{ds}{v}=\frac{1}{c}\int_A^B n(x,y,z)\,ds.\]</p>
-
-  <p>Parametrizando o caminho, \(ds=\sqrt{\dot x^2+\dot y^2+\dot z^2}\,dt\), e o funcional
-  fica</p>
-
-  <p>\[T[x,y,z]=\frac{1}{c}\int_{t_1}^{t_2}n(x,y,z)
-  \sqrt{\dot x^{2}+\dot y^{2}+\dot z^{2}}\;dt.\]</p>
-
-  <p>O <strong>princípio de <a href="https://pt.wikipedia.org/wiki/Pierre_de_Fermat">Fermat</a></strong> afirma que, entre todos os caminhos ligando \(A\) a
-  \(B\), a luz segue aquele que torna \(T\) estacionário. A lei da refração de <a href="https://pt.wikipedia.org/wiki/Willebrord_Snel_van_Royen">Snell</a> sai desse
-  princípio em três linhas, e a reflexão em duas.</p>
-
-  <h3>A ação e o princípio de Hamilton</h3>
-
-  <p>O funcional que organiza toda a mecânica dos próximos módulos é a <strong>ação</strong>,
-  construída a partir da lagrangiana \(\Lag=T-V\):</p>
+  <p>As duas últimas parcelas são ambas proporcionais à massa, o que permite juntá-las numa
+  só:</p>
 
   <div class="destaque">
-    <span class="anuncio">A ação</span>
-    \[\Acao[q]=\int_{t_1}^{t_2}\Lag\left(q,\dot q,t\right)dt.\]
+    <span class="anuncio">Gravidade efetiva</span>
+    \[\vet{g}_{\rm ef}=\vet{g}-\vet{A},\qquad
+    \left|\vet{g}_{\rm ef}\right|=\sqrt{g^2+A^2},\qquad
+    \tg\beta=\frac{A}{g}.\]
   </div>
 
-  <p>Aqui \(q(t)\) representa as coordenadas generalizadas do sistema, e cada história
-  imaginável do sistema entre \(t_1\) e \(t_2\) recebe um número. O <strong>princípio de
-  <a href="https://pt.wikipedia.org/wiki/William_Rowan_Hamilton">Hamilton</a></strong> seleciona uma dessas histórias:</p>
+  <p>Dentro do vagão, tudo se passa como se a gravidade tivesse mudado de módulo e de
+  direção. O fio em repouso aponta ao longo de \(\vet{g}_{\rm ef}\), inclinado de \(\beta\)
+  para trás, e as pequenas oscilações ocorrem em torno dessa nova vertical com frequência</p>
 
-  <p>\[\delta\Acao=0.\]</p>
+  <p>\[\omega=\sqrt{\frac{g_{\rm ef}}{\ell}}
+  =\left(\frac{g^2+A^2}{\ell^2}\right)^{1/4}.\]</p>
 
-  <p>Esse é todo o conteúdo dinâmico da mecânica clássica reescrito em uma linha, e a aula 8
-  mostrará que a condição \(\delta\Acao=0\) é equivalente às equações de <a href="https://pt.wikipedia.org/wiki/Isaac_Newton">Newton</a>. Vale o aviso
-  desde já: estacionária não quer dizer mínima. Para trajetórias longas a ação costuma ser
-  apenas ponto de sela, e o nome popular, "princípio da mínima ação", é impreciso.</p>
-
-  <h3>Superfícies mínimas</h3>
-
-  <p>Dada uma curva fechada no espaço, qual é a superfície de menor área que a tem como borda?
-  Escrevendo a superfície como \(z=f(x,y)\), a área vale</p>
-
-  <p>\[A[f]=\iint_D\sqrt{1+\left(\pder{f}{x}\right)^{2}
-  +\left(\pder{f}{y}\right)^{2}}\;dx\,dy.\]</p>
-
-  <p>Aqui a função a determinar depende de duas variáveis, e a condição de extremo será uma
-  equação a derivadas parciais em vez de uma equação ordinária. Uma película de sabão presa a
-  um aro de arame resolve esse problema por conta própria, porque a tensão superficial torna a
-  energia proporcional à área: o que se vê na bolha é o minimizante, com curvatura média
-  nula.</p>
+  <p>Para \(A=3{,}0\) m/s² e \(\ell=1{,}0\) m: \(\beta=17{,}0^\circ\),
+  \(g_{\rm ef}=10{,}26\) m/s² e o período cai de 2,006 s para 1,962 s. O passageiro que não
+  soubesse estar acelerando concluiria, com toda a coerência, que a gravidade do lugar é 4,6%
+  maior e aponta 17° fora da vertical do prédio. Não há experimento <em>local</em> que o
+  desminta, e essa impossibilidade é o <a href="https://pt.wikipedia.org/wiki/Princ%C3%ADpio_de_equival%C3%AAncia">princípio de equivalência</a>.</p>
 
   <!-- ================================================== -->
-  <h2 id="s4">4. A variação de um funcional</h2>
+  <h2 id="s3">3. A força de maré</h2>
 
-  <p>No cálculo diferencial a diferencial de \(f\) é definida pela parte linear do acréscimo,</p>
+  <p>O centro da Terra não é um ponto inercial: ele está em queda livre em direção à Lua.
+  Um referencial preso a ele acelera com \(\vet{A}_0=GM_L\vers{D}/D^2\), e a seção 1 diz
+  exatamente o que fazer com isso. Para uma massa \(m\) na superfície, a distância à Lua é
+  \(d\), não \(D\), e o que sobra depois do desconto é</p>
 
-  <p>\[df=f(x+dx)-f(x)\simeq f'(x)\,dx,\]</p>
-
-  <p>e é essa parte linear que anula no extremo. A construção análoga para funcionais parte de
-  uma deformação \(\delta y(x)\) da curva.</p>
-
-  <div class="bloco def">
-    <span class="rotulo">Definição · Variação de um funcional</span>
-    <p>Dado \(J[y]\) e uma deformação pequena \(\delta y(x)\), a <strong>variação</strong>
-    \(\delta J\) é a parte de primeira ordem em \(\delta y\) da diferença</p>
-    \[J\left[y+\delta y\right]-J[y].\]
-    <p>É o análogo exato de uma derivada direcional, com a direção dada pela função
-    \(\delta y\) e não por um vetor de \(\R^n\).</p>
+  <div class="destaque">
+    <span class="anuncio">Força de maré</span>
+    \[\vet{F}_{\rm maré}=-\frac{GM_Lm}{d^2}\vers{d}+\frac{GM_Lm}{D^2}\vers{D}.\]
+    Maré não é a atração da Lua: é a <em>diferença</em> entre a atração local e a atração no
+    centro da Terra.
   </div>
 
-  <p>Duas convenções de notação valem a pena fixar. Primeiro, \(\delta y(x)\) é uma função, e
-  não um número: em cada \(x\) ela diz de quanto a curva foi deslocada. Segundo, a variação e a
-  derivada comutam,</p>
+  <p>Convém trabalhar com o potencial, que é escalar. Seja \(r\) a distância ao centro da
+  Terra e \(\theta\) o ângulo entre \(\vet{r}\) e a direção da Lua. Pela lei dos
+  cossenos, \(d^2=D^2+r^2-2Dr\cos\theta\), e portanto</p>
 
-  <p>\[\delta\left(y'\right)=\left(\delta y\right)',\]</p>
+  <p>\[\frac{1}{d}=\frac{1}{D}\left[1-2\frac{r}{D}\cos\theta
+  +\left(\frac{r}{D}\right)^2\right]^{-1/2}.\]</p>
 
-  <p>porque deformar a curva e depois derivar dá o mesmo resultado que derivar a deformação.
-  Essa comutação é usada em quase toda conta variacional e passa facilmente despercebida.</p>
+  <p>O colchete é exatamente a <strong>função geratriz dos polinômios de Legendre</strong>.
+  Com \(u=r/D\), que vale no máximo 0,0166 para a Lua,</p>
 
-  <h3>Duas variações feitas à mão</h3>
+  <p>\[\left[1-2u\cos\theta+u^2\right]^{-1/2}
+  =\sum_{n=0}^{\infty}u^{n}P_n\!\left(\cos\theta\right),\qquad
+  P_0=1,\quad P_1=\cos\theta,\quad P_2=\frac{3\cos^2\theta-1}{2}.\]</p>
 
-  <p>Comece pelo funcional área, \(A[y]=\int_{x_1}^{x_2}y\,dx\). Substituindo \(y\) por
-  \(y+\delta y\) e subtraindo,</p>
+  <p>O potencial gravitacional da Lua no ponto fica, então,</p>
 
-  <p>\[\delta A=\int_{x_1}^{x_2}\left[y+\delta y\right]dx-\int_{x_1}^{x_2}y\,dx
-  =\int_{x_1}^{x_2}\delta y\,dx.\]</p>
+  <p>\[\Phi_L=-\frac{GM_L}{d}
+  =-\frac{GM_L}{D}\left[1+\frac{r}{D}\cos\theta
+  +\left(\frac{r}{D}\right)^2\frac{3\cos^2\theta-1}{2}+\cdots\right],\]</p>
 
-  <p>Não houve aproximação nenhuma: o funcional é linear, e a variação é exata. Agora tome a
-  energia da corda, \(J[y]=\int_0^{\ell}\left(y'\right)^2dx\). O quadrado produz três
-  parcelas,</p>
+  <p>e agora cada termo pode ser lido separadamente. O de \(n=0\) é constante e não produz
+  força. O de \(n=1\) vale \(-\left(GM_L/D^2\right)r\cos\theta\), cujo gradiente é um
+  campo <em>uniforme</em> de módulo \(GM_L/D^2\) apontando para a Lua: é precisamente a
+  aceleração do centro da Terra, e some ao se passar para o referencial que cai com ele.
+  O primeiro termo que sobrevive é o de \(P_2\):</p>
 
-  <p>\[J\left[y+\delta y\right]=\int_0^{\ell}\left(y'\right)^{2}dx
-  +2\int_0^{\ell}y'\left(\delta y\right)'dx
-  +\int_0^{\ell}\left[\left(\delta y\right)'\right]^{2}dx,\]</p>
-
-  <p>e das três apenas a segunda é linear em \(\delta y\). A terceira é quadrática e se descarta
-  na variação de primeira ordem, de modo que</p>
-
-  <p>\[\delta J=2\int_0^{\ell}y'\left(\delta y\right)'dx.\]</p>
-
-  <p>Guarde a forma desse resultado. A variação apareceu com \(\left(\delta y\right)'\) dentro
-  da integral, e não com \(\delta y\); para extrair daí uma condição sobre \(y\) será preciso
-  integrar por partes e transferir a derivada. Esse é o passo que a aula 8 executa, e dele sai
-  a equação de Euler-Lagrange.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s5">5. A condição de extremo</h2>
-
-  <div class="bloco def">
-    <span class="rotulo">Definição · Função extremante</span>
-    <p>A função \(y_0(x)\) é <strong>extremante</strong> de \(J[y]\) se, para toda deformação
-    admissível \(\delta y\), isto é toda deformação que respeite
-    \(\delta y(x_1)=\delta y(x_2)=0\), vale</p>
-    \[\delta J=0\]
-    <p>até a primeira ordem em \(\delta y\).</p>
+  <div class="destaque">
+    <span class="anuncio">Potencial de maré</span>
+    \[\Phi_{\rm maré}=-\frac{GM_L\,r^2}{D^3}\,
+    \frac{3\cos^2\theta-1}{2}.\]
+    Quadrupolar, porque o monopolo é constante e o dipolo foi cancelado pelo referencial.
   </div>
 
-  <p>A exigência de que \(\delta y\) se anule nas extremidades não é um detalhe técnico: ela
-  traduz o fato de que os pontos inicial e final estão fixos, e que a competição é só entre
-  curvas que os unem. Deformações que mexem nos extremos pertencem a um outro problema, o de
-  extremos livres, e levam a condições de contorno adicionais.</p>
+  <p>As componentes da aceleração saem do gradiente em coordenadas esféricas,
+  \(a_r=-\partial\Phi/\partial r\) e
+  \(a_\theta=-\left(1/r\right)\partial\Phi/\partial\theta\). Derivando e pondo
+  \(r=R\),</p>
+
+  <p>\[a_r=\frac{GM_LR}{D^3}\left(3\cos^2\theta-1\right),\qquad
+  a_\theta=-\frac{3}{2}\,\frac{GM_LR}{D^3}\,\sen2\theta.\]</p>
+
+  <p>Confira os valores notáveis. Em \(\theta=0\), o ponto sublunar,
+  \(a_r=+2GM_LR/D^3\): a água é puxada para fora. Em \(\theta=\pi\), o ponto
+  antilunar, \(\cos^2\theta=1\) outra vez e o resultado é o mesmo, <em>também</em> para
+  fora. Em \(\theta=\pi/2\), \(a_r=-GM_LR/D^3\), metade do valor anterior e apontando
+  para dentro. A tangencial é nula nos três e máxima em \(\theta=45^\circ\).</p>
+
+  <div data-widget="mare"></div>
+
+  <p>A figura responde de uma vez à pergunta que mais incomoda quem estuda marés: por que
+  são <strong>duas</strong> por dia, e não uma. A água do lado próximo é puxada mais que o
+  centro, e a do lado distante é puxada menos; nos dois casos ela se afasta do centro, e as
+  protuberâncias aparecem em lados opostos. A Terra gira por baixo desse par fixo, e cada
+  ponto passa por duas marés altas a cada volta.</p>
 
   <div class="bloco fisica">
-    <span class="rotulo">Necessária, não suficiente</span>
-    <p>A condição \(\delta J=0\) é o análogo de \(f'(x)=0\), e herda a sua limitação: anula em
-    mínimos, em máximos e em pontos de sela igualmente. Distinguir os três casos exige a
-    variação de segunda ordem, \(\delta^2J\), e a análise correspondente é bem mais delicada
-    que o teste da segunda derivada, porque em dimensão infinita há direções demais para
-    examinar. Na prática, em física, quem decide é o problema: o tempo de descida tem mínimo
-    porque é positivo e limitado inferiormente, e a ação de uma trajetória longa pode não ter
-    nenhum.</p>
+    <span class="rotulo">Quem levanta a água não é a componente radial</span>
+    <p>A aceleração de maré radial máxima vale 1,1 μm/s², ou uma parte em nove milhões de
+    \(g\). Erguer o oceano contra a gravidade com isso é impensável, e quem faz a conta
+    ingênua conclui, corretamente, que o efeito radial é desprezível.</p>
+    <p>O trabalho é feito pela componente <strong>tangencial</strong>, máxima a 45° da
+    direção da Lua. Ela é igualmente minúscula, mas não tem nada contra o que lutar: age
+    paralelamente à superfície, onde nenhuma força a equilibra, e empurra a água
+    horizontalmente rumo aos dois pontos de maré alta ao longo de milhares de quilômetros. É
+    o acúmulo sobre essa escala que produz a maré.</p>
   </div>
 
-  <h3>A tabela de correspondências</h3>
+  <h3>A altura da maré, por um argumento de equilíbrio</h3>
+
+  <p>Imagine dois tubos sem paredes, recortados do próprio oceano: um <strong>vertical</strong>
+  de altura \(h\) e outro <strong>horizontal</strong>, acompanhando a superfície do ponto de
+  maré baixa até o de maré alta. A coluna vertical tem peso e estabelece na sua base uma
+  pressão excedente \(\Delta p=\varrho gh\), que empurraria a água de volta para o tubo
+  horizontal. Para que nada escoe, a componente tangencial da maré tem de empurrar no sentido
+  contrário com o mesmo saldo.</p>
+
+  <div data-widget="tubos"></div>
+
+  <p>Escrevendo essa condição como trabalho por unidade de massa ao longo do arco de
+  quadrante,</p>
+
+  <p>\[g\,h=\int_0^{\pi/2}\left|a_\theta\right|R\,d\theta
+  =\frac{3}{2}\frac{GM_LR^2}{D^3}\int_0^{\pi/2}\sen2\theta\,d\theta
+  =\frac{3}{2}\frac{GM_LR^2}{D^3}\left[-\frac{\cos2\theta}{2}\right]_0^{\pi/2},\]</p>
+
+  <p>e como o colchete vale 1,</p>
+
+  <div class="destaque">
+    <span class="anuncio">Maré de equilíbrio</span>
+    \[\Delta h=\frac{3}{2}\,\frac{GM_LR^2}{g\,D^3}.\]
+  </div>
+
+  <p>O mesmo resultado sai em uma linha pelo potencial, e vale ver as duas rotas. A superfície
+  livre de um fluido em equilíbrio é uma equipotencial, de modo que
+  \(gh(\theta)+\Phi_{\rm maré}(R,\theta)\) é constante. Logo
+  \(h(\theta)=-\Phi_{\rm maré}/g+\text{const}\), e</p>
+
+  <p>\[\Delta h=h(0)-h\!\left(\tfrac{\pi}{2}\right)
+  =\frac{GM_LR^2}{gD^3}\left[\frac{3-1}{2}-\frac{0-1}{2}\right]
+  =\frac{3}{2}\frac{GM_LR^2}{gD^3}.\]</p>
+
+  <p>Com os números da Lua isso dá 53,5 cm, e com os do Sol, 24,6 cm. São valores modestos, e
+  deliberadamente: a maré de equilíbrio supõe um oceano global sem continentes nem inércia.
+  Marés reais de vários metros, como os 16 m da <a href="https://pt.wikipedia.org/wiki/Ba%C3%ADa_de_Fundy">baía de Fundy</a>, vêm de ressonância das bacias
+  oceânicas e de estrangulamento em estreitos, que são hidrodinâmica e não estática.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. Sizígia, quadratura e marés extremas</h2>
+
+  <p>A amplitude da maré vai com \(M/D^3\), e não com \(M/D^2\) como a atração. Essa potência
+  a mais no denominador muda o ranking: o Sol tem 27 milhões de vezes a massa da Lua e perde
+  para ela, porque está 389 vezes mais longe. A razão é</p>
+
+  <p>\[\frac{a_{\rm Lua}}{a_{\rm Sol}}
+  =\frac{M_L}{M_S}\left(\frac{D_S}{D_L}\right)^3=2{,}18.\]</p>
+
+  <p>As duas contribuições se superpõem. Na lua nova e na lua cheia, Sol e Lua estão
+  alinhados com a Terra e as marés se somam, dando a <strong>maré de sizígia</strong>, a mais
+  alta do mês. Nos quartos, os dois astros formam 90° e as contribuições se subtraem, dando a
+  <strong>maré de quadratura</strong>. Os botões do simulador mostram as quatro
+  configurações.</p>
+
+  <h3>Quando a maré deixa de ser suave</h3>
+
+  <p>A aceleração diferencial entre dois pontos separados de \(h\) vale \(2GMh/r^3\), e esse
+  cubo no denominador torna o efeito irrelevante longe e catastrófico perto. Para uma pessoa
+  de 1,80 m na superfície de uma estrela de nêutrons de 1,4 massas solares e 10 km de
+  raio,</p>
+
+  <p>\[\Delta a=\frac{2GMh}{r^3}=6{,}7\cruz10^{8}\ {\rm m/s^2},\]</p>
+
+  <p>o que sobre 70 kg dá \(4{,}7\cruz10^{10}\) N, quase \(10^{8}\) vezes o peso da mesma
+  pessoa na Terra. Nenhuma estrutura material resiste, e o corpo é estirado ao longo da
+  direção radial e comprimido na transversal, num processo que ganhou o nome de
+  <strong><a href="https://en.wikipedia.org/wiki/Spaghettification">espaguetificação</a></strong>.</p>
+
+  <p>Para buracos negros a conta tem uma inversão instrutiva. O <a href="https://pt.wikipedia.org/wiki/Raio_de_Schwarzschild">raio de Schwarzschild</a> é
+  \(r_s=2GM/c^2\), que para uma massa solar vale 2,95 km. Avaliando a maré <em>no
+  horizonte</em>,</p>
+
+  <p>\[\Delta a\big|_{r_s}=\frac{2GMh}{r_s^3}=\frac{c^6h}{4G^2M^2},\]</p>
+
+  <p>que é inversamente proporcional ao <strong>quadrado</strong> da massa. Num buraco negro
+  estelar a espaguetificação começa a cerca de 170 km, umas 57 vezes o horizonte, e o viajante
+  é destruído muito antes de chegar lá. Já em <a href="https://pt.wikipedia.org/wiki/Sagittarius_A*">Sagitário A*</a>, com 4,3 milhões de massas solares
+  e horizonte de \(1{,}27\cruz10^{10}\) m, a maré no horizonte vale \(10^{-3}\) m/s²: seria
+  possível atravessá-lo sem sentir nada. Buracos negros maiores são, nesse sentido preciso,
+  mais gentis.</p>
+
+  <p>O mesmo cálculo, aplicado a um satélite em vez de a uma pessoa, dá o <strong>limite de
+  <a href="https://en.wikipedia.org/wiki/%C3%89douard_Roche">Roche</a></strong>: a distância abaixo da qual a maré do planeta vence a coesão gravitacional
+  do satélite e o despedaça. Os <a href="https://pt.wikipedia.org/wiki/An%C3%A9is_de_Saturno">anéis de Saturno</a> estão dentro do <a href="https://pt.wikipedia.org/wiki/Limite_de_Roche">limite de Roche</a> do planeta,
+  e é por isso que são anéis em vez de luas.</p>
+  <!-- ================================================== -->
+  <h2 id="s5">5. O teorema do transporte</h2>
+
+  <p>O caso girante exige uma ferramenta, e ela já apareceu no módulo 1. Seja \(\vet{Q}\) um
+  vetor qualquer, que pode ser posição, velocidade, momento angular ou o que for, e sejam
+  \(\vers{e}\,'_i\) os versores do referencial que gira com \(\vet{\omega}\). Expanda
+  \(\vet{Q}\) nessa base:</p>
+
+  <p>\[\vet{Q}=\sum_{i=1}^{3}Q'_i\,\vers{e}\,'_i.\]</p>
+
+  <p>Para quem gira junto, os versores são fixos, e a única coisa que varia são as
+  componentes:</p>
+
+  <p>\[\left(\der{\vet{Q}}{t}\right)_{\!\rm gir}
+  =\sum_i\dot{Q}'_i\,\vers{e}\,'_i.\]</p>
+
+  <p>Para quem está fora, os versores também giram, e a regra do produto acrescenta um
+  termo:</p>
+
+  <p>\[\left(\der{\vet{Q}}{t}\right)_{\!\rm fixo}
+  =\sum_i\dot{Q}'_i\,\vers{e}\,'_i
+  +\sum_i Q'_i\,\der{\vers{e}\,'_i}{t}.\]</p>
+
+  <p>A derivada dos versores é exatamente o teorema do módulo 1,
+  \(\dot{\vers{e}}\,'_i=\vet{\omega}\cruz\vers{e}\,'_i\). Levando isso à segunda soma
+  e pondo \(\vet{\omega}\cruz\) em evidência,</p>
+
+  <p>\[\sum_i Q'_i\left(\vet{\omega}\cruz\vers{e}\,'_i\right)
+  =\vet{\omega}\cruz\sum_i Q'_i\vers{e}\,'_i=\vet{\omega}\cruz\vet{Q},\]</p>
+
+  <p>de onde</p>
+
+  <div class="destaque">
+    <span class="anuncio">Teorema do transporte</span>
+    \[\left(\der{\vet{Q}}{t}\right)_{\!\rm fixo}
+    =\left(\der{\vet{Q}}{t}\right)_{\!\rm gir}+\vet{\omega}\cruz\vet{Q}.\]
+    Vale para qualquer vetor: posição, velocidade, momento angular, campo magnético.
+  </div>
+
+  <p>A leitura é que o operador de derivada temporal muda de forma ao se trocar de
+  referencial, ganhando um termo \(\vet{\omega}\cruz\). Tudo o que vem a seguir é aplicar
+  essa regra duas vezes.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. Velocidade e aceleração no girante</h2>
+
+  <p>Aplique o teorema à posição. Com \(\vet{v}_{\rm rel}\) a velocidade medida por quem
+  gira,</p>
+
+  <p>\[\vet{v}=\vet{v}_{\rm rel}+\vet{\omega}\cruz\vet{r}.\]</p>
+
+  <p>Aplique-o de novo, agora a essa própria igualdade. O vetor a ser derivado é
+  \(\vet{v}_{\rm rel}+\vet{\omega}\cruz\vet{r}\), e o teorema manda derivar no girante e
+  acrescentar \(\vet{\omega}\cruz\) do mesmo vetor:</p>
+
+  <p>\[\vet{a}=\left(\der{}{t}\right)_{\!\rm gir}
+  \left(\vet{v}_{\rm rel}+\vet{\omega}\cruz\vet{r}\right)
+  +\vet{\omega}\cruz\left(\vet{v}_{\rm rel}+\vet{\omega}\cruz\vet{r}\right).\]</p>
+
+  <p>Abra a primeira parcela com a regra do produto, lembrando que
+  \(\left(d\vet{r}/dt\right)_{\rm gir}=\vet{v}_{\rm rel}\) e que
+  \(\dot{\vet{\omega}}\) é a mesma nos dois referenciais, já que
+  \(\vet{\omega}\cruz\vet{\omega}=\vet 0\):</p>
+
+  <p>\[\left(\der{}{t}\right)_{\!\rm gir}
+  \left(\vet{v}_{\rm rel}+\vet{\omega}\cruz\vet{r}\right)
+  =\vet{a}_{\rm rel}+\dot{\vet{\omega}}\cruz\vet{r}
+  +\vet{\omega}\cruz\vet{v}_{\rm rel}.\]</p>
+
+  <p>Somando as duas parcelas, os dois termos \(\vet{\omega}\cruz\vet{v}_{\rm rel}\),
+  um de cada origem, se juntam:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Aceleração em referencial girante</span>
+    \[\vet{a}=\vet{a}_{\rm rel}
+    +2\vet{\omega}\cruz\vet{v}_{\rm rel}
+    +\vet{\omega}\cruz\left(\vet{\omega}\cruz\vet{r}\right)
+    +\dot{\vet{\omega}}\cruz\vet{r}.\]
+  </div>
+
+  <p>O fator 2 do segundo termo não é um detalhe estético: uma das parcelas vem de derivar
+  \(\vet{v}_{\rm rel}\) e a outra de derivar \(\vet{\omega}\cruz\vet{r}\), e as duas são
+  iguais. Essa é a origem algébrica do 2 de Coriolis.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. As quatro forças de inércia</h2>
+
+  <p>Multiplique por \(m\), isole \(m\vet{a}_{\rm rel}\) e use \(m\vet{a}=\vet{F}\), válida
+  no referencial inercial. Incluindo também a translação da origem, o resultado completo
+  é</p>
+
+  <div class="destaque">
+    <span class="anuncio">A segunda lei num referencial não inercial</span>
+    \[m\vet{a}_{\rm rel}=\vet{F}
+    \underbrace{-\,m\vet{A}_0}_{\text{translação}}
+    \underbrace{-\,m\vet{\omega}\cruz\left(\vet{\omega}\cruz\vet{r}\right)}_{\text{centrífuga}}
+    \underbrace{-\,2m\vet{\omega}\cruz\vet{v}_{\rm rel}}_{\text{Coriolis}}
+    \underbrace{-\,m\dot{\vet{\omega}}\cruz\vet{r}}_{\text{Euler}}.\]
+  </div>
 
   <div class="tabela-rolavel">
   <table>
-    <thead><tr><th>Cálculo diferencial</th><th>Cálculo variacional</th></tr></thead>
+    <thead><tr><th>Termo</th><th>Depende de</th><th>Some quando</th><th>Realiza trabalho</th></tr></thead>
     <tbody>
-      <tr><td>função \(f(x)\)</td><td>funcional \(J[y]\)</td></tr>
-      <tr><td>variável independente \(x\)</td><td>função \(y(x)\)</td></tr>
-      <tr><td>diferencial \(dx\)</td><td>variação \(\delta y(x)\)</td></tr>
-      <tr><td>acréscimo linear \(df\)</td><td>variação \(\delta J\)</td></tr>
-      <tr><td>condição de extremo \(f'(x)=0\)</td><td>condição de extremo \(\delta J=0\)</td></tr>
-      <tr><td>equação resultante: \(f'(x)=0\)</td><td>equação resultante: Euler-Lagrange</td></tr>
+      <tr><td>translação</td><td>aceleração da origem</td><td>a origem não acelera</td><td>sim</td></tr>
+      <tr><td>centrífuga</td><td>posição</td><td>o corpo está no eixo</td><td>sim</td></tr>
+      <tr><td>Coriolis</td><td>velocidade relativa</td><td>o corpo está parado no girante</td><td><strong>não</strong></td></tr>
+      <tr><td>Euler</td><td>posição e \(\dot{\vet{\omega}}\)</td><td>a rotação é uniforme</td><td>sim</td></tr>
     </tbody>
   </table>
   </div>
 
-  <p>A coluna da direita não é uma analogia solta: cada linha pode ser obtida da esquerda
-  substituindo um índice discreto por uma variável contínua. Pense na curva \(y(x)\) discretizada
-  em \(N\) valores \(y_1,\dots,y_N\), com \(J\) virando uma função de \(N\) variáveis; a condição
-  \(\partial J/\partial y_i=0\) para todo \(i\) é a versão discreta de \(\delta J=0\), e o limite
-  \(N\to\infty\) reconstrói o caso contínuo. Essa é a leitura que torna o cálculo variacional
-  menos misterioso, e é também o algoritmo que os métodos numéricos de hoje usam de fato.</p>
+  <p>A última coluna merece atenção. A força de Coriolis é sempre perpendicular a
+  \(\vet{v}_{\rm rel}\), e uma força perpendicular ao deslocamento não realiza trabalho. Ela
+  encurva trajetórias sem jamais alterar a energia cinética medida no referencial girante, o
+  que é exatamente o que um campo magnético faz com uma carga.</p>
+
+  <div data-widget="girante"></div>
 
   <!-- ================================================== -->
-  <h2 id="s6">6. A menor distância</h2>
+  <h2 id="s8">8. A centrífuga</h2>
 
-  <p>Dos quatro problemas clássicos, este é o único cuja resposta já se sabe antes de fazer
-  qualquer conta. O funcional é o comprimento,</p>
+  <p>Expandindo o duplo produto vetorial,
+  \(-m\vet{\omega}\cruz\left(\vet{\omega}\cruz\vet{r}\right)
+  =-m\left[\vet{\omega}\left(\vet{\omega}\cdot\vet{r}\right)-\omega^2\vet{r}\right]
+  =m\omega^2\vet{r}_\perp\), onde \(\vet{r}_\perp\) é a componente perpendicular ao eixo.
+  A força aponta para fora <strong>do eixo</strong>, e não do centro, e cresce linearmente
+  com a distância a ele.</p>
 
-  <p>\[L[y]=\int_{x_1}^{x_2}\sqrt{1+\left(y'\right)^{2}}\,dx,\]</p>
+  <p>Note que ela existe mesmo para um corpo parado no referencial girante, e é por isso que
+  se faz sentir numa curva de carro ou numa centrífuga de laboratório. Numa ultracentrífuga a
+  30 000 rpm e 10 cm do eixo, \(\omega=3141\) rad/s e \(\omega^2r=9{,}9\cruz10^5\) m/s², cem
+  mil vezes a gravidade, o que basta para separar organelas celulares por densidade.</p>
 
-  <p>e a curva que o minimiza é o segmento de reta \(y=mx+b\), com
-  \(m=(y_2-y_1)/(x_2-x_1)\) e \(b=y_1-mx_1\). O valor do problema está em outra parte: ele serve
-  de teste de consistência. Na aula 8, a equação de Euler-Lagrange aplicada a esse funcional
-  produzirá \(y''=0\), cuja solução geral é precisamente a reta. Um formalismo que errasse esse
-  caso não mereceria confiança nos outros três.</p>
+  <p>A centrífuga é <strong>conservativa</strong>, o que quase nunca se diz. Como ela vale
+  \(m\omega^2\vet{r}_\perp\) e depende apenas da posição, existe um potencial que a
+  gera:</p>
 
-  <p>Trocando o plano por uma superfície curva, o mesmo funcional define as
-  <strong>geodésicas</strong> dela, e aí a resposta deixa de ser óbvia: na esfera são arcos de
-  círculo máximo, e o cálculo variacional é o caminho natural para obtê-los. Em relatividade
-  geral essa é a definição da trajetória de uma partícula livre.</p>
+  <p>\[U_{\rm cf}=-\frac12m\omega^2r_\perp^2
+  \qquad\Longrightarrow\qquad
+  -\nabla U_{\rm cf}=m\omega^2\vet{r}_\perp.\]</p>
+
+  <p>Conferindo com \(\vet{\omega}=\omega\vers{z}\), em que
+  \(r_\perp^2=x^2+y^2\), o gradiente de \(-\tfrac12m\omega^2(x^2+y^2)\) com sinal
+  trocado dá \(m\omega^2(x,y,0)\), que é a centrífuga. Somando-o ao potencial das forças
+  reais obtém-se o <strong>potencial efetivo</strong> do referencial girante,</p>
+
+  <p>\[U_{\rm ef}=U-\frac12m\omega^2r_\perp^2,\]</p>
+
+  <p>e com ele a conservação de energia volta a valer no girante, desde que a força de
+  Coriolis não atrapalhe. Ela não atrapalha, porque é perpendicular à velocidade e não
+  realiza trabalho. É esse potencial efetivo que organiza o problema restrito de três corpos
+  e os pontos de <a href="https://pt.wikipedia.org/wiki/Joseph-Louis_Lagrange">Lagrange</a>, em Mecânica Clássica III.</p>
+
+  <p>Um detalhe de linguagem que vale corrigir: a chamada força centrípeta e a força
+  centrífuga não formam um par de ação e reação. A primeira é real e age no referencial
+  inercial; a segunda é fictícia e só existe no girante. Elas nem sequer aparecem na mesma
+  equação.</p>
 
   <!-- ================================================== -->
-  <h2 id="s7">7. A braquistócrona</h2>
+  <h2 id="s9">9. Coriolis</h2>
 
-  <p>Dois pontos \(A\) e \(B\), com \(B\) mais baixo que \(A\) mas não diretamente abaixo. Uma
-  partícula desliza sem atrito de \(A\) até \(B\) sob gravidade, partindo do repouso. Qual
-  calha a leva no menor tempo? A conservação da energia dá a velocidade a cada altura de
-  descida \(y\),</p>
+  <p>A força de Coriolis, \(-2m\vet{\omega}\cruz\vet{v}_{\rm rel}\), tem três propriedades que
+  a distinguem de tudo o mais neste curso. Ela só existe para corpos em movimento relativo.
+  Ela é perpendicular à velocidade, de modo que desvia sem acelerar nem frear. E o seu sentido
+  depende do hemisfério, porque a componente de \(\vet{\omega}\) que importa troca de sinal
+  ao se cruzar o equador.</p>
 
-  <p>\[\frac{1}{2}mv^{2}=mgy\quad\Longrightarrow\quad v=\sqrt{2gy},\]</p>
-
-  <p>e com \(ds=\sqrt{1+\left(y'\right)^2}\,dx\) o tempo total fica</p>
-
-  <div class="destaque">
-    <span class="anuncio">O funcional da braquistócrona</span>
-    \[T[y]=\int_A^B\frac{ds}{v}
-    =\int_{x_1}^{x_2}\sqrt{\frac{1+\left(y'\right)^{2}}{2gy}}\;dx.\]
-  </div>
-
-  <p>Repare no conflito embutido nesse integrando. O numerador premia caminhos curtos, e o
-  denominador premia caminhos que desçam rápido no início, porque \(y\) grande significa \(v\)
-  grande. A reta é boa no primeiro critério e ruim no segundo; uma queda vertical seguida de
-  um trecho horizontal é ótima no segundo e péssima no primeiro. A curva vencedora negocia os
-  dois, e não é nenhuma das duas.</p>
-
-  <div data-widget="braquistocrona"></div>
-
-  <p>A solução é uma <strong>ciclóide</strong>, a curva traçada por um ponto fixo de uma
-  circunferência que rola sem deslizar sobre uma reta, percorrida com a concavidade para
-  cima. <a href="https://pt.wikipedia.org/wiki/Johann_Bernoulli">Johann Bernoulli</a> propôs o problema como desafio público em 1696, e as soluções que
-  chegaram no ano seguinte vieram de <a href="https://pt.wikipedia.org/wiki/Gottfried_Wilhelm_Leibniz">Leibniz</a>, de <a href="https://pt.wikipedia.org/wiki/Jakob_Bernoulli">Jakob Bernoulli</a>, de <a href="https://pt.wikipedia.org/wiki/Guillaume_Fran%C3%A7ois_Antoine,_Marqu%C3%AAs_de_l%27H%C3%B4pital">L'Hôpital</a> e de Newton,
-  este último anonimamente e, pelo relato, em uma única noite. <a href="https://pt.wikipedia.org/wiki/Galileu_Galilei">Galileu</a> havia estudado a questão
-  em 1638 e proposto um arco de círculo, que está errado mas é uma aproximação razoável do
-  arco de ciclóide.</p>
+  <p>No hemisfério norte, um corpo que se move horizontalmente é desviado para a
+  <strong>direita</strong> do seu movimento; no sul, para a esquerda. A regra vale para
+  qualquer direção de movimento, o que é fácil de verificar tomando a componente vertical de
+  \(\vet{\omega}\), que vale \(\omega\sen\lambda\).</p>
 
   <div class="bloco fisica">
-    <span class="rotulo">A ciclóide também é tautócrona</span>
-    <p>Uma partícula largada em qualquer ponto de um arco de ciclóide invertida chega ao fundo
-    no mesmo tempo, independentemente de onde foi largada. <a href="https://pt.wikipedia.org/wiki/Christiaan_Huygens">Huygens</a> descobriu essa propriedade
-    em 1659, antes do problema da braquistócrona existir, e tentou usá-la para construir
-    relógios de pêndulo com período rigorosamente independente da amplitude, prendendo o fio
-    entre duas faces de ciclóide. A ideia é correta e o relógio não funcionou: o atrito do fio
-    nas faces estragava mais do que a correção melhorava.</p>
+    <span class="rotulo">O que Coriolis explica e o que não explica</span>
+    <p><strong>Explica:</strong> o sentido de rotação de ciclones, anti-horário no norte e
+    horário no sul; a necessidade de correção balística em tiros de longo alcance; o desvio
+    sistemático de correntes oceânicas; e a precessão do pêndulo de Foucault.</p>
+    <p><strong>Não explica:</strong> o sentido em que a água gira ao escoar numa pia. A
+    aceleração de Coriolis numa pia é da ordem de \(10^{-5}\) m/s², desprezível diante de
+    qualquer assimetria da bacia ou do movimento residual da água. O efeito só se impõe em
+    escalas grandes de espaço e tempo, e é por isso que ciclones o obedecem e ralos não.</p>
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s8">8. A catenária</h2>
+  <h2 id="s10">10. A Terra como referencial girante</h2>
 
-  <p>Uma corrente flexível, inextensível e de densidade linear \(\varrho\) uniforme é suspensa
-  por dois pontos. A altura do centro de massa determina a energia potencial, e a corrente em
-  repouso é a que minimiza essa energia entre todas as formas de mesmo comprimento. Como o
-  elemento de massa é \(\varrho\,ds=\varrho\sqrt{1+\left(y'\right)^2}\,dx\),</p>
+  <p>A Terra gira uma volta por dia sideral, o que dá \(\omega=2\pi/86\,164=
+  7{,}292\cruz10^{-5}\) rad/s. É pouco, mas o raio é grande, e a centrífuga no equador
+  alcança \(\omega^2R=0{,}0339\) m/s², cerca de 0,35% de \(g\).</p>
 
-  <p>\[U[y]=\varrho g\int_{x_1}^{x_2}y\sqrt{1+\left(y'\right)^{2}}\;dx,\]</p>
+  <p>Para um laboratório na latitude \(\lambda\), a distância ao eixo é \(R\cos\lambda\), e a
+  centrífuga aponta para fora do eixo, não para fora do centro. Decompondo-a na vertical e na
+  horizontal do lugar,</p>
 
-  <p>com a restrição de que o comprimento total \(\int\sqrt{1+(y')^2}\,dx\) é fixo. A solução
-  é a <strong>catenária</strong></p>
+  <p>\[g_{\rm ef}=g_0-\omega^2R\cos^2\lambda,\qquad
+  g_{\rm horiz}=\omega^2R\cos\lambda\sen\lambda.\]</p>
 
-  <p>\[y(x)=a\cosh\left(\frac{x}{a}\right)+b,\]</p>
+  <div data-widget="pesoefetivo"></div>
 
-  <p>em que \(a\) é determinado pelo comprimento da corrente e pela separação dos apoios.
-  Galileu afirmou que a forma era uma parábola, e Huygens, Leibniz e Johann Bernoulli
-  mostraram em 1691 que não é, embora a parábola seja uma aproximação muito boa para flechas
-  pequenas. A distinção importa na engenharia: o cabo de uma ponte pênsil, que carrega o
-  tabuleiro e não apenas o próprio peso, fica de fato parabólico, enquanto um cabo de
-  transmissão pendurado entre duas torres é catenária.</p>
+  <p>A primeira parcela é a conhecida: a balança marca menos no equador. A segunda é
+  horizontal, aponta para o equador e <strong>inclina a vertical</strong>. O fio de prumo não
+  aponta para o centro da Terra em latitude nenhuma, exceto nos polos e no equador, e o
+  desvio \(\left(\omega^2R/2g\right)\sen2\lambda\) é máximo em 45°, onde chega a 5,9 minutos
+  de arco. Num prédio de 200 m isso dá 34 cm, e é a vertical do prumo, não a direção do
+  centro, que topografia e construção civil usam.</p>
 
-  <p>Uma observação sobre o método, e é o motivo de esse problema aparecer aqui. Minimizar
-  \(U[y]\) sem mais nada daria uma corrente de comprimento nulo pendurada no chão. A restrição
-  de comprimento fixo é essencial, e tratá-la exige multiplicadores de <a href="https://pt.wikipedia.org/wiki/Joseph-Louis_Lagrange">Lagrange</a> na versão
-  funcional, exatamente como no cálculo de várias variáveis. É o mesmo mecanismo que aparece no
-  problema seguinte.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s9">9. O problema de Dido</h2>
-
-  <p>Dado um perímetro fixo, qual é a curva fechada do plano que delimita a maior área? Os
-  funcionais em jogo são dois,</p>
-
-  <p>\[A=\oint y\,dx=\frac{1}{2}\oint\left(x\,dy-y\,dx\right),\qquad
-  L=\oint\sqrt{dx^{2}+dy^{2}}=\text{fixo},\]</p>
-
-  <p>e a resposta é o <strong>círculo</strong>. Problemas com essa estrutura, em que se
-  extremiza um funcional mantendo outro constante, chamam-se
-  <strong>isoperimétricos</strong>, e o nome vem justamente deste caso.</p>
-
-  <div data-widget="isoperimetrico"></div>
-
-  <p>A lenda dá nome ao problema. <a href="https://en.wikipedia.org/wiki/Dido">Dido</a>, princesa fenícia fugida de Tiro, teria negociado com um
-  chefe local do norte da África a compra de tanta terra quanta pudesse cercar com o couro de
-  um boi. Ela cortou o couro em tiras finíssimas, amarrou-as numa única correia longa e cercou
-  com ela um semicírculo tendo o mar como diâmetro, sobre o qual fundou <a href="https://pt.wikipedia.org/wiki/Cartago">Cartago</a>. A escolha do
-  semicírculo com a costa de diâmetro é ótima pelo mesmo argumento que torna o círculo ótimo no
-  plano, e a Dido da lenda sabia a resposta uns vinte e cinco séculos antes de alguém saber
-  demonstrá-la.</p>
-
-  <p>Os matemáticos gregos também sabiam que o círculo era a resposta, e tampouco podiam
-  prová-lo com rigor. <a href="https://en.wikipedia.org/wiki/Zenodorus_(mathematician)">Zenodoro</a>, no século II a.C., chegou perto; <a href="https://pt.wikipedia.org/wiki/Jakob_Steiner">Steiner</a>, em 1838, deu um
-  argumento geométrico elegante que supõe a existência do máximo sem demonstrá-la, falha
-  apontada por <a href="https://pt.wikipedia.org/wiki/Karl_Weierstrass">Weierstrass</a>; a prova completa só veio no fim do século XIX, com os métodos
-  diretos. A história da desigualdade isoperimétrica mostra o quanto da dificuldade do cálculo
-  variacional está em garantir que o extremo existe, e não em achar quem ele é.</p>
+  <p>Vale uma ressalva de honestidade. A variação medida de \(g\), de 9,780 m/s² no equador a
+  9,832 nos polos, não se deve apenas à rotação: cerca de um terço dela vem do
+  <strong>achatamento</strong> do planeta, que afasta o equador do centro. As duas causas têm
+  a mesma origem histórica, porque foi a rotação que achatou a Terra, mas são efeitos
+  distintos e o simulador mostra as duas curvas separadas.</p>
 
   <!-- ================================================== -->
-  <h2 id="s10">10. Tipos de problemas variacionais</h2>
+  <h2 id="s11">11. Desvios: queda livre e projéteis</h2>
 
-  <p>Os quatro exemplos anteriores já exibem variedade suficiente para merecer uma
-  classificação, e ela organiza o que vem nos módulos seguintes.</p>
+  <p>Monte um sistema de eixos local com \(\vers{x}\) para leste, \(\vers{y}\) para o
+  norte e \(\vers{z}\) para cima. Nessa base a velocidade angular da Terra se decompõe em</p>
 
-  <div class="tabela-rolavel">
-  <table>
-    <thead><tr><th>Tipo</th><th>Característica</th><th>Exemplo</th></tr></thead>
-    <tbody>
-      <tr><td>extremos fixos</td><td>\(y(x_1)=y_1\), \(y(x_2)=y_2\)</td><td>menor distância, braquistócrona</td></tr>
-      <tr><td>extremos livres</td><td>as extremidades podem variar</td><td>corda com uma ponta solta num trilho</td></tr>
-      <tr><td>isoperimétricos</td><td>restrição integral</td><td>Dido, catenária</td></tr>
-      <tr><td>várias funções</td><td>\(J[y_1,\dots,y_n]\)</td><td>ação de um sistema de \(n\) graus de liberdade</td></tr>
-      <tr><td>derivadas superiores</td><td>\(J=\int F(x,y,y',y'',\dots)dx\)</td><td>energia de flexão de uma viga</td></tr>
-    </tbody>
-  </table>
-  </div>
+  <p>\[\vet{\omega}=\omega\left(0,\;\cos\lambda,\;\sen\lambda\right),\]</p>
 
-  <p>A quarta linha é a que interessa à mecânica. As coordenadas generalizadas de um sistema com
-  \(n\) graus de liberdade são \(n\) funções do tempo, e a condição \(\delta\Acao=0\) produzirá
-  um sistema de \(n\) equações acopladas. A quinta linha aparece na teoria de vigas e em
-  gravitação modificada, e produz equações de quarta ordem.</p>
+  <p>e, com \(\vet{v}=(\dot x,\dot y,\dot z)\), o produto vetorial vale</p>
 
-  <!-- ================================================== -->
-  <h2 id="s11">11. O lema fundamental</h2>
+  <p>\[\vet{\omega}\cruz\vet{v}=\omega
+  \left(\dot z\cos\lambda-\dot y\sen\lambda,\;
+  \dot x\sen\lambda,\;-\dot x\cos\lambda\right).\]</p>
 
-  <p>Toda conta variacional termina do mesmo jeito: com uma integral que deve se anular para
-  <em>qualquer</em> deformação \(\delta y\),</p>
-
-  <p>\[\delta J=\int_{x_1}^{x_2}G(x)\,\delta y(x)\,dx=0.\]</p>
-
-  <p>Daí se quer concluir que \(G(x)=0\), e esse passo não é automático: a integral de uma
-  função não nula pode perfeitamente se anular, se as contribuições positivas e negativas se
-  cancelarem. O que salva o argumento é a liberdade de escolher \(\delta y\).</p>
+  <p>Levando à equação do movimento \(\vet{a}_{\rm rel}=\vet{g}_{\rm ef}
+  -2\vet{\omega}\cruz\vet{v}\), com \(\vet{g}_{\rm ef}=-g\vers{z}\), saem três
+  equações acopladas:</p>
 
   <div class="destaque">
-    <span class="anuncio">Lema fundamental do cálculo das variações</span>
-    <p>Se \(\displaystyle\int_a^b G(x)\,\eta(x)\,dx=0\) para toda função \(\eta\)
-    suficientemente regular com \(\eta(a)=\eta(b)=0\), então \(G(x)=0\) em todo o intervalo
-    \([a,b]\).</p>
+    <span class="anuncio">Queda livre num referencial que gira</span>
+    \[\ddot x=-2\omega\left(\dot z\cos\lambda-\dot y\sen\lambda\right),\qquad
+    \ddot y=-2\omega\dot x\sen\lambda,\qquad
+    \ddot z=-g+2\omega\dot x\cos\lambda.\]
   </div>
 
-  <p>A demonstração é por contradição, e vale acompanhá-la porque explica de onde vem a força
-  do método. Suponha que \(G\) seja contínua e que \(G(x_0)>0\) em algum ponto interior. Por
-  continuidade existe uma vizinhança \((x_0-\epsilon,x_0+\epsilon)\) em que \(G\) permanece
-  positiva. Escolha agora uma \(\eta\) que seja positiva dentro dessa vizinhança e
-  identicamente nula fora dela, como</p>
+  <p>Resolver isso exatamente é possível e desnecessário: \(\omega\) é pequeno, e a
+  aproximação sucessiva basta. Em ordem zero, despreze todos os termos em \(\omega\) e
+  fique com a queda de sempre, \(\dot z=-gt\), \(\dot x=\dot y=0\). Leve essa solução
+  ao lado direito da primeira equação:</p>
 
-  <p>\[\eta(x)=\begin{cases}
-  \left[\epsilon^{2}-\left(x-x_0\right)^{2}\right]^{2}, & \left|x-x_0\right|<\epsilon,\\[2pt]
-  0, & \text{caso contrário.}\end{cases}\]</p>
+  <p>\[\ddot x\simeq-2\omega\left(-gt\right)\cos\lambda=2\omega g\,t\cos\lambda.\]</p>
 
-  <p>Essa \(\eta\) é admissível, pois é suave e se anula nos extremos. Com ela o integrando é
-  positivo onde não é nulo, a integral é estritamente positiva, e a hipótese de que ela se
-  anula para toda \(\eta\) é violada. Logo \(G\) não pode ser positiva em ponto nenhum, e o
-  mesmo argumento com o sinal trocado exclui valores negativos. Resta \(G\equiv0\).</p>
+  <p>O resultado é positivo, isto é, <strong>para leste</strong>, e em qualquer hemisfério,
+  porque \(\cos\lambda>0\) dos dois lados do equador. Integrando duas vezes a partir do
+  repouso,</p>
 
-  <p>A ideia por trás do lema é que a liberdade de deformar a curva em qualquer pedacinho do
-  intervalo, isoladamente, transforma uma única condição integral em uma condição ponto a
-  ponto. É esse mecanismo que converte \(\delta\Acao=0\), uma afirmação global sobre o caminho
-  inteiro, numa equação diferencial local. A aula 8 começa exatamente aqui.</p>
+  <div class="destaque">
+    <span class="anuncio">Desvio para leste na queda livre</span>
+    \[d_{\rm leste}=\frac{1}{3}\,\omega g\,t^3\cos\lambda,
+    \qquad t=\sqrt{\frac{2h}{g}}.\]
+  </div>
 
-  <div class="bloco fisica">
-    <span class="rotulo">Três ferramentas para a próxima aula</span>
-    <ul>
-      <li>regra da cadeia para funções de várias variáveis;</li>
-      <li>integração por partes, \(\int u\,dv=uv-\int v\,du\), que é o que transfere a derivada
-      de \(\delta y'\) para o resto do integrando;</li>
-      <li>o lema fundamental acima, que converte a integral nula em equação diferencial.</li>
-    </ul>
-    <p>Com essas três, a dedução da equação de Euler-Lagrange cabe em meia página.</p>
+  <p>De uma torre de 100 m no equador, \(t=4{,}52\) s e \(d=2{,}2\) cm. É pequeno, mas foi
+  medido: a primeira confirmação cuidadosa veio de Ferdinand <a href="https://en.wikipedia.org/wiki/Ferdinand_Reich">Reich</a>, em 1831, soltando pesos
+  num poço de mina de 158 m em Freiberg e obtendo 28 mm contra os 27,5 mm previstos.</p>
+
+  <p>A explicação sem fórmula ajuda a fixar o sinal. O topo da torre está mais longe do eixo
+  que a base e, girando com a Terra, move-se mais rápido para leste. Ao ser solto, o corpo
+  conserva esse excesso de velocidade para leste e, portanto, chega ao solo adiantado em
+  relação ao pé da torre. Não é uma força misteriosa: é conservação de momento angular vista
+  de um referencial que gira.</p>
+
+  <p>Para projéteis de longo alcance o efeito deixa de ser curiosidade. Um disparo de 20 km
+  em 60 s de voo a 45° de latitude sofre desvio lateral da ordem de dezenas de metros, e
+  artilharia naval de longo alcance sempre corrigiu por latitude e por azimute.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s12">12. O pêndulo de Foucault</h2>
+
+  <p>Em 1851, no Panteão de Paris, Léon Foucault pendurou uma esfera de 28 kg num fio de 67 m
+  e a pôs a oscilar diante do público. Ao longo das horas o plano de oscilação foi girando,
+  riscando a areia do chão em direções sucessivamente diferentes, sem que força horizontal
+  alguma agisse sobre o pêndulo. Foi a primeira demonstração mecânica, visível a olho nu, de
+  que a Terra gira.</p>
+
+  <div data-widget="foucault"></div>
+
+  <p>Para pequenas oscilações o movimento é praticamente horizontal, e das três componentes
+  de \(\vet{\omega}\) só a vertical, \(\omega_z=\omega\sen\lambda\), produz
+  aceleração dentro do plano horizontal. Com \(\omega_0^2=g/\ell\), as equações nas duas
+  coordenadas horizontais ficam</p>
+
+  <p>\[\ddot x=-\omega_0^2x+2\omega_z\dot y,\qquad
+  \ddot y=-\omega_0^2y-2\omega_z\dot x.\]</p>
+
+  <p>Elas estão acopladas, e o truque que as desacopla é juntar as duas numa variável
+  complexa. Ponha \(\zeta=x+iy\) e some a primeira equação à segunda multiplicada por
+  \(i\):</p>
+
+  <p>\[\ddot\zeta=-\omega_0^2\zeta+2\omega_z\left(\dot y-i\dot x\right)
+  =-\omega_0^2\zeta-2i\omega_z\dot\zeta,\]</p>
+
+  <p>porque \(\dot y-i\dot x=-i(\dot x+i\dot y)=-i\dot\zeta\). Reorganizando,</p>
+
+  <div class="destaque">
+    <span class="anuncio">Equação do pêndulo de Foucault</span>
+    \[\ddot\zeta+2i\omega_z\dot\zeta+\omega_0^2\zeta=0.\]
+  </div>
+
+  <p>O termo de primeira ordem tem coeficiente imaginário, e isso sugere absorvê-lo numa
+  fase. Substitua \(\zeta=e^{-i\omega_zt}\eta\). Derivando duas vezes e simplificando, os
+  termos em \(\dot\eta\) se cancelam e sobra</p>
+
+  <p>\[\ddot\eta+\left(\omega_0^2+\omega_z^2\right)\eta=0.\]</p>
+
+  <p>Ou seja: \(\eta\) é uma oscilação <em>retilínea</em> comum, de frequência
+  \(\sqrt{\omega_0^2+\omega_z^2}\simeq\omega_0\), já que \(\omega_z\) é
+  desprezível diante de \(\omega_0\). Todo o efeito da rotação está no fator
+  \(e^{-i\omega_zt}\), que é uma rotação rígida do plano de oscilação com velocidade
+  angular \(-\omega_z\). Logo</p>
+
+  <p>\[\Omega_{\rm prec}=-\,\omega\sen\lambda,\qquad
+  T_{\rm prec}=\frac{23{,}93\ {\rm h}}{\left|\sen\lambda\right|}.\]</p>
+
+  <p>O sinal negativo diz o sentido: no hemisfério norte, com \(\sen\lambda>0\), a
+  precessão é horária vista de cima.</p>
+
+  <p>O fator \(\sen\lambda\) é o que transforma a experiência num problema de mecânica. No
+  polo o pêndulo mantém o plano fixo em relação às estrelas e o chão gira sob ele em 23,93 h,
+  o dia sideral. Em Paris, a 48,87°, o período sobe para 31,8 h, pouco menos de 11 graus por
+  hora. E no equador <strong>o pêndulo não precessa</strong>, o que mostra que a experiência
+  mede a componente vertical da rotação, e não a rotação em si.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s13">13. Exercícios resolvidos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 7.1 · Peso no equador e no polo</span>
+    <p>Uma pessoa de 70,0 kg é pesada no polo e no equador com a mesma balança de mola.
+    Supondo a Terra esférica de raio 6371 km, determine a diferença de leitura devida apenas
+    à rotação.</p>
+    <p><strong>Solução.</strong> No polo a distância ao eixo é nula e não há centrífuga. No
+    equador,</p>
+    \[\omega^2R=\left(7{,}292\cruz10^{-5}\right)^2\cruz6{,}371\cruz10^{6}
+    =0{,}03388\ {\rm m/s^2}.\]
+    <p>A balança mede a normal, isto é \(m\left(g_0-\omega^2R\right)\) no equador e
+    \(mg_0\) no polo, de modo que a diferença vale</p>
+    \[\Delta=m\,\omega^2R=70{,}0\cruz0{,}03388=2{,}37\ {\rm N},\]
+    <p>equivalente a 242 g de leitura. É 0,35% do peso, suficiente para ser notado por uma
+    balança de precisão e insuficiente para ser notado por uma pessoa. Note que a <em>massa</em>
+    não mudou em lugar nenhum.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 7.2 · O trem desviado</span>
+    <p>Um trem de 400 t corre a 144 km/h para o norte na latitude 30° N. Determine a força
+    horizontal de Coriolis sobre ele e diga sobre qual trilho ela se apoia.</p>
+    <p><strong>Solução.</strong> A componente vertical de \(\vet{\omega}\) vale
+    \(\omega\sen\lambda\), e com \(v=40{,}0\) m/s a aceleração horizontal é</p>
+    \[a=2\omega v\sen\lambda=2\cruz7{,}292\cruz10^{-5}\cruz40{,}0\cruz0{,}500
+    =2{,}92\cruz10^{-3}\ {\rm m/s^2}.\]
+    <p>A força vale \(F=ma=4{,}00\cruz10^{5}\cruz2{,}92\cruz10^{-3}=1{,}17\cruz10^{3}\) N,
+    pouco mais de uma tonelada-força, dirigida para a <strong>direita</strong> do movimento,
+    isto é, para leste. É o trilho do lado leste que a recebe, e esse desgaste assimétrico é
+    documentado em ferrovias antigas de traçado longitudinal.</p>
+    <p>Compare com o peso: \(1{,}17\cruz10^3\) N contra \(3{,}92\cruz10^6\) N, uma parte em
+    3300. Pequeno, mas cumulativo ao longo de décadas de tráfego.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 7.3 · A pedra no poço de Freiberg</span>
+    <p>Reich soltou pesos num poço de mina de 158 m em Freiberg, latitude 50,9° N, em 1831.
+    Calcule o desvio para leste previsto e compare com os 28 mm que ele mediu.</p>
+    <p><strong>Solução.</strong> O tempo de queda é
+    \(t=\sqrt{2h/g}=\sqrt{2\cruz158/9{,}81}=5{,}676\) s, e</p>
+    \[d=\frac13\omega g t^3\cos\lambda
+    =\frac13\cruz7{,}292\cruz10^{-5}\cruz9{,}81\cruz182{,}9\cruz0{,}6307
+    =0{,}0275\ {\rm m}.\]
+    <p>São 27,5 mm contra os 28 mm medidos, com erro de 2%. Reich repetiu a queda 106 vezes e
+    tomou a média, o que foi essencial: o desvio é da ordem do que qualquer corrente de ar ou
+    assimetria de soltura produz em uma queda isolada.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 7.4 · Foucault em Juazeiro do Norte</span>
+    <p>Qual seria o período de precessão de um pêndulo de Foucault instalado em Juazeiro do
+    Norte, latitude 7,21° S? Compare com Paris e comente a viabilidade da experiência.</p>
+    <p><strong>Solução.</strong> Com \(\sen7{,}21^\circ=0{,}1255\),</p>
+    \[T_{\rm prec}=\frac{23{,}93}{0{,}1255}=190{,}7\ {\rm h}=7{,}95\ \text{dias},\]
+    <p>contra 31,8 h em Paris. A taxa é de apenas 1,89 grau por hora, e o sentido é
+    anti-horário, por ser hemisfério sul.</p>
+    <p>A experiência é possível, mas exigente: em uma hora o plano gira menos de dois graus, e
+    manter o pêndulo oscilando por dias sem que o amortecimento e as assimetrias do suporte
+    introduzam precessão espúria é o problema real. É por isso que pêndulos de Foucault são
+    instalados preferencialmente em latitudes médias e altas.</p>
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s12">12. Exercícios resolvidos</h2>
-
-  <div class="bloco def">
-    <span class="rotulo">Exercício resolvido 7.1 · Variações elementares</span>
-    <p>Calcule \(\delta J\) para \(J_1[y]=\int_0^1y\,dx\), \(J_2[y]=\int_0^1y^{2}\,dx\) e
-    \(J_3[y]=\int_0^1xy\,dx\).</p>
-    <p><strong>Solução.</strong> O primeiro e o terceiro são lineares em \(y\), e a variação é
-    exata:</p>
-    \[\delta J_1=\int_0^1\delta y\,dx,\qquad\delta J_3=\int_0^1x\,\delta y\,dx.\]
-    <p>No segundo, \(\left(y+\delta y\right)^2=y^2+2y\,\delta y+\left(\delta y\right)^2\), e
-    descartando o termo quadrático</p>
-    \[\delta J_2=2\int_0^1y\,\delta y\,dx.\]
-    <p>Note que \(\delta J_2\) depende de \(y\), ao contrário dos outros dois. É o reflexo de
-    \(J_2\) ser não linear: a resposta à mesma deformação muda conforme a curva de
-    partida.</p>
-  </div>
-
-  <div class="bloco def">
-    <span class="rotulo">Exercício resolvido 7.2 · Funcional quadrático</span>
-    <p>Para \(J[y]=\displaystyle\int_0^1\left[\left(y'\right)^{2}+y^{2}\right]dx\), calcule
-    \(\delta J\).</p>
-    <p><strong>Solução.</strong> Substituindo \(y\to y+\delta y\) e abrindo os dois
-    quadrados,</p>
-    \[J\left[y+\delta y\right]=\int_0^1\left[\left(y'\right)^{2}
-    +2y'\,\delta y'+\left(\delta y'\right)^{2}
-    +y^{2}+2y\,\delta y+\left(\delta y\right)^{2}\right]dx.\]
-    <p>Os dois termos quadráticos em \(\delta y\) saem fora da primeira ordem, e sobra</p>
-    \[\delta J=2\int_0^1\left[y'\,\delta y'+y\,\delta y\right]dx.\]
-    <p>Integrando por partes o primeiro termo e usando \(\delta y(0)=\delta y(1)=0\),</p>
-    \[\delta J=2\int_0^1\left[y-y''\right]\delta y\,dx,\]
-    <p>de modo que o lema fundamental impõe \(y''=y\) para a extremante, com solução
-    \(y=C_1e^{x}+C_2e^{-x}\). Esta é a primeira equação de Euler-Lagrange do curso, obtida
-    antes de termos a fórmula geral.</p>
-  </div>
-
-  <div class="bloco def">
-    <span class="rotulo">Exercício resolvido 7.3 · Interpretação geométrica</span>
-    <p>Explique por que a menor distância entre dois pontos do plano é um problema variacional e
-    escreva o funcional.</p>
-    <p><strong>Solução.</strong> O que se procura não é um número nem um par de números, mas a
-    curva inteira que une os dois pontos, e cada candidata tem um comprimento associado. Há
-    portanto um conjunto de funções admissíveis, as curvas \(y(x)\) com \(y(a)=y_a\) e
-    \(y(b)=y_b\), e uma regra que atribui um número a cada uma,</p>
-    \[L[y]=\int_a^b\sqrt{1+\left(y'\right)^{2}}\,dx.\]
-    <p>Essa regra é um funcional, e procurar a curva que a minimiza é, por definição, um
-    problema variacional.</p>
-  </div>
-
-  <div class="bloco def">
-    <span class="rotulo">Exercício resolvido 7.4 · Problema inverso</span>
-    <p>Um funcional \(J[y]=\int_0^1F\left(x,y,y'\right)dx\) tem variação</p>
-    \[\delta J=\int_0^1\left[2xy\,\delta y+3y'\,\delta y'\right]dx.\]
-    <p>Determine \(F\).</p>
-    <p><strong>Solução.</strong> A forma geral da variação de um funcional desse tipo é</p>
-    \[\delta J=\int_0^1\left(\pder{F}{y}\,\delta y
-    +\pder{F}{y'}\,\delta y'\right)dx,\]
-    <p>e comparar os dois integrandos termo a termo dá
-    \(\partial F/\partial y=2xy\) e \(\partial F/\partial y'=3y'\). Integrando a primeira em
-    \(y\) vem \(F=xy^{2}+g\left(x,y'\right)\); integrando a segunda em \(y'\) vem
-    \(F=\tfrac{3}{2}\left(y'\right)^{2}+h(x,y)\). As duas expressões só são compatíveis se</p>
-    \[F\left(x,y,y'\right)=xy^{2}+\frac{3}{2}\left(y'\right)^{2}+C.\]
-    <p>A constante \(C\) é irrelevante, porque adicionar uma constante a \(F\) soma uma
-    constante a \(J\) e não altera variação nenhuma. Essa indeterminação inofensiva reaparecerá
-    de forma muito mais interessante na aula 8, quando se verá que somar a \(\Lag\) a derivada
-    total de uma função qualquer também não muda as equações de movimento.</p>
-  </div>
-
-  <!-- ================================================== -->
-  <h2 id="s13">13. Exercícios propostos</h2>
+  <h2 id="s14">14. Exercícios propostos</h2>
 
   <div class="bloco def">
     <span class="rotulo">Para resolver</span>
     <ol>
-      <li><b>7.1</b> Calcule \(\delta J\) para \(J[y]=\int_0^1\left(y'\right)^{3}dx\) e para
-      \(J[y]=\int_0^1y\,y'\,dx\). No segundo caso, mostre que a variação se reduz a um termo de
-      fronteira e explique o significado disso.</li>
+      <li><b>7.1</b> Um carrossel de 4,0 m de raio gira a 12 rpm. Uma pessoa de 60 kg está na
+      borda. Determine a força centrífuga que ela sente e compare com o seu peso. Que
+      inclinação do piso tornaria desnecessário o atrito?</li>
 
-      <li><b>7.2</b> Mostre que o funcional \(J[y]=\int_{x_1}^{x_2}\left(\alpha y+\beta
-      y'\right)dx\), com \(\alpha\) e \(\beta\) constantes, só pode ter extremante se
-      \(\alpha=0\). Interprete geometricamente.</li>
+      <li><b>7.2</b> Deduza a aceleração em referencial girante aplicando o teorema do
+      transporte duas vezes, com todos os passos. Identifique exatamente de onde vêm as duas
+      contribuições que somam no termo de Coriolis.</li>
 
-      <li><b>7.3</b> Para o funcional comprimento, calcule explicitamente \(L\) para a reta e
-      para o arco de parábola \(y=x+a\,x(1-x)\) ligando \((0,0)\) a \((1,1)\). Expanda o
-      resultado em potências de \(a\) e verifique que o termo linear se anula, como deve
-      acontecer num mínimo.</li>
+      <li><b>7.3</b> Mostre que a força de Coriolis nunca realiza trabalho e que a centrífuga
+      é conservativa, derivando do potencial
+      \(U_{\rm cf}=-\tfrac12m\omega^2r_\perp^2\). Escreva o potencial efetivo de um
+      referencial girante.</li>
 
-      <li><b>7.4</b> A refração de Snell pelo princípio de Fermat. Dois meios de índices
-      \(n_1\) e \(n_2\) separados por um plano. Escrevendo o tempo de percurso entre um ponto de
-      cada lado como função da abscissa \(x\) do ponto de cruzamento, minimize em \(x\) e
-      obtenha \(n_1\sen\theta_1=n_2\sen\theta_2\). Note que aqui basta cálculo diferencial
-      ordinário: por que?</li>
+      <li><b>7.4</b> Um rio corre para o sul a 2,0 m/s na latitude 20° S. Determine a
+      aceleração de Coriolis e qual das margens sofre mais erosão. Estime, com hipóteses
+      declaradas, a diferença de nível entre as duas margens de um rio de 500 m de
+      largura.</li>
 
-      <li><b>7.5</b> Estime numericamente o tempo de descida de \((0,0)\) a \((1,1)\) para a
-      reta, para o arco de círculo de Galileu e para a ciclóide, tomando \(g=9{,}81\) m/s².
-      Compare as três e diga de quanto por cento Galileu errou.</li>
+      <li><b>7.5</b> Calcule a que velocidade a Terra precisaria girar para que um corpo no
+      equador ficasse sem peso aparente. Qual seria a duração do dia? Compare com o período de
+      rotação de uma estrela de nêutrons.</li>
 
-      <li><b>7.6</b> Mostre que, se \(F\) não depende explicitamente de \(y\), a condição de
-      extremo implica \(\partial F/\partial y'=\) constante. Aplique isso ao funcional
-      comprimento e recupere a reta sem resolver equação diferencial nenhuma.</li>
+      <li><b>7.6</b> Um projétil é disparado horizontalmente para o norte a 800 m/s na
+      latitude 45° N e voa 50 s. Determine o desvio lateral por Coriolis, supondo que a
+      trajetória vertical não seja afetada. Em que direção ele erra?</li>
 
-      <li><b>7.7</b> Entre todos os retângulos de perímetro \(P\) fixo, qual tem área máxima?
-      Resolva com cálculo diferencial ordinário e compare o resultado com a área do círculo de
-      mesmo perímetro. Qual é a razão entre as duas?</li>
+      <li><b>7.7</b> Mostre que, para um pêndulo de Foucault, só a componente vertical de
+      \(\vet{\omega}\) contribui para a precessão do plano, e que a componente horizontal
+      produz apenas um efeito de segunda ordem na direção vertical.</li>
 
-      <li><b>7.8</b> Uma corrente de 12,0 m é pendurada entre dois postes separados de 10,0 m e
-      de mesma altura. Determine o parâmetro \(a\) da catenária e a flecha, isto é a diferença
-      de altura entre o apoio e o ponto mais baixo. Compare com a parábola de mesma flecha e
-      diga de quanto diferem no meio do vão.</li>
+      <li><b>7.8</b> Uma estação espacial cilíndrica de 100 m de raio gira para simular
+      gravidade. Determine o período necessário para produzir \(g\) na parede. Um astronauta
+      caminha a 1,5 m/s no sentido da rotação: quanto varia o seu peso aparente, e o que ele
+      sente ao subir uma escada de 3 m na direção do eixo?</li>
 
-      <li><b>7.9</b> Discuta em meia página por que \(\delta J=0\) é condição necessária e não
-      suficiente, construindo um exemplo de funcional em que a solução de \(\delta J=0\) é um
-      ponto de sela. Sugestão: pense em \(J[y]=\int\left[\left(y'\right)^2-y^2\right]dx\) em
-      intervalos longos.</li>
+      <li><b>7.9</b> Discuta em meia página: por que a água do ralo não obedece a Coriolis, se
+      os ciclones obedecem? Construa o argumento comparando a aceleração de Coriolis com as
+      outras acelerações presentes em cada caso, e estime a escala espacial a partir da qual o
+      efeito passa a dominar.</li>
     </ol>
   </div>
 
-  <!-- ================================================== -->
-  <h2 id="s14">14. Apêndice histórico</h2>
-
-  <p>O cálculo variacional nasceu de problemas concretos que o cálculo diferencial não
-  alcançava, e a sua história é uma sucessão de desafios lançados em público e resolvidos em
-  competição.</p>
-
-  <h3>Os primórdios</h3>
-
-  <p>As origens remontam ao problema isoperimétrico de Dido, por volta de 814 a.C. segundo a
-  lenda, e aos geômetras gregos que sabiam a resposta sem poder demonstrá-la. Na era moderna,
-  Galileu estudou a braquistócrona em 1638 e propôs um arco de círculo, resposta errada mas na
-  vizinhança da certa. O problema foi formalmente proposto por Johann Bernoulli em 1696, como
-  desafio aberto à comunidade científica europeia.</p>
-
-  <h3>A época de ouro, 1696 a 1744</h3>
-
-  <p>A braquistócrona catalisou o campo. Leibniz deu uma solução geral em 1697 com o seu
-  cálculo diferencial; Newton resolveu o problema no mesmo ano e publicou anonimamente, embora
-  Johann Bernoulli tenha reconhecido o autor pelo estilo; Jakob Bernoulli, em 1700, formulou um
-  princípio de desvios virtuais que antecipa o método variacional. Esses trabalhos abriram o
-  caminho para <a href="https://pt.wikipedia.org/wiki/Leonhard_Euler">Leonhard Euler</a>, cujo <em><a href="https://scholarlycommons.pacific.edu/euler-works/65/">Methodus inveniendi lineas curvas</a></em>, de 1744,
-  estabeleceu as bases sistemáticas do assunto e trouxe a equação</p>
-
-  <p>\[\der{}{x}\left(\pder{F}{y'}\right)-\pder{F}{y}=0\]</p>
-
-  <p>para funcionais da forma \(J[y]=\int F\left(x,y,y'\right)dx\).</p>
-
-  <h3>A revolução de Lagrange</h3>
-
-  <p>Em 1755, com dezenove anos, <a href="https://pt.wikipedia.org/wiki/Joseph-Louis_Lagrange">Joseph-Louis Lagrange</a> escreveu a <a href="https://pt.wikipedia.org/wiki/Leonhard_Euler">Euler</a> propondo um método mais
-  direto: introduzir a variação \(\delta y\) e impor \(\delta J=0\), em vez de recorrer às
-  construções geométricas que Euler usava. O formalismo de Lagrange dispensava figuras, se
-  estendia sem esforço a várias variáveis e a restrições, e Euler o adotou de imediato,
-  inclusive adiando a publicação dos próprios resultados para que o rapaz tivesse a
-  prioridade. Dessa troca vêm a notação \(\delta\), o tratamento analítico unificado e, em
-  1788, a <em><a href="https://gallica.bnf.fr/ark:/12148/bpt6k862625">Mécanique Analytique</a></em>, em que toda a mecânica aparece reformulada
-  variacionalmente e que, orgulhosamente, não contém uma única figura.</p>
-
-  <h3>Hamilton, Jacobi e o formalismo moderno</h3>
-
-  <p>Entre <a href="https://doi.org/10.1098/rstl.1834.0017">1834</a> e 1835, <a href="https://pt.wikipedia.org/wiki/William_Rowan_Hamilton">William Rowan Hamilton</a> enunciou o princípio \(\delta\Acao=0\) com
-  \(\Acao=\int\Lag\,dt\), desenvolveu as transformações canônicas e expôs a analogia profunda
-  entre óptica geométrica e mecânica, que acabaria sendo a pista que levou <a href="https://pt.wikipedia.org/wiki/Erwin_Schr%C3%B6dinger">Schrödinger</a> à
-  mecânica ondulatória quase um século depois. <a href="https://pt.wikipedia.org/wiki/Carl_Gustav_Jakob_Jacobi">Jacobi</a>, em 1837, estabeleceu condições para
-  extremos fortes, a condição que leva o seu nome, e a equação de Hamilton-Jacobi unificou a
-  teoria.</p>
-
-  <h3>O século XX e o legado</h3>
-
-  <p><a href="https://pt.wikipedia.org/wiki/David_Hilbert">Hilbert</a>, no décimo nono dos seus problemas de 1900, perguntou pela regularidade das
-  soluções; <a href="https://pt.wikipedia.org/wiki/Charles_%C3%89mile_Picard">Picard</a> desenvolveu métodos diretos de minimização por sequências; <a href="https://pt.wikipedia.org/wiki/Richard_Courant">Courant</a> deu
-  fundamentos rigorosos nos anos vinte; <a href="https://en.wikipedia.org/wiki/Lev_Pontryagin">Pontryagin</a>, em 1956, estendeu o princípio ao controle
-  ótimo. Hoje o cálculo variacional sustenta a teoria de campos, a relatividade geral e a
-  teoria de cordas na física, o controle ótimo e o projeto aerodinâmico na engenharia, o
-  treinamento de redes neurais na computação e a teoria do crescimento ótimo na economia.</p>
-
-  <div class="bloco fisica">
-    <span class="rotulo">O que a história ensina</span>
-    <p>Mais do que uma técnica, o cálculo variacional é uma maneira de formular leis: em lugar
-    de dizer como um sistema evolui passo a passo, diz-se qual quantidade ele extremiza ao
-    longo de toda a história. Da braquistócrona ao princípio da ação estacionária, da catenária
-    às equações de campo de <a href="https://pt.wikipedia.org/wiki/Albert_Einstein">Einstein</a>, a mesma estrutura reaparece em contextos sem nenhuma
-    relação aparente. Essa recorrência é o que faz do assunto algo mais do que um capítulo de
-    análise, e é por isso que ele vem antes da mecânica lagrangiana neste curso e não depois.</p>
-  </div>
-
   <nav class="nav-aulas">
-    <a href="aula06.html"><small>Módulo anterior</small>← 6. Referenciais em rotação</a>
-    <a class="prox" href="aula08.html"><small>Próximo módulo</small>8. Euler-Lagrange →</a>
+    <a href="aula06.html"><small>Módulo anterior</small>← 6. Matrizes de rotação</a>
+    <a class="prox" href="aula08.html"><small>Próximo módulo</small>8. Cálculo variacional →</a>
   </nav>
 
 </main>
@@ -703,6 +780,6 @@
   <!--PORTAL--><p><small><a href="https://apianomorais.github.io/">Todas as disciplinas e a pesquisa em apianomorais.github.io</a></small></p><!--/PORTAL-->
 </footer>
 
-<script src="assets/js/widgets.js?v=202611082243"></script>
+<script src="assets/js/widgets.js?v=202611201036"></script>
 </body>
 </html>

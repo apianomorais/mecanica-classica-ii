@@ -8018,6 +8018,584 @@
     registrarRedesenho(desenhar);
   };
 
+  /* =================================================================
+     Vigas: esforço cortante, momento fletor e linha elástica
+     Os três painéis empilhados e alinhados em x são o ponto: o aluno
+     tem de ver que V é a inclinação de M, e que a flecha máxima não
+     fica onde o momento é máximo em todos os casos. Tudo é integrado
+     numericamente a partir do carregamento, e as fórmulas fechadas
+     entram só como aferição, no cartão da direita.
+     ================================================================= */
+  REGISTRO.esforcos = function (raiz) {
+    var CASOS = [
+      { v: 'pontual', rot: 'Biapoiada, carga concentrada' },
+      { v: 'distrib', rot: 'Biapoiada, carga distribuída' },
+      { v: 'balanco', rot: 'Em balanço' },
+      { v: 'engast', rot: 'Bi-engastada, distribuída' }
+    ];
+    var est = { caso: 'pontual', a: 0.5 };
+    var N = 801, Lv = 1.0;            /* vão unitário, carga unitária */
+
+    var corpo = moldura(raiz, 'A viga por dentro: cortante, momento e flecha');
+
+    var bot = el('div', { class: 'controles' });
+    corpo.appendChild(bot);
+    opcoes(bot, CASOS, 0, function (v) { est.caso = v; montar(); desenhar(); });
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'reações', k: 'r' },
+      { rot: 'momento máximo', k: 'm' },
+      { rot: 'flecha máxima', k: 'f' },
+      { rot: 'contra a fórmula', k: 'c' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function montar() {
+      ctr.innerHTML = '';
+      if (est.caso === 'pontual') {
+        deslizante(ctr, 'posição da carga', 0.1, 0.9, 0.01, est.a,
+          function (v) { est.a = v; desenhar(); },
+          function (v) { return F.fmt(v, 2) + ' L'; });
+      }
+    }
+
+    /* ---- o carregamento, e dele tudo o mais ---- */
+    function calcular() {
+      var i, x = [], q = [];           /* q: carga distribuída para baixo */
+      for (i = 0; i < N; i++) { x.push(i * Lv / (N - 1)); q.push(0); }
+      var h = Lv / (N - 1);
+      var R1 = 0, R2 = 0, M1 = 0, M2 = 0, pontual = null;
+
+      if (est.caso === 'pontual') {
+        pontual = est.a;
+        R1 = 1 - est.a; R2 = est.a;    /* P = 1 */
+      } else if (est.caso === 'distrib') {
+        for (i = 0; i < N; i++) q[i] = 1;
+        R1 = R2 = 0.5;
+      } else if (est.caso === 'balanco') {
+        pontual = Lv;                  /* carga na ponta livre */
+        R1 = 1; M1 = -Lv;              /* engaste à esquerda */
+      } else {
+        for (i = 0; i < N; i++) q[i] = 1;
+        R1 = R2 = 0.5;
+        M1 = -1 / 12; M2 = -1 / 12;    /* hiperestático: vem da elástica */
+      }
+
+      /* Cortante e momento, integrados a partir do apoio esquerdo.
+         A carga concentrada é tratada com dois valores de V no nó em que
+         ela está, um à esquerda e outro à direita do salto. Integrar M
+         pela média dos dois contaria metade da carga antes da hora, e o
+         erro resultante, de meio por cento, aparecia no cartão de
+         aferição sem razão física nenhuma. */
+      var no = pontual === null ? -1 : Math.round(pontual / h);
+      var V = [], Ve = [], M = [];
+      V.push(no === 0 ? R1 - 1 : R1); Ve.push(R1); M.push(M1);
+      for (i = 1; i < N; i++) {
+        var ve = V[i - 1] - q[i - 1] * h;
+        Ve.push(ve);
+        V.push(i === no ? ve - 1 : ve);
+        M.push(M[i - 1] + 0.5 * (V[i - 1] + Ve[i]) * h);
+      }
+
+      /* linha elástica: EI y'' = M, integrada duas vezes.
+         As constantes saem das condições de contorno de cada caso. */
+      var t = [0], y = [0];            /* t = y' provisório */
+      for (i = 1; i < N; i++) {
+        t.push(t[i - 1] + 0.5 * (M[i - 1] + M[i]) * h);
+        y.push(y[i - 1] + 0.5 * (t[i - 1] + t[i]) * h);
+      }
+      if (est.caso === 'balanco' || est.caso === 'engast') {
+        /* y(0) = y'(0) = 0 já saem da integração. Na bi-engastada, que
+           y(L) e y'(L) também deem zero não é imposto: é a verificação de
+           que o momento de engastamento -qL^2/12 está certo. */
+      } else {
+        /* y(0) = 0 e y(L) = 0: subtrai a reta que passa pelas pontas */
+        var c = y[N - 1] / Lv;
+        for (i = 0; i < N; i++) y[i] -= c * x[i];
+      }
+
+      var fmax = 0, imax = 0, mmax = 0;
+      for (i = 0; i < N; i++) {
+        if (Math.abs(y[i]) > Math.abs(fmax)) { fmax = y[i]; imax = i; }
+        if (Math.abs(M[i]) > Math.abs(mmax)) mmax = M[i];
+      }
+      return { x: x, q: q, V: V, M: M, y: y, R1: R1, R2: R2, M1: M1, M2: M2,
+               pontual: pontual, fmax: fmax, xmax: x[imax], mmax: mmax };
+    }
+
+    /* o valor que a fórmula de tabela dá para a flecha máxima */
+    function formula(d) {
+      if (est.caso === 'distrib') return { f: 5 / 384, nome: '5qL⁴/384EI' };
+      if (est.caso === 'balanco') return { f: 1 / 3, nome: 'PL³/3EI' };
+      if (est.caso === 'engast') return { f: 1 / 384, nome: 'qL⁴/384EI' };
+      var a = est.a, b = 1 - a;
+      /* biapoiada com carga fora do meio: a flecha máxima não fica sob a
+         carga, e a fórmula de tabela é esta, válida para a > b */
+      var am = Math.max(a, b), bm = Math.min(a, b);
+      return { f: bm * Math.pow(am * (am + 2 * bm), 1.5)
+                  / (9 * Math.sqrt(3) * Lv),
+               nome: 'Pb(L²−b²)^1,5 / 9√3 LEI' };
+    }
+
+    function desenhar() {
+      var d = calcular(), alt = 430;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      var x0 = 46, x1 = Lp - 22, larg = x1 - x0;
+      function X(u) { return x0 + u / Lv * larg; }
+
+      /* Os rótulos vão na margem esquerda, fora da área de desenho, e por
+         isso são curtos: escritos por cima do gráfico, como estavam antes,
+         eles caíam em cima da curva de momento. */
+      var faixas = [
+        { y: 66, h: 46, rot: 'viga' },
+        { y: 178, h: 54, rot: 'V(x)' },
+        { y: 296, h: 54, rot: 'M(x)' },
+        { y: 404, h: 26, rot: 'y(x)' }
+      ];
+      ct.save();
+      ct.strokeStyle = G.COR.grade; ct.lineWidth = 1;
+      faixas.forEach(function (f) {
+        ct.beginPath(); ct.moveTo(x0, f.y); ct.lineTo(x1, f.y); ct.stroke();
+        rotulo(ct, f.rot, x0 - 6, f.y, G.COR.suave, 'right', 'middle',
+               '600 11px system-ui, sans-serif');
+      });
+      ct.restore();
+
+      /* ---- painel 1: a viga ---- */
+      var yv = faixas[0].y;
+      ct.fillStyle = 'rgba(23,107,93,.16)';
+      ct.fillRect(x0, yv - 7, larg, 14);
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 1.6;
+      ct.strokeRect(x0, yv - 7, larg, 14);
+
+      function apoio(x) {
+        ct.fillStyle = G.COR.suave;
+        ct.beginPath(); ct.moveTo(x, yv + 8);
+        ct.lineTo(x - 9, yv + 24); ct.lineTo(x + 9, yv + 24);
+        ct.closePath(); ct.fill();
+      }
+      function engaste(x, lado) {
+        ct.fillStyle = 'rgba(91,103,115,.35)';
+        ct.fillRect(lado > 0 ? x - 12 : x, yv - 24, 12, 48);
+      }
+      if (est.caso === 'balanco') { engaste(x0, 1); }
+      else if (est.caso === 'engast') { engaste(x0, 1); engaste(x1, -1); }
+      else { apoio(x0); apoio(x1); }
+
+      /* as cargas */
+      if (d.pontual !== null) {
+        seta(ct, X(d.pontual), yv - 46, X(d.pontual), yv - 9, G.COR.vinho, 2.4);
+        rotulo(ct, 'P', X(d.pontual), yv - 54, G.COR.vinho);
+      } else {
+        for (var k = 0; k <= 12; k++) {
+          var xq = x0 + k * larg / 12;
+          seta(ct, xq, yv - 32, xq, yv - 9, G.COR.vinho, 1.6);
+        }
+        ct.strokeStyle = G.COR.vinho; ct.lineWidth = 1.6;
+        ct.beginPath(); ct.moveTo(x0, yv - 32); ct.lineTo(x1, yv - 32); ct.stroke();
+        rotulo(ct, 'q', (x0 + x1) / 2, yv - 42, G.COR.vinho);
+      }
+
+      /* ---- painéis 2, 3 e 4: as três funções ---- */
+      function painel(f, vals, cor, preenche) {
+        var m = 0;
+        vals.forEach(function (v) { if (Math.abs(v) > m) m = Math.abs(v); });
+        if (m < 1e-12) m = 1;
+        var esc = f.h / m;
+        ct.save();
+        if (preenche) {
+          ct.fillStyle = preenche;
+          ct.beginPath(); ct.moveTo(x0, f.y);
+          for (var i = 0; i < N; i++) ct.lineTo(X(d.x[i]), f.y - vals[i] * esc);
+          ct.lineTo(x1, f.y); ct.closePath(); ct.fill();
+        }
+        ct.strokeStyle = cor; ct.lineWidth = 2.2;
+        ct.beginPath();
+        for (var j = 0; j < N; j++) {
+          var px = X(d.x[j]), py = f.y - vals[j] * esc;
+          if (j === 0) ct.moveTo(px, py); else ct.lineTo(px, py);
+        }
+        ct.stroke(); ct.restore();
+        return esc;
+      }
+
+      painel(faixas[1], d.V, G.COR.azul, 'rgba(44,95,141,.14)');
+      painel(faixas[2], d.M, G.COR.bronze, 'rgba(168,96,31,.14)');
+      /* y já é negativo onde a viga desce, e painel() desenha para baixo
+         o que é negativo: a flecha sai no sentido certo sem inverter nada */
+      painel(faixas[3], d.y, G.COR.mestra, null);
+
+      /* onde V cruza zero, M é extremo: marca o ponto nos dois painéis */
+      for (var j = 1; j < N; j++) {
+        if (d.V[j - 1] * d.V[j] < 0 || (d.pontual !== null
+            && Math.abs(d.x[j] - d.pontual) < Lv / (N - 1))) {
+          ct.save();
+          ct.strokeStyle = G.COR.suave; ct.lineWidth = 1; ct.setLineDash([3, 3]);
+          ct.beginPath();
+          ct.moveTo(X(d.x[j]), faixas[1].y - faixas[1].h - 6);
+          ct.lineTo(X(d.x[j]), faixas[2].y + faixas[2].h + 6);
+          ct.stroke(); ct.restore();
+          break;
+        }
+      }
+
+      var fo = formula(d);
+      var razao = Math.abs(d.fmax) / fo.f;
+      mostrar({
+        r: est.caso === 'balanco'
+             ? 'V = P, M = &minus;PL no engaste'
+             : F.fmt(d.R1, 3) + ' e ' + F.fmt(d.R2, 3),
+        m: F.fmt(d.mmax, 4) + '  em x = ' +
+           F.fmt(est.caso === 'pontual' ? est.a : (est.caso === 'balanco' ? 0
+                 : (est.caso === 'engast' ? 0 : 0.5)), 2) + ' L',
+        f: F.fmt(Math.abs(d.fmax), 5) + '  em x = ' + F.fmt(d.xmax, 3) + ' L',
+        c: fo.nome + ' → <b>' + F.fmt(razao, 4) + '</b>'
+      });
+
+      nota.innerHTML =
+        'Vão, carga e \\(EI\\) valem 1, de modo que os números são as '
+        + 'próprias frações das fórmulas de tabela. Nada aqui é calculado '
+        + 'por fórmula: \\(V\\) e \\(M\\) saem da integração do '
+        + 'carregamento, e a flecha da integração dupla de \\(M/EI\\). O '
+        + 'último cartão divide o resultado pela fórmula fechada, e tem de '
+        + 'dar 1. Os quatro painéis são, de cima para baixo, a viga com o '
+        + 'carregamento, o esforço cortante, o momento fletor e a linha '
+        + 'elástica, todos alinhados no mesmo \\(x\\).';
+      tipografar(nota);
+    }
+
+    montar();
+    registrarRedesenho(desenhar);
+  };
+
+
+  /* =================================================================
+     O momento de inércia de ÁREA, e por que a tábua fica de pé
+     ================================================================= */
+  REGISTRO.secao = function (raiz) {
+    var FORMAS = [
+      { v: 'ret', rot: 'Retângulo' },
+      { v: 'tubo', rot: 'Tubo' },
+      { v: 'duplo', rot: 'Perfil I' }
+    ];
+    var est = { forma: 'ret', ret: 3.0, tubo: 0.6, duplo: 3.0 };
+
+    var corpo = moldura(raiz, 'A mesma área, distribuída de outro jeito');
+
+    var bot = el('div', { class: 'controles' });
+    corpo.appendChild(bot);
+    opcoes(bot, FORMAS, 0, function (v) { est.forma = v; montar(); desenhar(); });
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'área A', k: 'a' },
+      { rot: 'momento de inércia I', k: 'i' },
+      { rot: 'módulo de resistência W', k: 'w' },
+      { rot: 'flecha, contra o quadrado', k: 'f' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    var AREA = 1.0;                /* todas as seções têm a mesma área */
+
+    function montar() {
+      ctr.innerHTML = '';
+      if (est.forma === 'ret') {
+        deslizante(ctr, 'altura / largura', 0.25, 6, 0.05, est.ret,
+          function (v) { est.ret = v; desenhar(); },
+          function (v) { return F.fmt(v, 2); });
+      } else if (est.forma === 'tubo') {
+        deslizante(ctr, 'diâmetro interno / externo', 0, 0.90, 0.05, est.tubo,
+          function (v) { est.tubo = v; desenhar(); },
+          function (v) { return v === 0 ? 'maciço' : F.fmt(v, 2); });
+      } else {
+        deslizante(ctr, 'altura do perfil / largura da mesa', 1, 6, 0.1,
+          est.duplo,
+          function (v) { est.duplo = v; desenhar(); },
+          function (v) { return F.fmt(v, 1); });
+      }
+    }
+
+    /* Cada forma devolve a sua geometria com ÁREA fixa, mais I e c.
+       I sai da fórmula exata, e é conferido por integração numérica
+       logo abaixo: a conferência é o que torna o widget confiável. */
+    function geometria() {
+      if (est.forma === 'ret') {
+        /* b·h = A, h/b = r  =>  b = sqrt(A/r), h = r·b */
+        var r = est.ret, b = Math.sqrt(AREA / r), h = r * b;
+        return { tipo: 'ret', b: b, h: h, I: b * h * h * h / 12, c: h / 2,
+                 cx: b, cy: h };
+      }
+      if (est.forma === 'tubo') {
+        /* π(Re² − Ri²) = A, com Ri = k·Re */
+        var k = est.tubo;
+        var Re = Math.sqrt(AREA / (Math.PI * (1 - k * k))), Ri = k * Re;
+        return { tipo: 'tubo', Re: Re, Ri: Ri,
+                 I: Math.PI * (Math.pow(Re, 4) - Math.pow(Ri, 4)) / 4, c: Re,
+                 cx: 2 * Re, cy: 2 * Re };
+      }
+      /* perfil I: duas mesas de largura bf e espessura tf, alma de
+         espessura tw. Fixamos as proporções e escalamos para a área. */
+      var H = est.duplo, bf = 1.0, tf = 0.12 * H, tw = 0.08 * bf;
+      var alma = H - 2 * tf;
+      var A0 = 2 * bf * tf + tw * alma;
+      var s = Math.sqrt(AREA / A0);          /* escala que fixa a área */
+      bf *= s; tf *= s; tw *= s; H *= s; alma = H - 2 * tf;
+      var Ia = tw * Math.pow(alma, 3) / 12;
+      var Im = 2 * (bf * Math.pow(tf, 3) / 12
+                    + bf * tf * Math.pow((H - tf) / 2, 2));
+      return { tipo: 'duplo', H: H, bf: bf, tf: tf, tw: tw, alma: alma,
+               I: Ia + Im, c: H / 2, cx: bf, cy: H };
+    }
+
+    /* conferência: I por integração em faixas horizontais */
+    function porIntegracao(g) {
+      var n = 4000, I = 0, A = 0, i, y, w;
+      var ymax = g.tipo === 'tubo' ? g.Re : (g.tipo === 'ret' ? g.h / 2 : g.H / 2);
+      var dy = 2 * ymax / n;
+      for (i = 0; i < n; i++) {
+        y = -ymax + (i + 0.5) * dy;
+        if (g.tipo === 'ret') w = g.b;
+        else if (g.tipo === 'tubo') {
+          w = 2 * Math.sqrt(Math.max(0, g.Re * g.Re - y * y));
+          if (Math.abs(y) < g.Ri) w -= 2 * Math.sqrt(g.Ri * g.Ri - y * y);
+        } else {
+          w = Math.abs(y) > g.alma / 2 ? g.bf : g.tw;
+        }
+        A += w * dy; I += w * y * y * dy;
+      }
+      return { A: A, I: I };
+    }
+
+    function desenhar() {
+      var g = geometria(), chk = porIntegracao(g);
+      var alt = 300;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      var cx = Lp * 0.33, cy = alt / 2;
+      var esc = Math.min(Lp * 0.26 / Math.max(g.cx, 0.2),
+                         (alt - 70) / Math.max(g.cy, 0.2));
+
+      ct.save();
+      ct.fillStyle = 'rgba(23,107,93,.20)';
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 1.6;
+      if (g.tipo === 'ret') {
+        ct.beginPath();
+        ct.rect(cx - g.b * esc / 2, cy - g.h * esc / 2, g.b * esc, g.h * esc);
+        ct.fill(); ct.stroke();
+      } else if (g.tipo === 'tubo') {
+        ct.beginPath();
+        ct.arc(cx, cy, g.Re * esc, 0, 6.2832);
+        if (g.Ri > 0) ct.arc(cx, cy, g.Ri * esc, 0, 6.2832, true);
+        ct.fill('evenodd'); ct.stroke();
+        if (g.Ri > 0) {
+          ct.beginPath(); ct.arc(cx, cy, g.Ri * esc, 0, 6.2832); ct.stroke();
+        }
+      } else {
+        var H = g.H * esc, bf = g.bf * esc, tf = g.tf * esc, tw = g.tw * esc;
+        ct.beginPath();
+        ct.rect(cx - bf / 2, cy - H / 2, bf, tf);
+        ct.rect(cx - tw / 2, cy - H / 2 + tf, tw, H - 2 * tf);
+        ct.rect(cx - bf / 2, cy + H / 2 - tf, bf, tf);
+        ct.fill(); ct.stroke();
+      }
+      ct.restore();
+
+      /* linha neutra */
+      ct.save();
+      ct.strokeStyle = G.COR.vinho; ct.lineWidth = 1.4; ct.setLineDash([6, 4]);
+      ct.beginPath();
+      ct.moveTo(cx - g.cx * esc * 0.75, cy);
+      ct.lineTo(Lp - 30, cy); ct.stroke();
+      ct.restore();
+      rotulo(ct, 'linha neutra', cx - g.cx * esc * 0.75, cy - 11,
+             G.COR.vinho, 'left');
+
+      /* o perfil de tensão: linear em y */
+      var xt = Lp * 0.70, meia = g.cy * esc / 2, amp = Lp * 0.17;
+      ct.save();
+      ct.strokeStyle = G.COR.bronze; ct.fillStyle = 'rgba(168,96,31,.16)';
+      ct.lineWidth = 2;
+      /* Momento positivo encurva com a concavidade para cima e traciona as
+         fibras de BAIXO: a reta tem de ir do lado da compressão em cima
+         para o da tração embaixo, e não o contrário. */
+      ct.beginPath();
+      ct.moveTo(xt, cy - meia); ct.lineTo(xt - amp, cy - meia);
+      ct.lineTo(xt + amp, cy + meia); ct.lineTo(xt, cy + meia);
+      ct.closePath(); ct.fill();
+      ct.beginPath();
+      ct.moveTo(xt - amp, cy - meia); ct.lineTo(xt + amp, cy + meia); ct.stroke();
+      ct.beginPath(); ct.moveTo(xt, cy - meia - 10); ct.lineTo(xt, cy + meia + 10);
+      ct.stroke();
+      ct.restore();
+      rotulo(ct, 'σ = My/I', xt, cy - meia - 20, G.COR.bronze);
+      rotulo(ct, 'tração', xt + amp * 0.55, cy + meia + 14, G.COR.bronze);
+      rotulo(ct, 'compressão', xt - amp * 0.55, cy - meia - 6, G.COR.bronze);
+
+      /* o quadrado de mesma área, para comparar */
+      var Iq = Math.pow(AREA, 2) / 12;      /* b = h = 1, I = 1/12 */
+      mostrar({
+        a: F.fmt(chk.A, 4) + '  (fixada em 1)',
+        i: F.fmt(g.I, 5),
+        w: F.fmt(g.I / g.c, 5),
+        f: F.fmt(Iq / g.I, 3) + ' vez(es)'
+      });
+
+      nota.innerHTML =
+        'Todas as seções têm a <b>mesma área</b>, isto é, o mesmo peso por '
+        + 'metro e o mesmo preço. O que muda é onde o material está. Como '
+        + '\\(I = \\int y^2\\,dA\\), afastar massa da linha neutra rende '
+        + 'quadraticamente, e é só isso que explica o perfil I, o tubo de '
+        + 'bicicleta e a tábua de pé. A '
+        + 'fórmula fechada de cada seção é conferida, a cada mexida no '
+        + 'deslizante, contra a integração numérica da própria figura '
+        + 'desenhada: aqui as duas dão ' + F.fmt(chk.I, 5) + ' e '
+        + F.fmt(g.I, 5) + '.';
+      tipografar(nota);
+    }
+
+    montar();
+    registrarRedesenho(desenhar);
+  };
+
+
+  /* =================================================================
+     Torção de um eixo circular
+     ================================================================= */
+  REGISTRO.torcao = function (raiz) {
+    var est = { k: 0.0, T: 500 };
+
+    var corpo = moldura(raiz, 'Torção: por que o eixo é oco');
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'diâmetro interno / externo', 0, 0.9, 0.05, 0,
+      function (v) { est.k = v; desenhar(); },
+      function (v) { return v === 0 ? 'maciço' : F.fmt(v, 2); });
+    deslizante(ctr, 'torque aplicado', 100, 2000, 50, 500,
+      function (v) { est.T = v; desenhar(); },
+      function (v) { return F.fmt(v, 0) + ' N·m'; });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'momento polar J', k: 'j' },
+      { rot: 'ângulo de torção em 1 m', k: 'p' },
+      { rot: 'tensão máxima τ', k: 't' },
+      { rot: 'rigidez por quilo de aço', k: 'r' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    var Gaco = 79e9, De = 0.040, Comp = 1.0;
+
+    function desenhar() {
+      var Re = De / 2, Ri = est.k * Re;
+      var J = Math.PI * (Math.pow(Re, 4) - Math.pow(Ri, 4)) / 2;
+      var A = Math.PI * (Re * Re - Ri * Ri);
+      var phi = est.T * Comp / (Gaco * J);
+      var tau = est.T * Re / J;
+      var J0 = Math.PI * Math.pow(Re, 4) / 2, A0 = Math.PI * Re * Re;
+      var porMassa = (J / J0) / (A / A0);
+
+      var alt = 300;
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L;
+      var cx = Lp * 0.27, cy = alt / 2, esc = (alt - 80) / De;
+
+      /* a seção, com o anel vazado */
+      ct.save();
+      ct.fillStyle = 'rgba(23,107,93,.18)';
+      ct.strokeStyle = G.COR.mestra; ct.lineWidth = 1.6;
+      ct.beginPath();
+      ct.arc(cx, cy, Re * esc, 0, 6.2832);
+      if (Ri > 0) ct.arc(cx, cy, Ri * esc, 0, 6.2832, true);
+      ct.fill('evenodd'); ct.stroke();
+      if (Ri > 0) { ct.beginPath(); ct.arc(cx, cy, Ri * esc, 0, 6.2832); ct.stroke(); }
+      ct.restore();
+
+      /* a tensão cresce com o raio: setas tangenciais de tamanho ∝ r */
+      ct.save();
+      for (var k = 0; k < 12; k++) {
+        var th = k * Math.PI / 6;
+        var r = Re * esc;
+        var px = cx + r * Math.cos(th), py = cy - r * Math.sin(th);
+        var tx = -Math.sin(th), ty = -Math.cos(th);
+        seta(ct, px, py, px + tx * 16, py + ty * 16, G.COR.bronze, 1.8);
+      }
+      ct.restore();
+      rotulo(ct, 'τ = Tr/J', cx, cy - Re * esc - 18, G.COR.bronze);
+
+      /* o perfil radial da tensão */
+      var x0 = Lp * 0.55, x1 = Lp - 30, yb = cy + Re * esc;
+      ct.save();
+      ct.strokeStyle = G.COR.grade; ct.lineWidth = 1;
+      ct.beginPath(); ct.moveTo(x0, yb); ct.lineTo(x1, yb); ct.stroke();
+      ct.beginPath(); ct.moveTo(x0, yb); ct.lineTo(x0, yb - 160); ct.stroke();
+      ct.restore();
+      ct.save();
+      ct.strokeStyle = G.COR.bronze; ct.lineWidth = 2.4;
+      ct.fillStyle = 'rgba(168,96,31,.16)';
+      var xa = x0 + (x1 - x0) * est.k;
+      ct.beginPath();
+      ct.moveTo(xa, yb); ct.lineTo(xa, yb - 160 * est.k);
+      ct.lineTo(x1, yb - 160); ct.lineTo(x1, yb);
+      ct.closePath(); ct.fill();
+      ct.beginPath();
+      ct.moveTo(xa, yb - 160 * est.k); ct.lineTo(x1, yb - 160); ct.stroke();
+      ct.restore();
+      rotulo(ct, 'τ(r)', x0 - 6, yb - 150, G.COR.bronze, 'right');
+      rotulo(ct, 'r = 0', x0, yb + 13, G.COR.suave);
+      rotulo(ct, 'r = R', x1, yb + 13, G.COR.suave);
+      if (est.k > 0) {
+        /* O triângulo em cinza é a tensão que o material retirado
+           carregaria. Desenhá-lo como um retângulo cheio, que era o que
+           estava aqui antes, dava a impressão contrária: a de que o miolo
+           era a parte mais solicitada. */
+        ct.save();
+        ct.fillStyle = 'rgba(91,103,115,.14)';
+        ct.beginPath();
+        ct.moveTo(x0, yb); ct.lineTo(xa, yb - 160 * est.k); ct.lineTo(xa, yb);
+        ct.closePath(); ct.fill();
+        ct.strokeStyle = G.COR.suave; ct.lineWidth = 1.2; ct.setLineDash([4, 3]);
+        ct.beginPath(); ct.moveTo(x0, yb); ct.lineTo(xa, yb - 160 * est.k);
+        ct.stroke();
+        ct.restore();
+        rotulo(ct, 'o que o furo levou', (x0 + xa) / 2, yb - 14, G.COR.suave);
+      }
+
+      mostrar({
+        j: (J * 1e8).toFixed(3).replace('.', ',') + ' × 10⁻⁸ m⁴',
+        p: F.fmt(phi * 180 / Math.PI, 3) + '°',
+        t: F.fmt(tau / 1e6, 1) + ' MPa',
+        r: F.fmt(porMassa, 3) + ' vez(es)'
+      });
+
+      nota.innerHTML =
+        'Eixo de aço de 40 mm e 1 m, com \\(G = 79\\) GPa. Como '
+        + '\\(J = \\int r^2\\,dA\\), o material perto do centro quase não '
+        + 'contribui, e é ele que o furo retira. Com furo de 0,75 do '
+        + 'diâmetro, o eixo perde 56 % da massa e só 32 % da rigidez: a '
+        + 'rigidez por quilo sobe mais de 50 %. O preço é a flambagem local, '
+        + 'que esta conta não vê, e que é o que impede furar o eixo até '
+        + 'virar papel.';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {

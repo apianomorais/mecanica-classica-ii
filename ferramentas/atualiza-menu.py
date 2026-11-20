@@ -17,21 +17,22 @@ TITULOS = {
     2: ("Centro de massa e momentos de inércia", "Centro de massa e inércia"),
     3: ("Momento angular, torque e equações de movimento", "Momento angular e torque"),
     4: ("Conservação e equilíbrio estático", "Conservação e equilíbrio"),
-    5: ("Matrizes de rotação e transformações de coordenadas", "Matrizes de rotação"),
-    6: ("Referenciais em rotação e forças fictícias", "Referenciais em rotação"),
-    7: ("Cálculo variacional: ação e caminhos extremos", "Cálculo variacional"),
-    8: ("A equação de Euler-Lagrange e o princípio de Hamilton", "Euler-Lagrange"),
-    9: ("Coordenadas generalizadas, vínculos e equações de Lagrange", "Equações de Lagrange"),
-    10: ("Aplicações do formalismo lagrangiano", "Aplicações de Lagrange"),
-    11: ("Transformação de Legendre e equações de Hamilton", "Equações de Hamilton"),
-    12: ("Espaço de fase e o teorema de Liouville", "Liouville"),
+    5: ("Vigas: cortante, momento fletor, linha elástica e torção", "Vigas e torção"),
+    6: ("Matrizes de rotação e transformações de coordenadas", "Matrizes de rotação"),
+    7: ("Referenciais em rotação e forças fictícias", "Referenciais em rotação"),
+    8: ("Cálculo variacional: ação e caminhos extremos", "Cálculo variacional"),
+    9: ("A equação de Euler-Lagrange e o princípio de Hamilton", "Euler-Lagrange"),
+    10: ("Coordenadas generalizadas, vínculos e equações de Lagrange", "Equações de Lagrange"),
+    11: ("Aplicações do formalismo lagrangiano", "Aplicações de Lagrange"),
+    12: ("Transformação de Legendre e equações de Hamilton", "Equações de Hamilton"),
+    13: ("Espaço de fase e o teorema de Liouville", "Liouville"),
 }
 
 UNIDADES = [
-    ("Corpos rígidos", "Corpos rígidos", [1, 2, 3, 4]),
-    ("Sistemas de coordenadas em movimento", "Referenciais", [5, 6]),
-    ("Noções de cálculo variacional", "Variacional", [7, 8]),
-    ("Formalismo lagrangiano e hamiltoniano", "Lagrange e Hamilton", [9, 10, 11, 12]),
+    ("Corpos rígidos", "Corpos rígidos", [1, 2, 3, 4, 5]),
+    ("Sistemas de coordenadas em movimento", "Referenciais", [6, 7]),
+    ("Noções de cálculo variacional", "Variacional", [8, 9]),
+    ("Formalismo lagrangiano e hamiltoniano", "Lagrange e Hamilton", [10, 11, 12, 13]),
 ]
 
 # o que vai no chapéu de cada página, logo acima do título
@@ -123,6 +124,15 @@ def main():
                 texto = re.sub(
                     r'(<p class="chapeu">)Módulo \d+[^<]*(</p>)',
                     lambda _: '<p class="chapeu">Módulo %d · %s</p>' % (n, CHAPEU[n]),
+                    texto, count=1)
+            if n in TITULOS:
+                # o <title> também sai daqui: numa renumeração, esquecer dele
+                # deixa a aba do navegador apontando para o módulo errado, que
+                # é o tipo de erro que ninguém vê revisando a página
+                texto = re.sub(
+                    r'<title>Módulo \d+:[^<]*</title>',
+                    lambda _: '<title>Módulo %d: %s | Mecânica Clássica II</title>'
+                              % (n, TITULOS[n][0]),
                     texto, count=1)
             rod = monta_rodape(n)
             if rod and pad_rod.search(texto):

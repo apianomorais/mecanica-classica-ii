@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo 8: A equação de Euler-Lagrange e o princípio de Hamilton | Mecânica Clássica II</title>
+<title>Módulo 8: Cálculo variacional: ação e caminhos extremos | Mecânica Clássica II</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611082243">
-<script src="assets/js/comum.js?v=202611082243"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611201036">
+<script src="assets/js/comum.js?v=202611201036"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -21,17 +21,18 @@
       <a href="aula02.html" class="num" title="Módulo 2: Centro de massa e momentos de inércia">2</a>
       <a href="aula03.html" class="num" title="Módulo 3: Momento angular, torque e equações de movimento">3</a>
       <a href="aula04.html" class="num" title="Módulo 4: Conservação e equilíbrio estático">4</a>
+      <a href="aula05.html" class="num" title="Módulo 5: Vigas: cortante, momento fletor, linha elástica e torção">5</a>
       <span class="grupo">Referenciais</span>
-      <a href="aula05.html" class="num" title="Módulo 5: Matrizes de rotação e transformações de coordenadas">5</a>
-      <a href="aula06.html" class="num" title="Módulo 6: Referenciais em rotação e forças fictícias">6</a>
+      <a href="aula06.html" class="num" title="Módulo 6: Matrizes de rotação e transformações de coordenadas">6</a>
+      <a href="aula07.html" class="num" title="Módulo 7: Referenciais em rotação e forças fictícias">7</a>
       <span class="grupo">Variacional</span>
-      <a href="aula07.html" class="num" title="Módulo 7: Cálculo variacional: ação e caminhos extremos">7</a>
-      <a href="aula08.html" class="num ativo" title="Módulo 8: A equação de Euler-Lagrange e o princípio de Hamilton">8</a>
+      <a href="aula08.html" class="num ativo" title="Módulo 8: Cálculo variacional: ação e caminhos extremos">8</a>
+      <a href="aula09.html" class="num" title="Módulo 9: A equação de Euler-Lagrange e o princípio de Hamilton">9</a>
       <span class="grupo">Lagrange e Hamilton</span>
-      <a href="aula09.html" class="num" title="Módulo 9: Coordenadas generalizadas, vínculos e equações de Lagrange">9</a>
-      <a href="aula10.html" class="num" title="Módulo 10: Aplicações do formalismo lagrangiano">10</a>
-      <a href="aula11.html" class="num" title="Módulo 11: Transformação de Legendre e equações de Hamilton">11</a>
-      <a href="aula12.html" class="num" title="Módulo 12: Espaço de fase e o teorema de Liouville">12</a>
+      <a href="aula10.html" class="num" title="Módulo 10: Coordenadas generalizadas, vínculos e equações de Lagrange">10</a>
+      <a href="aula11.html" class="num" title="Módulo 11: Aplicações do formalismo lagrangiano">11</a>
+      <a href="aula12.html" class="num" title="Módulo 12: Transformação de Legendre e equações de Hamilton">12</a>
+      <a href="aula13.html" class="num" title="Módulo 13: Espaço de fase e o teorema de Liouville">13</a>
     </nav>
   </div>
 </header>
@@ -52,658 +53,645 @@
 <aside class="lateral">
   <h4>Neste módulo</h4>
   <ol>
-    <li><a href="#s1">1. O problema geral</a></li>
-    <li><a href="#s2">2. Dedução da equação</a></li>
-    <li><a href="#s3">3. A equação de Euler-Lagrange</a></li>
-    <li><a href="#s4">4. Dois casos especiais</a></li>
-    <li><a href="#s5">5. A braquistócrona resolvida</a></li>
-    <li><a href="#s6">6. A catenária e a catenoide</a></li>
-    <li><a href="#s7">7. Fermat e a lei de Snell</a></li>
-    <li><a href="#s8">8. Resumo dos três problemas</a></li>
-    <li><a href="#s9">9. O princípio de Hamilton</a></li>
-    <li><a href="#s10">10. Estacionária, não mínima</a></li>
-    <li><a href="#s11">11. Exercícios resolvidos</a></li>
-    <li><a href="#s12">12. Exercícios propostos</a></li>
+    <li><a href="#s1">1. Do cálculo diferencial ao variacional</a></li>
+    <li><a href="#s2">2. Funcionais</a></li>
+    <li><a href="#s3">3. Funcionais da física</a></li>
+    <li><a href="#s4">4. A variação de um funcional</a></li>
+    <li><a href="#s5">5. A condição de extremo</a></li>
+    <li><a href="#s6">6. A menor distância</a></li>
+    <li><a href="#s7">7. A braquistócrona</a></li>
+    <li><a href="#s8">8. A catenária</a></li>
+    <li><a href="#s9">9. O problema de Dido</a></li>
+    <li><a href="#s10">10. Tipos de problemas variacionais</a></li>
+    <li><a href="#s11">11. O lema fundamental</a></li>
+    <li><a href="#s12">12. Exercícios resolvidos</a></li>
+    <li><a href="#s13">13. Exercícios propostos</a></li>
+    <li><a href="#s14">14. Apêndice histórico</a></li>
   </ol>
 </aside>
 
 <main class="conteudo">
 
   <p class="chapeu">Módulo 8 · Noções de cálculo variacional</p>
-  <h1>A equação de Euler-Lagrange e o princípio de Hamilton</h1>
-  <p class="subtitulo">O módulo anterior montou o vocabulário e parou na véspera da conta. Aqui
-  a condição \(\delta J=0\), que é uma afirmação sobre o caminho inteiro, vira uma equação
-  diferencial ponto a ponto. Com ela os três problemas clássicos caem em poucas linhas, e a
-  mecânica inteira ganha uma formulação nova.</p>
+  <h1>Cálculo variacional: ação e caminhos extremos</h1>
+  <p class="subtitulo">Até aqui a mecânica foi escrita com forças e acelerações. Este módulo
+  prepara uma reformulação inteiramente diferente, em que a trajetória real de um sistema é
+  selecionada por uma condição de extremo sobre todos os caminhos imagináveis. A ferramenta
+  matemática para isso tem trezentos anos e nome próprio.</p>
 
   <hr class="linha">
 
   <!-- ================================================== -->
-  <h2 id="s1">1. O problema geral</h2>
+  <h2 id="s1">1. Do cálculo diferencial ao variacional</h2>
 
-  <p>O objeto de estudo é o funcional</p>
+  <p>Encontrar o mínimo de \(f(x)=x^2-4x+5\) é exercício de primeiro semestre: deriva-se,
+  iguala-se a zero, acha-se \(x=2\), e a segunda derivada \(f''=2>0\) confirma que o ponto é
+  mínimo. Para uma função de várias variáveis o procedimento se repete componente a
+  componente, e a condição de extremo passa a ser</p>
 
-  <p>\[J[y]=\int_{x_1}^{x_2}f\left(x,y,y'\right)dx,\]</p>
+  <p>\[\pder{f}{x_i}=0,\qquad i=1,2,\dots,n.\]</p>
 
-  <p>em que \(y=y(x)\) é a função procurada, \(y'=dy/dx\) e \(f\) é uma função dada de três
-  argumentos, chamada <strong>integrando</strong>. Os extremos estão presos: \(y(x_1)=y_1\) e
-  \(y(x_2)=y_2\). A pergunta é qual \(y(x)\) torna \(J\) extremo.</p>
+  <p>Em todos esses casos o que se procura é um <em>número</em>, ou no máximo uma lista de
+  números, porque a função que se otimiza é uma aplicação de \(\R^n\) em \(\R\): entram
+  números, sai um número.</p>
 
   <div class="bloco fisica">
-    <span class="rotulo">Por que essa forma e não outra</span>
-    <p>O integrando depende de \(x\), de \(y\) e de \(y'\), e não de \(y''\) nem de valores de
-    \(y\) em outros pontos. Essa restrição não é arbitrária: ela cobre a esmagadora maioria
-    dos problemas físicos, porque as leis da mecânica são de segunda ordem no tempo, e uma
-    lagrangiana com \(\dot q\) produz exatamente isso. Integrandos com \(y''\) existem, e
-    levam a equações de quarta ordem. O caso geral aparece no módulo 9.</p>
+    <span class="rotulo">Três perguntas que esse cálculo não responde</span>
+    <ul>
+      <li>Qual é a curva de menor comprimento entre dois pontos?</li>
+      <li>Qual é a trajetória que minimiza o tempo de descida de uma partícula sob gravidade?</li>
+      <li>Qual é a forma de uma corda suspensa sob o próprio peso?</li>
+    </ul>
+    <p>Nenhuma delas pede um número. Todas pedem uma <strong>função inteira</strong>, e o
+    conjunto onde a busca acontece não é \(\R^n\) mas um espaço de curvas, de dimensão
+    infinita.</p>
   </div>
 
-  <!-- ================================================== -->
-  <h2 id="s2">2. Dedução da equação</h2>
-
-  <h3>Passo 1: parametrizar as curvas vizinhas</h3>
-
-  <p>Tome a curva candidata \(y(x)\) e deforme-a de maneira controlada,</p>
-
-  <p>\[y(x)\;\longrightarrow\;y(x)+\varepsilon\,\eta(x),\]</p>
-
-  <p>com \(\varepsilon\ll1\) e \(\eta\) uma função arbitrária que se anula nas pontas,
-  \(\eta(x_1)=\eta(x_2)=0\), para que as condições de contorno não sejam violadas. A função
-  \(\eta\) escolhe a <em>direção</em> da perturbação, e \(\varepsilon\) mede o quanto se anda
-  nessa direção. O funcional vira uma função comum de uma variável:</p>
-
-  <p>\[J(\varepsilon)=\int_{x_1}^{x_2}
-  f\left(x,\;y+\varepsilon\eta,\;y'+\varepsilon\eta'\right)dx.\]</p>
-
-  <p>Com isso o problema de dimensão infinita foi reduzido, ao longo de cada direção, a um
-  problema de cálculo de uma variável. É o truque central da dedução.</p>
-
-  <h3>Passo 2: derivar e avaliar em \(\varepsilon=0\)</h3>
-
-  <p>Se \(y\) é extremante, \(J(\varepsilon)\) tem extremo em \(\varepsilon=0\) qualquer que
-  seja \(\eta\). Pela regra da cadeia,</p>
-
-  <p>\[\der{J}{\varepsilon}=\int_{x_1}^{x_2}\left(\pder{f}{y}\,\eta
-  +\pder{f}{y'}\,\eta'\right)dx,\]</p>
-
-  <p>e a condição de extremo é que essa integral se anule em \(\varepsilon=0\).</p>
-
-  <h3>Passo 3: integrar por partes</h3>
-
-  <p>A integral tem \(\eta\) no primeiro termo e \(\eta'\) no segundo, e enquanto isso durar
-  não há como fatorar \(\eta\). A integração por partes resolve:</p>
-
-  <p>\[\int_{x_1}^{x_2}\pder{f}{y'}\,\eta'\,dx
-  =\left[\pder{f}{y'}\,\eta\right]_{x_1}^{x_2}
-  -\int_{x_1}^{x_2}\der{}{x}\left(\pder{f}{y'}\right)\eta\,dx.\]</p>
-
-  <p>O colchete é avaliado nos extremos, onde \(\eta\) foi construída para se anular, de modo
-  que o termo de fronteira desaparece. É aqui que a hipótese de extremos fixos entra de fato
-  na conta, e é por isso que problemas de extremos livres têm condições adicionais: o colchete
-  sobrevive e precisa ser anulado de outra maneira.</p>
-
-  <h3>Passo 4: aplicar o lema fundamental</h3>
-
-  <p>Juntando as duas parcelas, a condição de extremo fica</p>
-
-  <p>\[\der{J}{\varepsilon}\bigg|_{\varepsilon=0}
-  =\int_{x_1}^{x_2}\left[\pder{f}{y}
-  -\der{}{x}\left(\pder{f}{y'}\right)\right]\eta(x)\,dx=0,\]</p>
-
-  <p>e isso tem de valer para <em>toda</em> \(\eta\) admissível. O lema fundamental, provado no
-  módulo anterior, converte essa condição integral numa condição ponto a ponto: o colchete tem
-  de ser identicamente nulo.</p>
+  <p>Para atacar perguntas desse tipo é preciso derivar com respeito a uma função, e não com
+  respeito a um número. O ramo da matemática que faz isso de maneira sistemática se chama
+  <strong>cálculo variacional</strong>, e o objeto que ele otimiza se chama funcional.</p>
 
   <!-- ================================================== -->
-  <h2 id="s3">3. A equação de Euler-Lagrange</h2>
-
-  <div class="destaque">
-    <span class="anuncio">Equação de Euler-Lagrange</span>
-    \[\pder{f}{y}-\der{}{x}\left(\pder{f}{y'}\right)=0.\]
-    Condição necessária para que \(y(x)\) torne extremo o funcional
-    \(J[y]=\int f\left(x,y,y'\right)dx\).
-  </div>
-
-  <p>Abrindo a derivada total do segundo termo,</p>
-
-  <p>\[\der{}{x}\left(\pder{f}{y'}\right)
-  =\frac{\partial^2f}{\partial x\,\partial y'}
-  +\frac{\partial^2f}{\partial y\,\partial y'}\,y'
-  +\frac{\partial^2f}{\partial y'^2}\,y'',\]</p>
-
-  <p>de modo que a equação é, em geral, uma equação diferencial ordinária de <strong>segunda
-  ordem</strong> para \(y(x)\). As duas constantes de integração que ela traz são fixadas
-  pelas duas condições de contorno, e o problema fecha.</p>
-
-  <div data-widget="residuoel"></div>
+  <h2 id="s2">2. Funcionais</h2>
 
   <div class="bloco def">
-    <span class="rotulo">Exemplo · A menor distância, enfim demonstrada</span>
-    <p>Para \(L[y]=\int\sqrt{1+y'^2}\,dx\) o integrando não depende de \(y\), e</p>
-    \[\pder{f}{y}=0,\qquad\pder{f}{y'}=\frac{y'}{\sqrt{1+y'^2}}.\]
-    <p>A equação de Euler-Lagrange reduz-se a dizer que essa segunda derivada é constante:</p>
-    \[\frac{y'}{\sqrt{1+y'^2}}=C\quad\Longrightarrow\quad
-    y'^2\left(1-C^2\right)=C^2\quad\Longrightarrow\quad
-    y'=\frac{C}{\sqrt{1-C^2}}=m,\]
-    <p>com \(m\) constante. Integrando, \(y=mx+b\): a reta. O resultado era esperado, e o que
-    se ganha é confiança no método para os casos em que a resposta não é óbvia.</p>
+    <span class="rotulo">Definição · Funcional</span>
+    <p>Um <strong>funcional</strong> é uma aplicação que associa um número real a cada função
+    de um certo conjunto de funções admissíveis:</p>
+    \[J:\mathcal{C}\longrightarrow\R,\qquad y(x)\longmapsto J[y].\]
+    <p>Os colchetes são deliberados. Eles avisam que \(J\) depende da função \(y\) <em>como um
+    todo</em>, e não do valor dela num ponto: mudar \(y\) numa vizinhança qualquer de
+    \([x_1,x_2]\) muda o número \(J[y]\).</p>
   </div>
+
+  <p>O exemplo mais limpo é o comprimento de arco. Entre dois pontos fixos \((x_1,y_1)\) e
+  \((x_2,y_2)\) passam infinitas curvas suaves, e cada uma tem o seu comprimento</p>
+
+  <p>\[L[y]=\int_{x_1}^{x_2}\sqrt{1+\left(\der{y}{x}\right)^{2}}\,dx.\]</p>
+
+  <p>Troque a curva e o número muda. Dois outros exemplos, ainda mais simples, serão úteis
+  adiante: a área sob a curva,</p>
+
+  <p>\[A[y]=\int_{x_1}^{x_2}y(x)\,dx,\]</p>
+
+  <p>que é <em>linear</em> em \(y\) e portanto o funcional mais elementar que existe, e a
+  energia potencial de uma corda esticada de tensão \(T\) e extremos fixos,</p>
+
+  <p>\[U[y]=\frac{T}{2}\int_0^{\ell}\left(\der{y}{x}\right)^{2}dx,\]</p>
+
+  <p>cuja minimização determina a configuração de repouso da corda.</p>
+
+  <div data-widget="funcional"></div>
+
+  <p>A máquina do simulador recebe uma curva e devolve um número, e é exatamente isso que um
+  funcional faz. Repare numa coisa que o simulador deixa evidente e que a notação esconde: o
+  mesmo conjunto de curvas, submetido a funcionais diferentes, tem minimizantes diferentes. A
+  reta vence o comprimento, a parábola certa vence a energia da corda sob carga, e não há
+  nenhuma curva universalmente boa. Quem decide o minimizante é o funcional, não a curva.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. Funcionais da física</h2>
+
+  <h3>Tempo de percurso e o princípio de Fermat</h3>
+
+  <p>A luz que atravessa um meio de índice de refração \(n(x,y,z)\) viaja com velocidade
+  \(v=c/n\), de modo que o tempo gasto entre dois pontos \(A\) e \(B\) ao longo de um caminho
+  dado vale</p>
+
+  <p>\[T[\vet{r}]=\int_A^B\frac{ds}{v}=\frac{1}{c}\int_A^B n(x,y,z)\,ds.\]</p>
+
+  <p>Parametrizando o caminho, \(ds=\sqrt{\dot x^2+\dot y^2+\dot z^2}\,dt\), e o funcional
+  fica</p>
+
+  <p>\[T[x,y,z]=\frac{1}{c}\int_{t_1}^{t_2}n(x,y,z)
+  \sqrt{\dot x^{2}+\dot y^{2}+\dot z^{2}}\;dt.\]</p>
+
+  <p>O <strong>princípio de <a href="https://pt.wikipedia.org/wiki/Pierre_de_Fermat">Fermat</a></strong> afirma que, entre todos os caminhos ligando \(A\) a
+  \(B\), a luz segue aquele que torna \(T\) estacionário. A lei da refração de <a href="https://pt.wikipedia.org/wiki/Willebrord_Snel_van_Royen">Snell</a> sai desse
+  princípio em três linhas, e a reflexão em duas.</p>
+
+  <h3>A ação e o princípio de Hamilton</h3>
+
+  <p>O funcional que organiza toda a mecânica dos próximos módulos é a <strong>ação</strong>,
+  construída a partir da lagrangiana \(\Lag=T-V\):</p>
+
+  <div class="destaque">
+    <span class="anuncio">A ação</span>
+    \[\Acao[q]=\int_{t_1}^{t_2}\Lag\left(q,\dot q,t\right)dt.\]
+  </div>
+
+  <p>Aqui \(q(t)\) representa as coordenadas generalizadas do sistema, e cada história
+  imaginável do sistema entre \(t_1\) e \(t_2\) recebe um número. O <strong>princípio de
+  <a href="https://pt.wikipedia.org/wiki/William_Rowan_Hamilton">Hamilton</a></strong> seleciona uma dessas histórias:</p>
+
+  <p>\[\delta\Acao=0.\]</p>
+
+  <p>Esse é todo o conteúdo dinâmico da mecânica clássica reescrito em uma linha, e a aula 9
+  mostrará que a condição \(\delta\Acao=0\) é equivalente às equações de <a href="https://pt.wikipedia.org/wiki/Isaac_Newton">Newton</a>. Vale o aviso
+  desde já: estacionária não quer dizer mínima. Para trajetórias longas a ação costuma ser
+  apenas ponto de sela, e o nome popular, "princípio da mínima ação", é impreciso.</p>
+
+  <h3>Superfícies mínimas</h3>
+
+  <p>Dada uma curva fechada no espaço, qual é a superfície de menor área que a tem como borda?
+  Escrevendo a superfície como \(z=f(x,y)\), a área vale</p>
+
+  <p>\[A[f]=\iint_D\sqrt{1+\left(\pder{f}{x}\right)^{2}
+  +\left(\pder{f}{y}\right)^{2}}\;dx\,dy.\]</p>
+
+  <p>Aqui a função a determinar depende de duas variáveis, e a condição de extremo será uma
+  equação a derivadas parciais em vez de uma equação ordinária. Uma película de sabão presa a
+  um aro de arame resolve esse problema por conta própria, porque a tensão superficial torna a
+  energia proporcional à área: o que se vê na bolha é o minimizante, com curvatura média
+  nula.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. A variação de um funcional</h2>
+
+  <p>No cálculo diferencial a diferencial de \(f\) é definida pela parte linear do acréscimo,</p>
+
+  <p>\[df=f(x+dx)-f(x)\simeq f'(x)\,dx,\]</p>
+
+  <p>e é essa parte linear que anula no extremo. A construção análoga para funcionais parte de
+  uma deformação \(\delta y(x)\) da curva.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Definição · Variação de um funcional</span>
+    <p>Dado \(J[y]\) e uma deformação pequena \(\delta y(x)\), a <strong>variação</strong>
+    \(\delta J\) é a parte de primeira ordem em \(\delta y\) da diferença</p>
+    \[J\left[y+\delta y\right]-J[y].\]
+    <p>É o análogo exato de uma derivada direcional, com a direção dada pela função
+    \(\delta y\) e não por um vetor de \(\R^n\).</p>
+  </div>
+
+  <p>Duas convenções de notação valem a pena fixar. Primeiro, \(\delta y(x)\) é uma função, e
+  não um número: em cada \(x\) ela diz de quanto a curva foi deslocada. Segundo, a variação e a
+  derivada comutam,</p>
+
+  <p>\[\delta\left(y'\right)=\left(\delta y\right)',\]</p>
+
+  <p>porque deformar a curva e depois derivar dá o mesmo resultado que derivar a deformação.
+  Essa comutação é usada em quase toda conta variacional e passa facilmente despercebida.</p>
+
+  <h3>Duas variações feitas à mão</h3>
+
+  <p>Comece pelo funcional área, \(A[y]=\int_{x_1}^{x_2}y\,dx\). Substituindo \(y\) por
+  \(y+\delta y\) e subtraindo,</p>
+
+  <p>\[\delta A=\int_{x_1}^{x_2}\left[y+\delta y\right]dx-\int_{x_1}^{x_2}y\,dx
+  =\int_{x_1}^{x_2}\delta y\,dx.\]</p>
+
+  <p>Não houve aproximação nenhuma: o funcional é linear, e a variação é exata. Agora tome a
+  energia da corda, \(J[y]=\int_0^{\ell}\left(y'\right)^2dx\). O quadrado produz três
+  parcelas,</p>
+
+  <p>\[J\left[y+\delta y\right]=\int_0^{\ell}\left(y'\right)^{2}dx
+  +2\int_0^{\ell}y'\left(\delta y\right)'dx
+  +\int_0^{\ell}\left[\left(\delta y\right)'\right]^{2}dx,\]</p>
+
+  <p>e das três apenas a segunda é linear em \(\delta y\). A terceira é quadrática e se descarta
+  na variação de primeira ordem, de modo que</p>
+
+  <p>\[\delta J=2\int_0^{\ell}y'\left(\delta y\right)'dx.\]</p>
+
+  <p>Guarde a forma desse resultado. A variação apareceu com \(\left(\delta y\right)'\) dentro
+  da integral, e não com \(\delta y\); para extrair daí uma condição sobre \(y\) será preciso
+  integrar por partes e transferir a derivada. Esse é o passo que a aula 9 executa, e dele sai
+  a equação de Euler-Lagrange.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. A condição de extremo</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Definição · Função extremante</span>
+    <p>A função \(y_0(x)\) é <strong>extremante</strong> de \(J[y]\) se, para toda deformação
+    admissível \(\delta y\), isto é toda deformação que respeite
+    \(\delta y(x_1)=\delta y(x_2)=0\), vale</p>
+    \[\delta J=0\]
+    <p>até a primeira ordem em \(\delta y\).</p>
+  </div>
+
+  <p>A exigência de que \(\delta y\) se anule nas extremidades não é um detalhe técnico: ela
+  traduz o fato de que os pontos inicial e final estão fixos, e que a competição é só entre
+  curvas que os unem. Deformações que mexem nos extremos pertencem a um outro problema, o de
+  extremos livres, e levam a condições de contorno adicionais.</p>
 
   <div class="bloco fisica">
-    <span class="rotulo">Geodésicas</span>
-    <p>O mesmo funcional, escrito sobre uma superfície curva, define as geodésicas dela. Na
-    esfera a resposta são os círculos máximos, que é o motivo de um voo de São Paulo a Tóquio
-    passar perto do Alasca: a rota que parece torta no mapa plano é a mais curta sobre a
-    Terra. Em relatividade geral a trajetória de uma partícula livre é a geodésica do
-    espaço-tempo, e a equação acima, escrita com a métrica, é a equação do movimento.</p>
+    <span class="rotulo">Necessária, não suficiente</span>
+    <p>A condição \(\delta J=0\) é o análogo de \(f'(x)=0\), e herda a sua limitação: anula em
+    mínimos, em máximos e em pontos de sela igualmente. Distinguir os três casos exige a
+    variação de segunda ordem, \(\delta^2J\), e a análise correspondente é bem mais delicada
+    que o teste da segunda derivada, porque em dimensão infinita há direções demais para
+    examinar. Na prática, em física, quem decide é o problema: o tempo de descida tem mínimo
+    porque é positivo e limitado inferiormente, e a ação de uma trajetória longa pode não ter
+    nenhum.</p>
   </div>
 
-  <!-- ================================================== -->
-  <h2 id="s4">4. Dois casos especiais</h2>
-
-  <h3>Quando \(f\) não depende de \(y\)</h3>
-
-  <p>Se \(f=f(x,y')\), então \(\partial f/\partial y=0\) e a equação diz que a derivada total
-  de \(\partial f/\partial y'\) é nula. Integrando de uma vez,</p>
-
-  <div class="destaque">
-    <span class="anuncio">Primeira integral</span>
-    \[\pder{f}{y'}=\text{constante}.\]
-  </div>
-
-  <p>Uma equação de segunda ordem foi trocada por uma de primeira. Foi exatamente isso que
-  aconteceu no exemplo da reta, e é o que acontece sempre que a coordenada \(y\) é
-  <strong>cíclica</strong>, isto é, não aparece explicitamente. No módulo 11 esse mesmo fato
-  reaparece com outro nome: a quantidade conservada é o momento conjugado, e a conservação vem
-  de uma simetria.</p>
-
-  <h3>Quando \(f\) não depende de \(x\)</h3>
-
-  <p>Se \(f=f(y,y')\) há outra quantidade conservada, menos evidente. Tome a derivada total de
-  \(f\) ao longo da curva,</p>
-
-  <p>\[\der{f}{x}=\pder{f}{y}\,y'+\pder{f}{y'}\,y'',\]</p>
-
-  <p>e substitua \(\partial f/\partial y\) pela equação de Euler-Lagrange, isto é por
-  \(\frac{d}{dx}(\partial f/\partial y')\):</p>
-
-  <p>\[\der{f}{x}=\der{}{x}\left(\pder{f}{y'}\right)y'
-  +\pder{f}{y'}\,y''=\der{}{x}\left(y'\pder{f}{y'}\right).\]</p>
-
-  <p>Os dois lados são derivadas totais, e subtrair um do outro dá uma constante:</p>
-
-  <div class="destaque">
-    <span class="anuncio">Integral de <a href="https://en.wikipedia.org/wiki/Eugenio_Beltrami">Beltrami</a></span>
-    \[f-y'\,\pder{f}{y'}=\text{constante}.\]
-  </div>
-
-  <p>Essa é a ferramenta que resolve a braquistócrona, a catenária e as geodésicas de várias
-  superfícies, e todas pelo mesmo motivo: nenhuma delas tem \(x\) aparecendo explicitamente no
-  integrando. Guarde a forma dessa combinação, porque ela voltará no módulo 11 como a
-  <strong>energia</strong>, quando a variável independente for o tempo.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s5">5. A braquistócrona resolvida</h2>
-
-  <p>O funcional montado no módulo 7 era</p>
-
-  <p>\[T[y]=\int_0^{x_B}\frac{\sqrt{1+y'^2}}{\sqrt{2gy}}\,dx
-  =\frac{1}{\sqrt{2g}}\int_0^{x_B}\sqrt{\frac{1+y'^2}{y}}\;dx,\]</p>
-
-  <p>com \(y\) medido para baixo a partir de A. O integrando
-  \(f=\sqrt{(1+y'^2)/y}\) não contém \(x\), e Beltrami se aplica. Calculando a derivada
-  parcial,</p>
-
-  <p>\[\pder{f}{y'}=\frac{y'}{\sqrt{y\left(1+y'^2\right)}},\]</p>
-
-  <p>e substituindo na combinação de Beltrami, os dois termos se juntam sobre o mesmo
-  denominador e o numerador colapsa:</p>
-
-  <p>\[\frac{\sqrt{1+y'^2}}{\sqrt{y}}-\frac{y'^2}{\sqrt{y\left(1+y'^2\right)}}
-  =\frac{\left(1+y'^2\right)-y'^2}{\sqrt{y\left(1+y'^2\right)}}
-  =\frac{1}{\sqrt{y\left(1+y'^2\right)}}=C.\]</p>
-
-  <p>Logo</p>
-
-  <div class="destaque">
-    <span class="anuncio">A equação da braquistócrona</span>
-    \[y\left(1+y'^2\right)=\frac{1}{C^2}=K,\qquad\text{ou}\qquad
-    y'=\sqrt{\frac{K-y}{y}}.\]
-  </div>
-
-  <p>Essa equação de primeira ordem é separável, e a substituição que a resolve é
-  \(y=\frac{K}{2}\left(1-\cos\theta\right)\). Com ela, \(dy=\frac{K}{2}\sen\theta\,d\theta\)
-  e \(y'=\cotg(\theta/2)\), de modo que</p>
-
-  <p>\[x=\int\frac{dy}{y'}
-  =\int\frac{\frac{K}{2}\sen\theta}{\cotg(\theta/2)}\,d\theta
-  =\frac{K}{2}\left(\theta-\sen\theta\right)+\text{const}.\]</p>
-
-  <p>A condição \(x(0)=y(0)=0\) zera a constante, e escrevendo \(a=K/2\),</p>
-
-  <div class="destaque">
-    <span class="anuncio">A ciclóide</span>
-    \[x=a\left(\theta-\sen\theta\right),\qquad
-    y=a\left(1-\cos\theta\right).\]
-  </div>
-
-  <p>São as equações paramétricas da curva traçada por um ponto fixo de uma roda que rola sem
-  deslizar sobre uma reta. O parâmetro \(a\) é determinado pela exigência de que a curva passe
-  pelo ponto B.</p>
-
-  <div data-widget="cicloide"></div>
-
-  <div class="bloco fisica">
-    <span class="rotulo">Por que mergulhar compensa</span>
-    <p>A conta não explica, ela calcula. A explicação é a seguinte: a conta parte do repouso, e
-    cada metro de queda inicial compra velocidade que será usada no resto do percurso. Um
-    caminho que mergulhe cedo é mais longo, e percorre esse comprimento extra depressa; um
-    caminho reto é curto e é percorrido devagar no começo, quando a velocidade ainda é pequena.
-    O ótimo negocia os dois efeitos, e a negociação tem nome: ciclóide. Quem esquia sabe disso
-    por experiência: desce-se rápido primeiro e atravessa-se depois.</p>
-  </div>
-
-  <!-- ================================================== -->
-  <h2 id="s6">6. A catenária e a catenoide</h2>
-
-  <p>Uma corrente flexível e inextensível de densidade linear \(\varrho\), pendurada por duas
-  pontas, assume a forma que minimiza a energia potencial</p>
-
-  <p>\[U[y]=\varrho g\int_{x_1}^{x_2}y\sqrt{1+y'^2}\;dx.\]</p>
-
-  <p>De novo o integrando \(f=y\sqrt{1+y'^2}\) ignora \(x\), e de novo Beltrami corta caminho.
-  Com \(\partial f/\partial y'=yy'/\sqrt{1+y'^2}\),</p>
-
-  <p>\[y\sqrt{1+y'^2}-\frac{y\,y'^2}{\sqrt{1+y'^2}}
-  =\frac{y\left[\left(1+y'^2\right)-y'^2\right]}{\sqrt{1+y'^2}}
-  =\frac{y}{\sqrt{1+y'^2}}=C.\]</p>
-
-  <p>Isolando \(y'=\sqrt{y^2-C^2}/C\) e integrando,</p>
-
-  <p>\[x=C\int\frac{dy}{\sqrt{y^2-C^2}}=C\,\mathrm{arccosh}\frac{y}{C}+K,\]</p>
-
-  <div class="destaque">
-    <span class="anuncio">A catenária</span>
-    \[y(x)=C\cosh\left(\frac{x-K}{C}\right).\]
-  </div>
-
-  <p>Para apoios na mesma altura a simetria impõe \(K=0\), o ponto mais baixo fica em \(x=0\)
-  com \(y(0)=C\), e o comprimento sai de uma conta limpa, porque
-  \(\sqrt{1+\mathrm{senh}^2u}=\cosh u\):</p>
-
-  <p>\[L=\int_{-a}^{a}\cosh\frac{x}{C}\,dx=2C\,\mathrm{senh}\frac{a}{C}.\]</p>
-
-  <div data-widget="catenaria"></div>
-
-  <div class="bloco fisica">
-    <span class="rotulo">Catenária ou parábola</span>
-    <p>As duas curvas se parecem o bastante para terem sido confundidas por <a href="https://pt.wikipedia.org/wiki/Galileu_Galilei">Galileu</a>, que
-    apostou na parábola em 1638. A diferença está em como o peso se distribui. Se a carga
-    acompanha o <em>arco</em>, como no próprio peso de um cabo, a forma é a catenária
-    \(y=C\cosh(x/C)\); se a carga se distribui uniformemente na <strong>horizontal</strong>,
-    como o tabuleiro de uma ponte pênsil pendurado no cabo, a forma é a parábola. Um cabo de
-    transmissão entre duas torres é catenária; o cabo principal da <a href="https://pt.wikipedia.org/wiki/Ponte_Herc%C3%ADlio_Luz">ponte Hercílio Luz</a> é, com
-    boa aproximação, parábola.</p>
-  </div>
-
-  <h3>A superfície mínima de revolução</h3>
-
-  <p>Gire uma curva \(y(x)\) em torno do eixo \(x\) e a superfície gerada tem área</p>
-
-  <p>\[A[y]=2\pi\int_{x_1}^{x_2}y\sqrt{1+y'^2}\;dx,\]</p>
-
-  <p>que é, a menos do fator \(2\pi\varrho g\), o mesmo funcional da catenária. A resposta,
-  portanto, é a mesma curva, e a superfície que ela gera chama-se <strong>catenoide</strong>.
-  Vale a pena ver a conta também pela via direta, sem Beltrami. Com</p>
-
-  <p>\[\pder{f}{y}=\sqrt{1+y'^2},\qquad
-  \pder{f}{y'}=\frac{y\,y'}{\sqrt{1+y'^2}},\]</p>
-
-  <p>a equação de Euler-Lagrange, depois de derivar o quociente e multiplicar por
-  \(\left(1+y'^2\right)^{3/2}\), fica</p>
-
-  <p>\[\left(1+y'^2\right)^2=y'^2\left(1+y'^2\right)+y\,y''
-  \quad\Longrightarrow\quad y\,y''=1+y'^2,\]</p>
-
-  <p>equação de segunda ordem cuja solução é a mesma catenária. A via de Beltrami produz
-  \(y/\sqrt{1+y'^2}=C\) em três linhas, e é por isso que vale a pena verificar, antes de
-  derivar qualquer coisa, se o integrando contém \(x\).</p>
-
-  <div class="bloco fisica">
-    <span class="rotulo">A película de sabão entre dois anéis</span>
-    <p>Mergulhe dois anéis coaxiais em água com sabão e retire-os: a película que se forma
-    entre eles é uma catenoide, porque a tensão superficial torna a energia proporcional à
-    área e a película procura o mínimo. Afaste os anéis devagar e, passado certo limite, a
-    película estoura: além de uma separação crítica não existe mais catenoide ligando os dois
-    anéis, e o mínimo absoluto passa a ser a solução degenerada, dois discos separados. É um
-    exemplo concreto de que a equação de Euler-Lagrange dá condição necessária e não garante a
-    existência do extremo.</p>
-  </div>
-
-  <!-- ================================================== -->
-  <h2 id="s7">7. Fermat e a lei de Snell</h2>
-
-  <p>A luz percorre, entre dois pontos, o caminho que torna estacionário o tempo de percurso.
-  Como \(v=c/n\), o tempo é proporcional ao <strong>caminho óptico</strong>
-  \(\Lambda=\int n\,ds\), e minimizar um é minimizar o outro.</p>
-
-  <p>No caso de dois meios homogêneos separados por um plano, o problema não precisa de
-  cálculo variacional. A trajetória é reta em cada meio, de modo que a única incógnita é a
-  abscissa \(x\) do ponto de cruzamento. Com \(A=(0,a)\) e \(B=(b,-c)\),</p>
-
-  <p>\[\Lambda(x)=n_1\sqrt{x^2+a^2}+n_2\sqrt{\left(b-x\right)^2+c^2},\]</p>
-
-  <p>e derivar em \(x\) é cálculo de uma variável:</p>
-
-  <p>\[\der{\Lambda}{x}=n_1\frac{x}{\sqrt{x^2+a^2}}
-  -n_2\frac{b-x}{\sqrt{\left(b-x\right)^2+c^2}}=0.\]</p>
-
-  <p>Os dois quocientes são, pela geometria da figura, os senos dos ângulos com a normal, de
-  modo que a condição de estacionariedade é</p>
-
-  <div class="destaque">
-    <span class="anuncio">Lei de <a href="https://pt.wikipedia.org/wiki/Willebrord_Snel_van_Royen">Snell</a></span>
-    \[n_1\sen\theta_1=n_2\sen\theta_2.\]
-  </div>
-
-  <div data-widget="snell"></div>
-
-  <p>Para a reflexão num espelho basta pôr \(n_1=n_2\), e a mesma condição dá
-  \(\theta_1=\theta_2\): o ângulo de incidência é o de reflexão.</p>
-
-  <h3>Meios estratificados</h3>
-
-  <p>Quando o índice varia continuamente com a altura, \(n=n(y)\), não há ponto de cruzamento
-  a determinar e a curva inteira é a incógnita. Aí o problema é variacional de verdade, com
-  integrando</p>
-
-  <p>\[f\left(y,y'\right)=n(y)\sqrt{1+y'^2},\]</p>
-
-  <p>que não depende de \(x\). Beltrami devolve</p>
-
-  <p>\[f-y'\pder{f}{y'}
-  =n(y)\sqrt{1+y'^2}-n(y)\frac{y'^2}{\sqrt{1+y'^2}}
-  =\frac{n(y)}{\sqrt{1+y'^2}}=\text{constante},\]</p>
-
-  <p>e reconhecendo \(1/\sqrt{1+y'^2}=dx/ds=\sen\theta\), com \(\theta\) medido a partir da
-  vertical,</p>
-
-  <div class="destaque">
-    <span class="anuncio">Invariante de Snell</span>
-    \[n(y)\,\sen\theta=\text{constante ao longo de todo o raio}.\]
-  </div>
-
-  <p>É a lei de Snell em forma contínua, e dela saem as miragens. Perto do asfalto quente o ar
-  é menos denso e \(n\) cai; para manter \(n\sen\theta\) constante, \(\sen\theta\) tem de
-  crescer, o raio vai ficando mais horizontal até rasar o chão e voltar a subir. O observador
-  recebe luz do céu vinda de baixo e vê uma poça que não existe.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s8">8. Resumo dos três problemas</h2>
+  <h3>A tabela de correspondências</h3>
 
   <div class="tabela-rolavel">
   <table>
-    <thead><tr><th>Problema</th><th>Funcional</th><th>Ferramenta</th><th>Solução</th></tr></thead>
+    <thead><tr><th>Cálculo diferencial</th><th>Cálculo variacional</th></tr></thead>
     <tbody>
-      <tr><td>menor distância</td><td>\(\int\sqrt{1+y'^2}\,dx\)</td><td>primeira integral</td><td>reta \(y=mx+b\)</td></tr>
-      <tr><td>braquistócrona</td><td>\(\int\sqrt{\dfrac{1+y'^2}{y}}\,dx\)</td><td>Beltrami</td><td>ciclóide</td></tr>
-      <tr><td>catenária e catenoide</td><td>\(\int y\sqrt{1+y'^2}\,dx\)</td><td>Beltrami</td><td>\(y=C\cosh(x/C)\)</td></tr>
-      <tr><td><a href="https://pt.wikipedia.org/wiki/Pierre_de_Fermat">Fermat</a>, dois meios</td><td>\(n_1d_1+n_2d_2\)</td><td>cálculo ordinário</td><td>\(n_1\sen\theta_1=n_2\sen\theta_2\)</td></tr>
-      <tr><td>Fermat, meio estratificado</td><td>\(\int n(y)\sqrt{1+y'^2}\,dx\)</td><td>Beltrami</td><td>\(n\sen\theta\) constante</td></tr>
+      <tr><td>função \(f(x)\)</td><td>funcional \(J[y]\)</td></tr>
+      <tr><td>variável independente \(x\)</td><td>função \(y(x)\)</td></tr>
+      <tr><td>diferencial \(dx\)</td><td>variação \(\delta y(x)\)</td></tr>
+      <tr><td>acréscimo linear \(df\)</td><td>variação \(\delta J\)</td></tr>
+      <tr><td>condição de extremo \(f'(x)=0\)</td><td>condição de extremo \(\delta J=0\)</td></tr>
+      <tr><td>equação resultante: \(f'(x)=0\)</td><td>equação resultante: Euler-Lagrange</td></tr>
     </tbody>
   </table>
   </div>
 
-  <p>Três das cinco linhas foram resolvidas pela mesma observação: o integrando não continha a
-  variável independente. Vale fazer disso um hábito, porque em mecânica a variável
-  independente é o tempo, e um sistema cuja lagrangiana não depende explicitamente do tempo é
-  precisamente um sistema que conserva energia.</p>
+  <p>A coluna da direita não é uma analogia solta: cada linha pode ser obtida da esquerda
+  substituindo um índice discreto por uma variável contínua. Pense na curva \(y(x)\) discretizada
+  em \(N\) valores \(y_1,\dots,y_N\), com \(J\) virando uma função de \(N\) variáveis; a condição
+  \(\partial J/\partial y_i=0\) para todo \(i\) é a versão discreta de \(\delta J=0\), e o limite
+  \(N\to\infty\) reconstrói o caso contínuo. Essa é a leitura que torna o cálculo variacional
+  menos misterioso, e é também o algoritmo que os métodos numéricos de hoje usam de fato.</p>
 
   <!-- ================================================== -->
-  <h2 id="s9">9. O princípio de Hamilton</h2>
+  <h2 id="s6">6. A menor distância</h2>
 
-  <p>Toda a maquinaria construída até aqui trata de curvas \(y(x)\). Troque \(x\) pelo tempo
-  \(t\), troque \(y\) pela coordenada \(q\) do sistema e troque o integrando pela diferença
-  entre as energias cinética e potencial. O funcional que aparece é a <strong>ação</strong>:</p>
+  <p>Dos quatro problemas clássicos, este é o único cuja resposta já se sabe antes de fazer
+  qualquer conta. O funcional é o comprimento,</p>
+
+  <p>\[L[y]=\int_{x_1}^{x_2}\sqrt{1+\left(y'\right)^{2}}\,dx,\]</p>
+
+  <p>e a curva que o minimiza é o segmento de reta \(y=mx+b\), com
+  \(m=(y_2-y_1)/(x_2-x_1)\) e \(b=y_1-mx_1\). O valor do problema está em outra parte: ele serve
+  de teste de consistência. Na aula 9, a equação de Euler-Lagrange aplicada a esse funcional
+  produzirá \(y''=0\), cuja solução geral é precisamente a reta. Um formalismo que errasse esse
+  caso não mereceria confiança nos outros três.</p>
+
+  <p>Trocando o plano por uma superfície curva, o mesmo funcional define as
+  <strong>geodésicas</strong> dela, e aí a resposta deixa de ser óbvia: na esfera são arcos de
+  círculo máximo, e o cálculo variacional é o caminho natural para obtê-los. Em relatividade
+  geral essa é a definição da trajetória de uma partícula livre.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. A braquistócrona</h2>
+
+  <p>Dois pontos \(A\) e \(B\), com \(B\) mais baixo que \(A\) mas não diretamente abaixo. Uma
+  partícula desliza sem atrito de \(A\) até \(B\) sob gravidade, partindo do repouso. Qual
+  calha a leva no menor tempo? A conservação da energia dá a velocidade a cada altura de
+  descida \(y\),</p>
+
+  <p>\[\frac{1}{2}mv^{2}=mgy\quad\Longrightarrow\quad v=\sqrt{2gy},\]</p>
+
+  <p>e com \(ds=\sqrt{1+\left(y'\right)^2}\,dx\) o tempo total fica</p>
 
   <div class="destaque">
-    <span class="anuncio">Princípio de <a href="https://pt.wikipedia.org/wiki/William_Rowan_Hamilton">Hamilton</a></span>
-    \[\Acao[q]=\int_{t_1}^{t_2}\Lag\left(q,\dot q,t\right)dt,\qquad
-    \Lag=T-V,\qquad\delta\Acao=0.\]
-    Entre todas as histórias possíveis ligando dois estados em tempos dados, o sistema percorre
-    aquela que torna a ação estacionária.
+    <span class="anuncio">O funcional da braquistócrona</span>
+    \[T[y]=\int_A^B\frac{ds}{v}
+    =\int_{x_1}^{x_2}\sqrt{\frac{1+\left(y'\right)^{2}}{2gy}}\;dx.\]
   </div>
 
-  <p>A equação de Euler-Lagrange, aplicada a essa ação, não muda de forma: só muda o nome das
-  letras. Ela passa a ser</p>
+  <p>Repare no conflito embutido nesse integrando. O numerador premia caminhos curtos, e o
+  denominador premia caminhos que desçam rápido no início, porque \(y\) grande significa \(v\)
+  grande. A reta é boa no primeiro critério e ruim no segundo; uma queda vertical seguida de
+  um trecho horizontal é ótima no segundo e péssima no primeiro. A curva vencedora negocia os
+  dois, e não é nenhuma das duas.</p>
 
-  <p>\[\der{}{t}\left(\pder{\Lag}{\dot q}\right)-\pder{\Lag}{q}=0.\]</p>
+  <div data-widget="braquistocrona"></div>
 
-  <p>Vale testar no caso mais simples possível. Uma partícula em queda tem
-  \(\Lag=\tfrac{1}{2}m\dot y^2-mgy\), de modo que</p>
-
-  <p>\[\pder{\Lag}{\dot y}=m\dot y,\qquad\pder{\Lag}{y}=-mg,\]</p>
-
-  <p>e a equação devolve \(\frac{d}{dt}\left(m\dot y\right)+mg=0\), isto é \(m\ddot y=-mg\). A
-  segunda lei de <a href="https://pt.wikipedia.org/wiki/Isaac_Newton">Newton</a> saiu de um princípio que não menciona forças em momento algum.</p>
-
-  <div data-widget="acao"></div>
-
-  <div class="bloco fisica">
-    <span class="rotulo">Por que \(T-V\) e não \(T+V\)</span>
-    <p>A pergunta é natural e a resposta é instrutiva. A energia total \(T+V\) é constante ao
-    longo do movimento real, e um funcional construído com ela daria o mesmo número para uma
-    família inteira de caminhos: não serviria para distinguir nenhum. A diferença \(T-V\), ao
-    contrário, varia de caminho para caminho, e varia do jeito certo: ela penaliza demorar-se
-    onde \(V\) é grande e penaliza correr à toa onde \(V\) é pequeno. O movimento real é o
-    compromisso entre as duas penalidades.</p>
-  </div>
+  <p>A solução é uma <strong>ciclóide</strong>, a curva traçada por um ponto fixo de uma
+  circunferência que rola sem deslizar sobre uma reta, percorrida com a concavidade para
+  cima. <a href="https://pt.wikipedia.org/wiki/Johann_Bernoulli">Johann Bernoulli</a> propôs o problema como desafio público em 1696, e as soluções que
+  chegaram no ano seguinte vieram de <a href="https://pt.wikipedia.org/wiki/Gottfried_Wilhelm_Leibniz">Leibniz</a>, de <a href="https://pt.wikipedia.org/wiki/Jakob_Bernoulli">Jakob Bernoulli</a>, de <a href="https://pt.wikipedia.org/wiki/Guillaume_Fran%C3%A7ois_Antoine,_Marqu%C3%AAs_de_l%27H%C3%B4pital">L'Hôpital</a> e de Newton,
+  este último anonimamente e, pelo relato, em uma única noite. <a href="https://pt.wikipedia.org/wiki/Galileu_Galilei">Galileu</a> havia estudado a questão
+  em 1638 e proposto um arco de círculo, que está errado mas é uma aproximação razoável do
+  arco de ciclóide.</p>
 
   <div class="bloco fisica">
-    <span class="rotulo">O que se ganha</span>
-    <p>A formulação variacional parece, a esta altura, um rodeio para chegar onde Newton já
-    estava. A vantagem aparece quando o sistema tem vínculos, que é o assunto do módulo 9. A
-    ação é um <em>escalar</em>, e escalares não se importam com a escolha de coordenadas: a
-    mesma equação funciona em cartesianas, polares, esféricas ou em qualquer conjunto de
-    parâmetros que descreva a configuração. Forças de vínculo, que em Newton exigem decompor
-    normais e trações desconhecidas, simplesmente não aparecem. Além disso, o formalismo se
-    estende sem mudanças a campos, à relatividade e à mecânica quântica, enquanto a noção de
-    força não.</p>
+    <span class="rotulo">A ciclóide também é tautócrona</span>
+    <p>Uma partícula largada em qualquer ponto de um arco de ciclóide invertida chega ao fundo
+    no mesmo tempo, independentemente de onde foi largada. <a href="https://pt.wikipedia.org/wiki/Christiaan_Huygens">Huygens</a> descobriu essa propriedade
+    em 1659, antes do problema da braquistócrona existir, e tentou usá-la para construir
+    relógios de pêndulo com período rigorosamente independente da amplitude, prendendo o fio
+    entre duas faces de ciclóide. A ideia é correta e o relógio não funcionou: o atrito do fio
+    nas faces estragava mais do que a correção melhorava.</p>
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s10">10. Estacionária, não mínima</h2>
+  <h2 id="s8">8. A catenária</h2>
 
-  <p>O nome popular do princípio, "mínima ação", promete mais do que o teorema entrega. A
-  condição \(\delta\Acao=0\) diz que a ação é <strong>estacionária</strong>, e isso inclui
-  mínimos, máximos e pontos de sela, exatamente como \(f'(x)=0\) inclui os três casos no
-  cálculo de uma variável.</p>
+  <p>Uma corrente flexível, inextensível e de densidade linear \(\varrho\) uniforme é suspensa
+  por dois pontos. A altura do centro de massa determina a energia potencial, e a corrente em
+  repouso é a que minimiza essa energia entre todas as formas de mesmo comprimento. Como o
+  elemento de massa é \(\varrho\,ds=\varrho\sqrt{1+\left(y'\right)^2}\,dx\),</p>
 
-  <p>Em alguns sistemas a ação é mínima sempre. A queda livre é um deles: com
-  \(\Lag=\tfrac{1}{2}m\dot y^2-mgy\), uma deformação \(\eta(t)\) que se anule nas
-  pontas muda a ação em</p>
+  <p>\[U[y]=\varrho g\int_{x_1}^{x_2}y\sqrt{1+\left(y'\right)^{2}}\;dx,\]</p>
 
-  <p>\[\delta^2\Acao=\frac{m}{2}\int_{t_1}^{t_2}\dot\eta^2\,dt>0,\]</p>
+  <p>com a restrição de que o comprimento total \(\int\sqrt{1+(y')^2}\,dx\) é fixo. A solução
+  é a <strong>catenária</strong></p>
 
-  <p>porque o potencial é linear em \(y\) e não contribui para a segunda variação. Por mais
-  longo que seja o percurso, o caminho real é mínimo.</p>
+  <p>\[y(x)=a\cosh\left(\frac{x}{a}\right)+b,\]</p>
 
-  <p>Basta o potencial ser quadrático para a conclusão mudar. No oscilador harmônico,
-  \(\Lag=\tfrac{1}{2}m\dot y^2-\tfrac{1}{2}m\omega^2y^2\), a segunda variação ganha um
-  termo negativo,</p>
+  <p>em que \(a\) é determinado pelo comprimento da corrente e pela separação dos apoios.
+  Galileu afirmou que a forma era uma parábola, e Huygens, Leibniz e Johann Bernoulli
+  mostraram em 1691 que não é, embora a parábola seja uma aproximação muito boa para flechas
+  pequenas. A distinção importa na engenharia: o cabo de uma ponte pênsil, que carrega o
+  tabuleiro e não apenas o próprio peso, fica de fato parabólico, enquanto um cabo de
+  transmissão pendurado entre duas torres é catenária.</p>
 
-  <p>\[\delta^2\Acao=\frac{m}{2}\int_{t_1}^{t_2}
-  \left(\dot\eta^2-\omega^2\eta^2\right)dt,\]</p>
+  <p>Uma observação sobre o método, e é o motivo de esse problema aparecer aqui. Minimizar
+  \(U[y]\) sem mais nada daria uma corrente de comprimento nulo pendurada no chão. A restrição
+  de comprimento fixo é essencial, e tratá-la exige multiplicadores de <a href="https://pt.wikipedia.org/wiki/Joseph-Louis_Lagrange">Lagrange</a> na versão
+  funcional, exatamente como no cálculo de várias variáveis. É o mesmo mecanismo que aparece no
+  problema seguinte.</p>
 
-  <p>e basta escolher uma deformação lenta para torná-la negativa. Com
-  \(\eta=\sen\left(\pi t/T\right)\) sobre um percurso de duração \(T\), as duas
-  integrais valem \(T/2\) vezes \(\left(\pi/T\right)^2\) e \(\omega^2\), de modo
-  que</p>
+  <!-- ================================================== -->
+  <h2 id="s9">9. O problema de Dido</h2>
+
+  <p>Dado um perímetro fixo, qual é a curva fechada do plano que delimita a maior área? Os
+  funcionais em jogo são dois,</p>
+
+  <p>\[A=\oint y\,dx=\frac{1}{2}\oint\left(x\,dy-y\,dx\right),\qquad
+  L=\oint\sqrt{dx^{2}+dy^{2}}=\text{fixo},\]</p>
+
+  <p>e a resposta é o <strong>círculo</strong>. Problemas com essa estrutura, em que se
+  extremiza um funcional mantendo outro constante, chamam-se
+  <strong>isoperimétricos</strong>, e o nome vem justamente deste caso.</p>
+
+  <div data-widget="isoperimetrico"></div>
+
+  <p>A lenda dá nome ao problema. <a href="https://en.wikipedia.org/wiki/Dido">Dido</a>, princesa fenícia fugida de Tiro, teria negociado com um
+  chefe local do norte da África a compra de tanta terra quanta pudesse cercar com o couro de
+  um boi. Ela cortou o couro em tiras finíssimas, amarrou-as numa única correia longa e cercou
+  com ela um semicírculo tendo o mar como diâmetro, sobre o qual fundou <a href="https://pt.wikipedia.org/wiki/Cartago">Cartago</a>. A escolha do
+  semicírculo com a costa de diâmetro é ótima pelo mesmo argumento que torna o círculo ótimo no
+  plano, e a Dido da lenda sabia a resposta uns vinte e cinco séculos antes de alguém saber
+  demonstrá-la.</p>
+
+  <p>Os matemáticos gregos também sabiam que o círculo era a resposta, e tampouco podiam
+  prová-lo com rigor. <a href="https://en.wikipedia.org/wiki/Zenodorus_(mathematician)">Zenodoro</a>, no século II a.C., chegou perto; <a href="https://pt.wikipedia.org/wiki/Jakob_Steiner">Steiner</a>, em 1838, deu um
+  argumento geométrico elegante que supõe a existência do máximo sem demonstrá-la, falha
+  apontada por <a href="https://pt.wikipedia.org/wiki/Karl_Weierstrass">Weierstrass</a>; a prova completa só veio no fim do século XIX, com os métodos
+  diretos. A história da desigualdade isoperimétrica mostra o quanto da dificuldade do cálculo
+  variacional está em garantir que o extremo existe, e não em achar quem ele é.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. Tipos de problemas variacionais</h2>
+
+  <p>Os quatro exemplos anteriores já exibem variedade suficiente para merecer uma
+  classificação, e ela organiza o que vem nos módulos seguintes.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Tipo</th><th>Característica</th><th>Exemplo</th></tr></thead>
+    <tbody>
+      <tr><td>extremos fixos</td><td>\(y(x_1)=y_1\), \(y(x_2)=y_2\)</td><td>menor distância, braquistócrona</td></tr>
+      <tr><td>extremos livres</td><td>as extremidades podem variar</td><td>corda com uma ponta solta num trilho</td></tr>
+      <tr><td>isoperimétricos</td><td>restrição integral</td><td>Dido, catenária</td></tr>
+      <tr><td>várias funções</td><td>\(J[y_1,\dots,y_n]\)</td><td>ação de um sistema de \(n\) graus de liberdade</td></tr>
+      <tr><td>derivadas superiores</td><td>\(J=\int F(x,y,y',y'',\dots)dx\)</td><td>energia de flexão de uma viga</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>A quarta linha é a que interessa à mecânica. As coordenadas generalizadas de um sistema com
+  \(n\) graus de liberdade são \(n\) funções do tempo, e a condição \(\delta\Acao=0\) produzirá
+  um sistema de \(n\) equações acopladas. A quinta linha aparece na teoria de vigas e em
+  gravitação modificada, e produz equações de quarta ordem.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. O lema fundamental</h2>
+
+  <p>Toda conta variacional termina do mesmo jeito: com uma integral que deve se anular para
+  <em>qualquer</em> deformação \(\delta y\),</p>
+
+  <p>\[\delta J=\int_{x_1}^{x_2}G(x)\,\delta y(x)\,dx=0.\]</p>
+
+  <p>Daí se quer concluir que \(G(x)=0\), e esse passo não é automático: a integral de uma
+  função não nula pode perfeitamente se anular, se as contribuições positivas e negativas se
+  cancelarem. O que salva o argumento é a liberdade de escolher \(\delta y\).</p>
 
   <div class="destaque">
-    <span class="anuncio">Onde o mínimo deixa de ser mínimo</span>
-    \[\delta^2\Acao=\frac{mT}{4}\left[\left(\frac{\pi}{T}\right)^2-\omega^2\right],
-    \qquad\text{negativa para}\qquad T>\frac{\pi}{\omega}.\]
+    <span class="anuncio">Lema fundamental do cálculo das variações</span>
+    <p>Se \(\displaystyle\int_a^b G(x)\,\eta(x)\,dx=0\) para toda função \(\eta\)
+    suficientemente regular com \(\eta(a)=\eta(b)=0\), então \(G(x)=0\) em todo o intervalo
+    \([a,b]\).</p>
   </div>
 
-  <p>Meio período é o limite. Passado ele, o caminho real continua estacionário e deixa de ser
-  mínimo, e o instante em que isso acontece tem nome próprio: <strong>ponto
-  conjugado</strong>. A interpretação geométrica é bonita: meio período depois de passar pela
-  origem, <em>todas</em> as trajetórias do oscilador que partiram de lá se reencontram no
-  mesmo ponto, independentemente da amplitude. Famílias de extremantes que se cruzam são
-  exatamente o sintoma da perda de minimalidade.</p>
+  <p>A demonstração é por contradição, e vale acompanhá-la porque explica de onde vem a força
+  do método. Suponha que \(G\) seja contínua e que \(G(x_0)>0\) em algum ponto interior. Por
+  continuidade existe uma vizinhança \((x_0-\epsilon,x_0+\epsilon)\) em que \(G\) permanece
+  positiva. Escolha agora uma \(\eta\) que seja positiva dentro dessa vizinhança e
+  identicamente nula fora dela, como</p>
 
-  <p>O mesmo fenômeno aparece na esfera. Entre dois pontos próximos, o arco de círculo máximo
-  que os liga é o caminho mais curto; entre dois pontos separados por mais de meia volta, o
-  arco complementar continua sendo geodésica e não é mínimo de nada. Os polos de uma esfera
-  são pontos conjugados um do outro, e por eles passam infinitas geodésicas.</p>
+  <p>\[\eta(x)=\begin{cases}
+  \left[\epsilon^{2}-\left(x-x_0\right)^{2}\right]^{2}, & \left|x-x_0\right|<\epsilon,\\[2pt]
+  0, & \text{caso contrário.}\end{cases}\]</p>
+
+  <p>Essa \(\eta\) é admissível, pois é suave e se anula nos extremos. Com ela o integrando é
+  positivo onde não é nulo, a integral é estritamente positiva, e a hipótese de que ela se
+  anula para toda \(\eta\) é violada. Logo \(G\) não pode ser positiva em ponto nenhum, e o
+  mesmo argumento com o sinal trocado exclui valores negativos. Resta \(G\equiv0\).</p>
+
+  <p>A ideia por trás do lema é que a liberdade de deformar a curva em qualquer pedacinho do
+  intervalo, isoladamente, transforma uma única condição integral em uma condição ponto a
+  ponto. É esse mecanismo que converte \(\delta\Acao=0\), uma afirmação global sobre o caminho
+  inteiro, numa equação diferencial local. A aula 9 começa exatamente aqui.</p>
 
   <div class="bloco fisica">
-    <span class="rotulo">Verifique no simulador</span>
-    <p>No widget da seção 9, troque o potencial de queda livre para oscilador harmônico e
-    aumente a duração do percurso. Com \(\omega=2\) rad/s a troca acontece em
-    \(T=\pi/2=1{,}57\) s: abaixo disso o ponto \(a=0\) é fundo de vale, acima dele é topo
-    de morro ao longo dessa deformação. O cartão da natureza do extremo acusa a mudança.
-    Nenhuma física mudou no caminho real, apenas o adjetivo.</p>
+    <span class="rotulo">Três ferramentas para a próxima aula</span>
+    <ul>
+      <li>regra da cadeia para funções de várias variáveis;</li>
+      <li>integração por partes, \(\int u\,dv=uv-\int v\,du\), que é o que transfere a derivada
+      de \(\delta y'\) para o resto do integrando;</li>
+      <li>o lema fundamental acima, que converte a integral nula em equação diferencial.</li>
+    </ul>
+    <p>Com essas três, a dedução da equação de Euler-Lagrange cabe em meia página.</p>
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s11">11. Exercícios resolvidos</h2>
+  <h2 id="s12">12. Exercícios resolvidos</h2>
 
   <div class="bloco def">
-    <span class="rotulo">Exercício resolvido 8.1 · A parábola</span>
-    <p>Mostre que \(y=x^2\) é extremante do funcional
-    \(J[y]=\displaystyle\int_0^1\left[\left(y'\right)^2+4y\right]dx\), com \(y(0)=0\)
-    e \(y(1)=1\).</p>
-    <p><strong>Solução.</strong> O integrando é \(f=\left(y'\right)^2+4y\), e</p>
-    \[\pder{f}{y}=4,\qquad\pder{f}{y'}=2y'.\]
-    <p>A equação de Euler-Lagrange fica</p>
-    \[4-\der{}{x}\left(2y'\right)=0\quad\Longrightarrow\quad y''=2,\]
-    <p>cuja solução geral é \(y=x^2+Ax+B\). As condições de contorno dão \(B=0\) e
-    \(1=1+A\), portanto \(A=0\) e \(y=x^2\), como se queria.</p>
-    <p>Vale notar o que o termo linear em \(y\) faz. Ele age como uma fonte constante, e a
-    equação \(y''=2\) é a mesma de uma partícula sob aceleração uniforme, com \(x\) no
-    papel do tempo. Trocando a fonte por \(-4xy\) o lado direito vira \(-2x\) e a
-    extremante passa a ser cúbica: a forma do termo em \(y\) determina a ordem do
-    polinômio.</p>
-    <span class="rotulo">Exercício resolvido 8.2 · O oscilador harmônico</span>
-    <p>Encontre a equação de Euler-Lagrange do funcional
-    \(J[y]=\displaystyle\int_0^{T}\left[\tfrac{1}{2}\left(\dot y\right)^2
-    -\tfrac{k}{2}y^2\right]dt\) e identifique o resultado.</p>
-    <p><strong>Solução.</strong> Com \(f=\tfrac{1}{2}\dot y^2-\tfrac{k}{2}y^2\),</p>
-    \[\pder{f}{y}=-ky,\qquad\pder{f}{\dot y}=\dot y,\]
-    <p>de modo que a equação é</p>
-    \[\der{}{t}\left(\dot y\right)+ky=0\quad\Longrightarrow\quad\ddot y+ky=0.\]
-    <p>É o oscilador harmônico de frequência \(\omega=\sqrt{k}\), com solução
-    \(y=A\cos\left(\omega t+\varphi\right)\). Note que o integrando é exatamente a lagrangiana
-    \(\Lag=T-V\) de uma massa unitária presa a uma mola de constante \(k\): a equação de
-    Euler-Lagrange aplicada a ela reproduz a lei de <a href="https://pt.wikipedia.org/wiki/Robert_Hooke">Hooke</a> sem nunca escrever
-    \(\vet{F}=-k\vet{x}\).</p>
+    <span class="rotulo">Exercício resolvido 8.1 · Variações elementares</span>
+    <p>Calcule \(\delta J\) para \(J_1[y]=\int_0^1y\,dx\), \(J_2[y]=\int_0^1y^{2}\,dx\) e
+    \(J_3[y]=\int_0^1xy\,dx\).</p>
+    <p><strong>Solução.</strong> O primeiro e o terceiro são lineares em \(y\), e a variação é
+    exata:</p>
+    \[\delta J_1=\int_0^1\delta y\,dx,\qquad\delta J_3=\int_0^1x\,\delta y\,dx.\]
+    <p>No segundo, \(\left(y+\delta y\right)^2=y^2+2y\,\delta y+\left(\delta y\right)^2\), e
+    descartando o termo quadrático</p>
+    \[\delta J_2=2\int_0^1y\,\delta y\,dx.\]
+    <p>Note que \(\delta J_2\) depende de \(y\), ao contrário dos outros dois. É o reflexo de
+    \(J_2\) ser não linear: a resposta à mesma deformação muda conforme a curva de
+    partida.</p>
   </div>
 
   <div class="bloco def">
-    <span class="rotulo">Exercício resolvido 8.3 · A catenária de 12 m</span>
-    <p>Uma corrente de 12,0 m é pendurada entre dois postes separados de 10,0 m e de mesma
-    altura. Determine \(C\) e a flecha.</p>
-    <p><strong>Solução.</strong> Com \(a=5{,}00\) m e \(L=12{,}0\) m, resolve-se</p>
-    \[12{,}0=2C\,\mathrm{senh}\frac{5{,}00}{C}.\]
-    <p>A equação é transcendental, e o lado direito decresce monotonamente com \(C\): basta
-    uma bisseção. Testando, \(C=6{,}0\) dá
-    \(12{,}0\cdot\mathrm{senh}\left(0{,}833\right)=11{,}1\) m, pouco;
-    \(C=4{,}5\) dá \(9{,}0\cdot\mathrm{senh}\left(1{,}111\right)=12{,}4\) m, demais.
-    Refinando entre os dois,</p>
-    \[C=4{,}695\ \text{m}.\]
-    <p>A flecha é a diferença entre a altura dos apoios e a do ponto mais baixo,</p>
-    \[\Delta=C\cosh\frac{a}{C}-C
-    =4{,}695\left[\cosh\left(1{,}065\right)-1\right]=2{,}92\ \text{m}.\]
-    <p>Uma folga de 2,0 m no comprimento, sobre um vão de 10 m, produz quase 3 m de
-    barrigão. A sensibilidade é alta, e é por isso que linhas de transmissão são tensionadas
-    com cuidado: o vão varia com a temperatura, e a flecha varia muito mais do que o
-    comprimento.</p>
+    <span class="rotulo">Exercício resolvido 8.2 · Funcional quadrático</span>
+    <p>Para \(J[y]=\displaystyle\int_0^1\left[\left(y'\right)^{2}+y^{2}\right]dx\), calcule
+    \(\delta J\).</p>
+    <p><strong>Solução.</strong> Substituindo \(y\to y+\delta y\) e abrindo os dois
+    quadrados,</p>
+    \[J\left[y+\delta y\right]=\int_0^1\left[\left(y'\right)^{2}
+    +2y'\,\delta y'+\left(\delta y'\right)^{2}
+    +y^{2}+2y\,\delta y+\left(\delta y\right)^{2}\right]dx.\]
+    <p>Os dois termos quadráticos em \(\delta y\) saem fora da primeira ordem, e sobra</p>
+    \[\delta J=2\int_0^1\left[y'\,\delta y'+y\,\delta y\right]dx.\]
+    <p>Integrando por partes o primeiro termo e usando \(\delta y(0)=\delta y(1)=0\),</p>
+    \[\delta J=2\int_0^1\left[y-y''\right]\delta y\,dx,\]
+    <p>de modo que o lema fundamental impõe \(y''=y\) para a extremante, com solução
+    \(y=C_1e^{x}+C_2e^{-x}\). Esta é a primeira equação de Euler-Lagrange do curso, obtida
+    antes de termos a fórmula geral.</p>
   </div>
 
   <div class="bloco def">
-    <span class="rotulo">Exercício resolvido 8.4 · Snell numérico</span>
-    <p>Luz vai de \(A=(0;\,1{,}20)\) m no ar até \(B=(3{,}00;\,-1{,}60)\) m dentro d'água
-    (\(n_1=1{,}00\), \(n_2=1{,}33\)). Determine o ponto de cruzamento e verifique a lei de
-    Snell.</p>
-    <p><strong>Solução.</strong> O caminho óptico em função da abscissa do cruzamento é</p>
-    \[\Lambda(x)=\sqrt{x^2+1{,}44}
-    +1{,}33\sqrt{\left(3{,}00-x\right)^2+2{,}56},\]
-    <p>e a condição de estacionariedade é</p>
-    \[\frac{x}{\sqrt{x^2+1{,}44}}
-    =1{,}33\,\frac{3{,}00-x}{\sqrt{\left(3{,}00-x\right)^2+2{,}56}}.\]
-    <p>Resolvendo numericamente, \(x=1{,}739\) m, com \(\Lambda=4{,}822\) m. Nesse
-    ponto</p>
-    \[\sen\theta_1=\frac{1{,}739}{\sqrt{1{,}739^2+1{,}20^2}}=0{,}8231,\qquad
-    \sen\theta_2=\frac{1{,}261}{\sqrt{1{,}261^2+1{,}60^2}}=0{,}6189,\]
-    <p>isto é \(\theta_1=55{,}4^\circ\) e \(\theta_2=38{,}2^\circ\). A verificação
-    fecha:</p>
-    \[n_1\sen\theta_1=0{,}8231,\qquad
-    n_2\sen\theta_2=1{,}33\cdot0{,}6189=0{,}8231.\]
-    <p>Duas conferências de bom senso valem sempre. Primeira: o ângulo maior fica no meio de
-    <em>menor</em> índice, e aqui \(\theta_1\) é maior que \(\theta_2\) com \(n_1\) menor que \(n_2\), como
-    deve ser.
-    Segunda: o ponto de cruzamento fica deslocado em direção a B em relação ao que a reta
-    \(AB\) daria, porque a luz "prefere" encurtar o trecho dentro da água, onde anda mais
-    devagar. A reta \(AB\) cruzaria o plano em \(x=1{,}29\) m, e o caminho real cruza em
-    1,74 m.</p>
+    <span class="rotulo">Exercício resolvido 8.3 · Interpretação geométrica</span>
+    <p>Explique por que a menor distância entre dois pontos do plano é um problema variacional e
+    escreva o funcional.</p>
+    <p><strong>Solução.</strong> O que se procura não é um número nem um par de números, mas a
+    curva inteira que une os dois pontos, e cada candidata tem um comprimento associado. Há
+    portanto um conjunto de funções admissíveis, as curvas \(y(x)\) com \(y(a)=y_a\) e
+    \(y(b)=y_b\), e uma regra que atribui um número a cada uma,</p>
+    \[L[y]=\int_a^b\sqrt{1+\left(y'\right)^{2}}\,dx.\]
+    <p>Essa regra é um funcional, e procurar a curva que a minimiza é, por definição, um
+    problema variacional.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Exercício resolvido 8.4 · Problema inverso</span>
+    <p>Um funcional \(J[y]=\int_0^1F\left(x,y,y'\right)dx\) tem variação</p>
+    \[\delta J=\int_0^1\left[2xy\,\delta y+3y'\,\delta y'\right]dx.\]
+    <p>Determine \(F\).</p>
+    <p><strong>Solução.</strong> A forma geral da variação de um funcional desse tipo é</p>
+    \[\delta J=\int_0^1\left(\pder{F}{y}\,\delta y
+    +\pder{F}{y'}\,\delta y'\right)dx,\]
+    <p>e comparar os dois integrandos termo a termo dá
+    \(\partial F/\partial y=2xy\) e \(\partial F/\partial y'=3y'\). Integrando a primeira em
+    \(y\) vem \(F=xy^{2}+g\left(x,y'\right)\); integrando a segunda em \(y'\) vem
+    \(F=\tfrac{3}{2}\left(y'\right)^{2}+h(x,y)\). As duas expressões só são compatíveis se</p>
+    \[F\left(x,y,y'\right)=xy^{2}+\frac{3}{2}\left(y'\right)^{2}+C.\]
+    <p>A constante \(C\) é irrelevante, porque adicionar uma constante a \(F\) soma uma
+    constante a \(J\) e não altera variação nenhuma. Essa indeterminação inofensiva reaparecerá
+    de forma muito mais interessante na aula 9, quando se verá que somar a \(\Lag\) a derivada
+    total de uma função qualquer também não muda as equações de movimento.</p>
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s12">12. Exercícios propostos</h2>
+  <h2 id="s13">13. Exercícios propostos</h2>
 
   <div class="bloco def">
     <span class="rotulo">Para resolver</span>
     <ol>
-      <li><b>8.1</b> Para \(J[y]=\int_0^1\left(y'\right)^2dx\) com \(y(0)=y(1)=0\), obtenha a
-      equação de Euler-Lagrange e mostre que a única extremante é \(y\equiv0\). Interprete o
-      resultado em termos da corda esticada.</li>
+      <li><b>8.1</b> Calcule \(\delta J\) para \(J[y]=\int_0^1\left(y'\right)^{3}dx\) e para
+      \(J[y]=\int_0^1y\,y'\,dx\). No segundo caso, mostre que a variação se reduz a um termo de
+      fronteira e explique o significado disso.</li>
 
-      <li><b>8.2</b> Mostre, aplicando a integral de Beltrami ao funcional comprimento, que a
-      reta é recuperada sem resolver equação diferencial nenhuma. Compare o trabalho com o da
-      via direta feita na seção 3.</li>
+      <li><b>8.2</b> Mostre que o funcional \(J[y]=\int_{x_1}^{x_2}\left(\alpha y+\beta
+      y'\right)dx\), com \(\alpha\) e \(\beta\) constantes, só pode ter extremante se
+      \(\alpha=0\). Interprete geometricamente.</li>
 
-      <li><b>8.3</b> Obtenha a equação diferencial da superfície mínima de revolução pelas duas
-      vias (Euler-Lagrange direta e Beltrami) e mostre que \(y\,y''=1+y'^2\) e
-      \(y/\sqrt{1+y'^2}=C\) são equivalentes. Verifique que \(y=C\cosh\left[(x-x_0)/C\right]\)
-      satisfaz as duas.</li>
+      <li><b>8.3</b> Para o funcional comprimento, calcule explicitamente \(L\) para a reta e
+      para o arco de parábola \(y=x+a\,x(1-x)\) ligando \((0,0)\) a \((1,1)\). Expanda o
+      resultado em potências de \(a\) e verifique que o termo linear se anula, como deve
+      acontecer num mínimo.</li>
 
-      <li><b>8.4</b> Braquistócrona numérica: para A na origem e B em \((1;1)\) m, determine o
-      ângulo final \(\theta_1\) e o parâmetro \(a\) da ciclóide. Calcule o tempo de descida com
-      \(g=10\) m/s² e compare com o da reta.</li>
+      <li><b>8.4</b> A refração de Snell pelo princípio de Fermat. Dois meios de índices
+      \(n_1\) e \(n_2\) separados por um plano. Escrevendo o tempo de percurso entre um ponto de
+      cada lado como função da abscissa \(x\) do ponto de cruzamento, minimize em \(x\) e
+      obtenha \(n_1\sen\theta_1=n_2\sen\theta_2\). Note que aqui basta cálculo diferencial
+      ordinário: por que?</li>
 
-      <li><b>8.5</b> Mostre que, para a ciclóide da braquistócrona, a combinação
-      \(y\left(1+y'^2\right)\) vale \(2a\) em todo ponto. Sugestão: calcule \(y'\) a partir das
-      equações paramétricas usando \(dy/dx=\left(dy/d\theta\right)/\left(dx/d\theta\right)\).</li>
+      <li><b>8.5</b> Estime numericamente o tempo de descida de \((0,0)\) a \((1,1)\) para a
+      reta, para o arco de círculo de Galileu e para a ciclóide, tomando \(g=9{,}81\) m/s².
+      Compare as três e diga de quanto por cento Galileu errou.</li>
 
-      <li><b>8.6</b> Uma corrente de comprimento \(L\) pende entre \(x=-a\) e \(x=+a\) à mesma
-      altura. Mostre que \(L=2C\,\mathrm{senh}(a/C)\) e discuta os dois limites: \(L\to2a\) e
-      \(L\gg2a\). O que acontece com \(C\) em cada caso?</li>
+      <li><b>8.6</b> Mostre que, se \(F\) não depende explicitamente de \(y\), a condição de
+      extremo implica \(\partial F/\partial y'=\) constante. Aplique isso ao funcional
+      comprimento e recupere a reta sem resolver equação diferencial nenhuma.</li>
 
-      <li><b>8.7</b> Fibra óptica de índice \(n(r)=n_0\left(1-\alpha r^2\right)\). Usando o
-      invariante \(n\sen\theta\), mostre que, para raios próximos ao eixo, as trajetórias são
-      senoidais, e determine o período espacial em função de \(\alpha\).</li>
+      <li><b>8.7</b> Entre todos os retângulos de perímetro \(P\) fixo, qual tem área máxima?
+      Resolva com cálculo diferencial ordinário e compare o resultado com a área do círculo de
+      mesmo perímetro. Qual é a razão entre as duas?</li>
 
-      <li><b>8.8</b> Meio estratificado com \(n(y)=n_0\left(1-\beta y\right)\), modelo grosseiro
-      do ar quente sobre o asfalto. Obtenha a trajetória do raio e determine a que distância
-      um observador de 1,70 m de altura vê a miragem, com
-      \(\beta=2{,}0\cruz10^{-6}\) m⁻¹.</li>
+      <li><b>8.8</b> Uma corrente de 12,0 m é pendurada entre dois postes separados de 10,0 m e
+      de mesma altura. Determine o parâmetro \(a\) da catenária e a flecha, isto é a diferença
+      de altura entre o apoio e o ponto mais baixo. Compare com a parábola de mesma flecha e
+      diga de quanto diferem no meio do vão.</li>
 
-      <li><b>8.9</b> Discuta em meia página por que o princípio de Hamilton usa \(T-V\) e não
-      \(T+V\), e construa um exemplo numérico que mostre que a ação de dois caminhos distintos
-      com os mesmos extremos pode ser igual se o integrando for a energia total.</li>
-
-      <li><b>8.10</b> Ponto conjugado: para o oscilador harmônico de frequência \(\omega\),
-      mostre que a ação deixa de ser mínima quando o intervalo de tempo excede meio período, e
-      relacione isso com o fato de que todas as trajetórias que partem de um ponto se
-      reencontram ali depois de meio período.</li>
+      <li><b>8.9</b> Discuta em meia página por que \(\delta J=0\) é condição necessária e não
+      suficiente, construindo um exemplo de funcional em que a solução de \(\delta J=0\) é um
+      ponto de sela. Sugestão: pense em \(J[y]=\int\left[\left(y'\right)^2-y^2\right]dx\) em
+      intervalos longos.</li>
     </ol>
   </div>
 
+  <!-- ================================================== -->
+  <h2 id="s14">14. Apêndice histórico</h2>
+
+  <p>O cálculo variacional nasceu de problemas concretos que o cálculo diferencial não
+  alcançava, e a sua história é uma sucessão de desafios lançados em público e resolvidos em
+  competição.</p>
+
+  <h3>Os primórdios</h3>
+
+  <p>As origens remontam ao problema isoperimétrico de Dido, por volta de 814 a.C. segundo a
+  lenda, e aos geômetras gregos que sabiam a resposta sem poder demonstrá-la. Na era moderna,
+  Galileu estudou a braquistócrona em 1638 e propôs um arco de círculo, resposta errada mas na
+  vizinhança da certa. O problema foi formalmente proposto por Johann Bernoulli em 1696, como
+  desafio aberto à comunidade científica europeia.</p>
+
+  <h3>A época de ouro, 1696 a 1744</h3>
+
+  <p>A braquistócrona catalisou o campo. Leibniz deu uma solução geral em 1697 com o seu
+  cálculo diferencial; Newton resolveu o problema no mesmo ano e publicou anonimamente, embora
+  Johann Bernoulli tenha reconhecido o autor pelo estilo; Jakob Bernoulli, em 1700, formulou um
+  princípio de desvios virtuais que antecipa o método variacional. Esses trabalhos abriram o
+  caminho para <a href="https://pt.wikipedia.org/wiki/Leonhard_Euler">Leonhard Euler</a>, cujo <em><a href="https://scholarlycommons.pacific.edu/euler-works/65/">Methodus inveniendi lineas curvas</a></em>, de 1744,
+  estabeleceu as bases sistemáticas do assunto e trouxe a equação</p>
+
+  <p>\[\der{}{x}\left(\pder{F}{y'}\right)-\pder{F}{y}=0\]</p>
+
+  <p>para funcionais da forma \(J[y]=\int F\left(x,y,y'\right)dx\).</p>
+
+  <h3>A revolução de Lagrange</h3>
+
+  <p>Em 1755, com dezenove anos, <a href="https://pt.wikipedia.org/wiki/Joseph-Louis_Lagrange">Joseph-Louis Lagrange</a> escreveu a <a href="https://pt.wikipedia.org/wiki/Leonhard_Euler">Euler</a> propondo um método mais
+  direto: introduzir a variação \(\delta y\) e impor \(\delta J=0\), em vez de recorrer às
+  construções geométricas que Euler usava. O formalismo de Lagrange dispensava figuras, se
+  estendia sem esforço a várias variáveis e a restrições, e Euler o adotou de imediato,
+  inclusive adiando a publicação dos próprios resultados para que o rapaz tivesse a
+  prioridade. Dessa troca vêm a notação \(\delta\), o tratamento analítico unificado e, em
+  1788, a <em><a href="https://gallica.bnf.fr/ark:/12148/bpt6k862625">Mécanique Analytique</a></em>, em que toda a mecânica aparece reformulada
+  variacionalmente e que, orgulhosamente, não contém uma única figura.</p>
+
+  <h3>Hamilton, Jacobi e o formalismo moderno</h3>
+
+  <p>Entre <a href="https://doi.org/10.1098/rstl.1834.0017">1834</a> e 1835, <a href="https://pt.wikipedia.org/wiki/William_Rowan_Hamilton">William Rowan Hamilton</a> enunciou o princípio \(\delta\Acao=0\) com
+  \(\Acao=\int\Lag\,dt\), desenvolveu as transformações canônicas e expôs a analogia profunda
+  entre óptica geométrica e mecânica, que acabaria sendo a pista que levou <a href="https://pt.wikipedia.org/wiki/Erwin_Schr%C3%B6dinger">Schrödinger</a> à
+  mecânica ondulatória quase um século depois. <a href="https://pt.wikipedia.org/wiki/Carl_Gustav_Jakob_Jacobi">Jacobi</a>, em 1837, estabeleceu condições para
+  extremos fortes, a condição que leva o seu nome, e a equação de Hamilton-Jacobi unificou a
+  teoria.</p>
+
+  <h3>O século XX e o legado</h3>
+
+  <p><a href="https://pt.wikipedia.org/wiki/David_Hilbert">Hilbert</a>, no décimo nono dos seus problemas de 1900, perguntou pela regularidade das
+  soluções; <a href="https://pt.wikipedia.org/wiki/Charles_%C3%89mile_Picard">Picard</a> desenvolveu métodos diretos de minimização por sequências; <a href="https://pt.wikipedia.org/wiki/Richard_Courant">Courant</a> deu
+  fundamentos rigorosos nos anos vinte; <a href="https://en.wikipedia.org/wiki/Lev_Pontryagin">Pontryagin</a>, em 1956, estendeu o princípio ao controle
+  ótimo. Hoje o cálculo variacional sustenta a teoria de campos, a relatividade geral e a
+  teoria de cordas na física, o controle ótimo e o projeto aerodinâmico na engenharia, o
+  treinamento de redes neurais na computação e a teoria do crescimento ótimo na economia.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O que a história ensina</span>
+    <p>Mais do que uma técnica, o cálculo variacional é uma maneira de formular leis: em lugar
+    de dizer como um sistema evolui passo a passo, diz-se qual quantidade ele extremiza ao
+    longo de toda a história. Da braquistócrona ao princípio da ação estacionária, da catenária
+    às equações de campo de <a href="https://pt.wikipedia.org/wiki/Albert_Einstein">Einstein</a>, a mesma estrutura reaparece em contextos sem nenhuma
+    relação aparente. Essa recorrência é o que faz do assunto algo mais do que um capítulo de
+    análise, e é por isso que ele vem antes da mecânica lagrangiana neste curso e não depois.</p>
+  </div>
+
   <nav class="nav-aulas">
-    <a href="aula07.html"><small>Módulo anterior</small>← 7. Cálculo variacional</a>
-    <a class="prox" href="aula09.html"><small>Próximo módulo</small>9. Equações de Lagrange →</a>
+    <a href="aula07.html"><small>Módulo anterior</small>← 7. Referenciais em rotação</a>
+    <a class="prox" href="aula09.html"><small>Próximo módulo</small>9. Euler-Lagrange →</a>
   </nav>
 
 </main>
@@ -716,6 +704,6 @@
   <!--PORTAL--><p><small><a href="https://apianomorais.github.io/">Todas as disciplinas e a pesquisa em apianomorais.github.io</a></small></p><!--/PORTAL-->
 </footer>
 
-<script src="assets/js/widgets.js?v=202611082243"></script>
+<script src="assets/js/widgets.js?v=202611201036"></script>
 </body>
 </html>
