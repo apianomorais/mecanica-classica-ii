@@ -562,3 +562,29 @@ h3.unidade:first-of-type{margin-top:1.2rem}
   font-size:.82rem;color:var(--tinta-suave);text-align:center;
   margin-top:.35rem;line-height:1.35}
 @media (max-width:620px){.figuras{gap:1.4rem}.figuras figure{flex:1 1 100%}}
+
+/* ---- faixa da sequência de Mecânica Clássica (ferramentas/sequencia.py) ---- */
+.sequencia{
+  background:var(--azul-pastel);
+  border-bottom:1px solid var(--borda);
+  font-family:var(--sans);
+  font-size:.82rem;
+}
+.sequencia-interno{
+  max-width:1180px;margin:0 auto;padding:.38rem 1.1rem;
+  display:flex;align-items:center;gap:.9rem;flex-wrap:wrap;
+}
+.sequencia .rot{
+  color:var(--tinta-suave);text-transform:uppercase;
+  letter-spacing:.05em;font-size:.7rem;
+}
+.sequencia a{
+  color:var(--azul-claro);text-decoration:none;
+  border-bottom:1px solid transparent;padding-bottom:1px;
+}
+.sequencia a:hover{border-bottom-color:currentColor}
+.sequencia .aqui{color:var(--azul);font-weight:700}
+@media (max-width:620px){
+  .sequencia-interno{padding:.35rem .8rem;gap:.6rem}
+  .sequencia .rot{width:100%}
+}
