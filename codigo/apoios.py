@@ -387,6 +387,36 @@ def main():
     print('   onde estava, porque ele e geometria.')
     print()
 
+    print('=' * 72)
+    print('7. A FAMILIA DA ESTATICA E A FAMILIA DAS RIGIDEZES')
+    print('=' * 72)
+    print('   O exercicio 4.5 do modulo anterior mostrou que a viga sobre')
+    print('   tres apoios, com a carga no centro, tem uma familia inteira de')
+    print('   reacoes em equilibrio: N1 = t, N2 = W - 2t, N3 = t, com t')
+    print('   qualquer. A pergunta e qual delas acontece.')
+    print()
+    Lv, W = 1.0, 60.0
+    print('      r = kc/ke      N1        N2        N3      t medido   W/(2+r)')
+    for r in (0.0, 0.25, 1.0, 2.0, 4.0, 1000.0):
+        ke = 1.0
+        kc = max(r * ke, 1e-12)
+        _, _, RR = resolve_viga([0.0, Lv, 2 * Lv], [ke, kc, ke], [(Lv, W)])
+        print('      %9.2f %9.3f %9.3f %9.3f %10.4f %9.4f'
+              % (r, RR[0], RR[1], RR[2], RR[2], W / (2 + r)))
+    print()
+    print('   Cada valor de t que a estatica deixava em aberto corresponde a')
+    print('   exatamente uma razao de rigidezes, por t = W/(2+r), e a conta')
+    print('   confere em todas as casas. As duas familias a um parametro sao')
+    print('   a mesma familia vista de dois lados.')
+    print()
+    print('   E repare no alcance: com rigidezes positivas, r >= 0, logo')
+    print('   t fica entre 0 e W/2 = %.1f. A solucao t = W da tabela do' % (W / 2))
+    print('   exercicio 4.5, com o apoio central puxando a viga para baixo,')
+    print('   estava em equilibrio perfeito e nao e realizavel por apoio')
+    print('   elastico nenhum. A lei constitutiva nao so escolhe uma')
+    print('   resposta: ela revela que parte do leque nunca foi possivel.')
+    print()
+
 
 if __name__ == '__main__':
     main()

@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 4: Conservação e equilíbrio estático | Mecânica Clássica II</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611202351">
-<script src="assets/js/comum.js?v=202611202351"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611211629">
+<script src="assets/js/comum.js?v=202611211629"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -395,6 +395,52 @@
     não depende da massa do armário.</p>
   </div>
 
+  <div class="bloco fisica">
+    <span class="rotulo">Exercício resolvido 4.5 · A viga sobre três apoios, ou onde a estática para</span>
+    <p>Uma viga de peso desprezível e comprimento \(2L\) repousa sobre três apoios, em
+    \(x=0\), \(x=L\) e \(x=2L\). Uma carga \(W\) é colocada no meio, sobre o apoio central.
+    Determine as três reações.</p>
+    <p><strong>Tentativa de solução.</strong> As duas condições de equilíbrio são as de
+    sempre. Somando as forças verticais,</p>
+    <p>\[N_1+N_2+N_3=W,\]</p>
+    <p>e tomando torques em torno de \(x=0\), o que elimina \(N_1\),</p>
+    <p>\[N_2L+N_3\left(2L\right)=WL
+    \;\Longrightarrow\;
+    N_2+2N_3=W.\]</p>
+    <p>Tentar um terceiro ponto não adianta: a seção 7 provou que, num corpo em equilíbrio de
+    forças, mudar o ponto de torques não produz equação nova. Restam duas equações e três
+    incógnitas.</p>
+    <p><strong>O que isso significa, exatamente.</strong> Não é que a conta fique difícil: é
+    que ela tem <em>infinitas</em> respostas. Chamando \(N_3=t\) e resolvendo o que sobra,</p>
+    <p>\[N_3=t,\qquad N_2=W-2t,\qquad N_1=t,\]</p>
+    <p>e qualquer \(t\) satisfaz as duas equações. Confira alguns:</p>
+    <div class="tabela-rolavel">
+    <table>
+      <tr><th>\(t\)</th><th>\(N_1\)</th><th>\(N_2\)</th><th>\(N_3\)</th><th>soma</th><th>torque em \(x=0\)</th></tr>
+      <tr><td>0</td><td>0</td><td>\(W\)</td><td>0</td><td>\(W\)</td><td>\(WL\)</td></tr>
+      <tr><td>\(W/4\)</td><td>\(W/4\)</td><td>\(W/2\)</td><td>\(W/4\)</td><td>\(W\)</td><td>\(WL\)</td></tr>
+      <tr><td>\(W/3\)</td><td>\(W/3\)</td><td>\(W/3\)</td><td>\(W/3\)</td><td>\(W\)</td><td>\(WL\)</td></tr>
+      <tr><td>\(W/2\)</td><td>\(W/2\)</td><td>0</td><td>\(W/2\)</td><td>\(W\)</td><td>\(WL\)</td></tr>
+      <tr><td>\(W\)</td><td>\(W\)</td><td>\(-W\)</td><td>\(W\)</td><td>\(W\)</td><td>\(WL\)</td></tr>
+    </table>
+    </div>
+    <p>Todas as linhas estão em equilíbrio perfeito. A viga que apoia tudo no centro, a que
+    apoia um terço em cada, e até a que pendura o apoio central com \(-W\) enquanto as pontas
+    empurram com \(W\) cada: as três satisfazem as duas equações e a estática não tem como
+    preferir nenhuma.</p>
+    <div class="bloco alerta">
+      <span class="rotulo">A conclusão, que é o ponto do exercício</span>
+      <p>O equilíbrio não <em>falhou</em>: ele <strong>subdeterminou</strong>. As duas
+      equações continuam verdadeiras e continuam sendo tudo o que a estática do corpo rígido
+      tem a dizer, e elas deixam uma família a um parâmetro de respostas possíveis.</p>
+      <p>A viga real, no entanto, escolhe uma. Ela tem de escolher, porque só existe uma
+      distribuição de reações no laboratório. A informação que falta não está escondida em
+      alguma equação de equilíbrio ainda não escrita: ela está na <strong>deformação</strong>,
+      que o modelo de corpo rígido apagou de propósito. O módulo 5 recupera essa informação
+      admitindo que os apoios cedem, e com ela o parâmetro \(t\) fica determinado.</p>
+    </div>
+  </div>
+
   <!-- ================================================== -->
   <h2 id="s11">11. Exercícios propostos</h2>
 
@@ -441,6 +487,30 @@
       <li><b>4.9</b> Discuta em meia página: um gato solto de cabeça para baixo cai de pé sem
       que nenhum torque externo atue sobre ele. Isso viola a conservação do momento angular?
       Explique o que o gato faz e por que a conservação continua valendo.</li>
+
+      <li><b>4.10</b> Uma mesa de tampo retangular repousa sobre quatro pernas, uma em cada
+      canto, e recebe uma carga vertical num ponto qualquer. Conte as incógnitas e as equações
+      de equilíbrio disponíveis para um corpo rígido apoiado num plano, e determine o grau de
+      indeterminação. Em seguida escreva a família de soluções em função de um parâmetro, como
+      no exercício resolvido 4.5, e exiba duas soluções distintas que satisfaçam todas as
+      equações.</li>
+
+      <li><b>4.11</b> Uma barra rígida horizontal de peso \(W\) é suspensa por três cabos
+      verticais, nas posições \(0\), \(L/2\) e \(L\). Mostre que o equilíbrio determina apenas
+      duas combinações das três trações, e exiba a família de soluções. Depois responda: se um
+      dos cabos fosse cortado, o problema passaria a ter solução única? E se fossem cortados
+      dois?</li>
+
+      <li><b>4.12</b> Uma porta de 20 kg e 0,80 m de largura é presa ao batente por três
+      dobradiças igualmente espaçadas. Monte as equações de equilíbrio e verifique que elas não
+      determinam as reações de cada dobradiça separadamente. Explique por que, na prática, a
+      dobradiça de cima costuma arrancar primeiro, e identifique qual informação física decide
+      isso e está ausente do modelo de corpo rígido.</li>
+
+      <li><b>4.13</b> Mostre, em geral, que um corpo rígido plano apoiado em \(n\) pontos tem
+      grau de indeterminação \(n-2\) quando as reações são todas verticais. Em seguida explique
+      por que, apesar disso, o caso \(n=2\) é determinado qualquer que seja a posição da carga,
+      e o que muda exatamente quando se acrescenta o terceiro apoio.</li>
     </ol>
   </div>
 
@@ -459,6 +529,6 @@
   <!--PORTAL--><p><small><a href="https://apianomorais.github.io/">Todas as disciplinas e a pesquisa em apianomorais.github.io</a></small></p><!--/PORTAL-->
 </footer>
 
-<script src="assets/js/widgets.js?v=202611202351"></script>
+<script src="assets/js/widgets.js?v=202611211629"></script>
 </body>
 </html>

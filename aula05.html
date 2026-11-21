@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 5: Apoios elásticos e a relação constitutiva | Mecânica Clássica II</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611202351">
-<script src="assets/js/comum.js?v=202611202351"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611211629">
+<script src="assets/js/comum.js?v=202611211629"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -436,6 +436,9 @@
   casas decimais.</li>
   <li>A mesa com um pé curto: a bisseção acha 0,0233 mm para a folga em que a perna descola.</li>
   <li>A excentricidade em que a pressão de borda zera sai em \(L/6\) com doze casas.</li>
+  <li>A última seção fecha o ciclo com o módulo 4: para a viga sobre três apoios com carga
+  centrada, o parâmetro livre que a estática deixava em aberto sai \(t=W/(2+r)\) em todas as
+  casas, com \(r\) a razão entre a rigidez central e a das pontas.</li>
   </ul>
 
   <div class="bloco ex">
@@ -519,6 +522,53 @@
     toleraria.</p>
   </div>
 
+  <div class="bloco fisica">
+    <span class="rotulo">Exercício resolvido 5.4 · Qual membro da família a viga escolhe</span>
+    <p>O exercício resolvido 4.5 do módulo anterior deixou uma pergunta em aberto. Uma viga de
+    comprimento \(2L\) sobre três apoios, com carga \(W\) sobre o apoio central, tem toda uma
+    família de reações em equilíbrio,</p>
+    <p>\[N_1=t,\qquad N_2=W-2t,\qquad N_3=t,\]</p>
+    <p>com \(t\) qualquer. Agora que os apoios têm rigidez, determine \(t\).</p>
+    <p><strong>Solução.</strong> Sejam \(k_e\) a rigidez dos dois apoios externos, iguais entre
+    si, e \(k_c\) a do central. A carga está no centro e a configuração é simétrica, de modo
+    que o centro de rigidez coincide com ela: a viga desce sem girar, e os três recalques são o
+    mesmo \(w\). Pela seção 4,</p>
+    <p>\[w=\frac{W}{S_0}=\frac{W}{2k_e+k_c},\]</p>
+    <p>e as reações saem direto da lei constitutiva:</p>
+    <p>\[N_1=N_3=k_ew=\frac{k_eW}{2k_e+k_c},
+    \qquad
+    N_2=k_cw=\frac{k_cW}{2k_e+k_c}.\]</p>
+    <p>Comparando com a família, \(t=k_eW/(2k_e+k_c)\). Escrevendo em função apenas da razão
+    de rigidezes \(r=k_c/k_e\), que é o que de fato importa,</p>
+    <p>\[\boxed{\;t=\frac{W}{2+r}\;}\]</p>
+    <p><strong>O que a fórmula diz.</strong> Cada valor do parâmetro \(t\) que a estática
+    deixava em aberto corresponde a exatamente uma razão de rigidezes:</p>
+    <div class="tabela-rolavel">
+    <table>
+      <tr><th>\(r=k_c/k_e\)</th><th>\(t=N_1=N_3\)</th><th>\(N_2\)</th><th>situação</th></tr>
+      <tr><td>\(\to0\)</td><td>\(W/2\)</td><td>\(\to0\)</td><td>apoio central mole: é como se não existisse</td></tr>
+      <tr><td>1</td><td>\(W/3\)</td><td>\(W/3\)</td><td>três apoios iguais</td></tr>
+      <tr><td>4</td><td>\(W/6\)</td><td>\(2W/3\)</td><td>central quatro vezes mais rígido</td></tr>
+      <tr><td>\(\to\infty\)</td><td>\(\to0\)</td><td>\(\to W\)</td><td>central rígido: leva tudo</td></tr>
+    </table>
+    </div>
+    <p>A família a um parâmetro da estática e a família a um parâmetro das rigidezes são a
+    mesma família, vistas de dois lados. Fixar \(r\) é fixar \(t\), e é isso que significa
+    dizer que a lei constitutiva fornece a equação que faltava.</p>
+    <div class="bloco alerta">
+      <span class="rotulo">A elasticidade não só escolhe: ela também proíbe</span>
+      <p>Repare no alcance da fórmula. Com rigidezes positivas, \(r\ge0\), e portanto
+      \(0&lt;t\le W/2\). A linha \(t=W\) da tabela do exercício 4.5, em que o apoio central
+      puxava a viga para baixo com \(-W\) enquanto as pontas empurravam com \(W\) cada, estava
+      em equilíbrio perfeito e <strong>não é realizável</strong> por nenhum conjunto de apoios
+      elásticos comuns.</p>
+      <p>A estática admitia soluções que a física do material rejeita. Esse é um padrão geral e
+      vale guardá-lo: quando um modelo subdetermina um problema, a informação que falta
+      costuma não apenas selecionar uma resposta, mas também revelar que parte do leque de
+      respostas nunca foi fisicamente possível.</p>
+    </div>
+  </div>
+
   <!-- ================================================== -->
   <h2 id="s12">12. Exercícios propostos</h2>
 
@@ -560,7 +610,13 @@
       problema é idêntico ao de uma carga excêntrica com \(e=M/P\). Esse é o motivo de
       excentricidade e momento serem tratados como a mesma coisa em fundações.</li>
 
-      <li><b>5.9</b> Um equipamento de 5 kN é apoiado em quatro coxins de borracha de
+      <li><b>5.9</b> Retome o exercício 4.11 do módulo anterior, da barra suspensa por três
+      cabos verticais, que lá ficou com uma família de soluções. Dê aos cabos áreas \(A\),
+      \(A\) e \(2A\), todos de mesmo material e comprimento, e determine qual membro da
+      família ocorre. Depois mostre que a resposta não muda se todos os comprimentos forem
+      dobrados, e explique por quê.</li>
+
+      <li><b>5.10</b> Um equipamento de 5 kN é apoiado em quatro coxins de borracha de
       \(k=0{,}8\) MN/m cada, e precisa ficar nivelado dentro de 0,1 mm. Qual é a excentricidade
       máxima admissível do centro de massa, para um tampo de \(0{,}6\times0{,}6\) m? Discuta o
       que fazer se o equipamento real tiver o centro de massa fora dessa tolerância.</li>
@@ -582,6 +638,6 @@
   <!--PORTAL--><p><small><a href="https://apianomorais.github.io/">Todas as disciplinas e a pesquisa em apianomorais.github.io</a></small></p><!--/PORTAL-->
 </footer>
 
-<script src="assets/js/widgets.js?v=202611202351"></script>
+<script src="assets/js/widgets.js?v=202611211629"></script>
 </body>
 </html>
