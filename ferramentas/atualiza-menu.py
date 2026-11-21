@@ -17,7 +17,7 @@ TITULOS = {
     2: ("Centro de massa e momentos de inércia", "Centro de massa e inércia"),
     3: ("Momento angular, torque e equações de movimento", "Momento angular e torque"),
     4: ("Conservação e equilíbrio estático", "Conservação e equilíbrio"),
-    5: ("Vigas: cortante, momento fletor, linha elástica e torção", "Vigas e torção"),
+    5: ("Apoios elásticos e a relação constitutiva", "Apoios elásticos"),
     6: ("Matrizes de rotação e transformações de coordenadas", "Matrizes de rotação"),
     7: ("Referenciais em rotação e forças fictícias", "Referenciais em rotação"),
     8: ("Cálculo variacional: ação e caminhos extremos", "Cálculo variacional"),

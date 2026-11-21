@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo 5: Vigas: cortante, momento fletor, linha elástica e torção | Mecânica Clássica II</title>
+<title>Módulo 5: Apoios elásticos e a relação constitutiva | Mecânica Clássica II</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611201318">
-<script src="assets/js/comum.js?v=202611201318"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611202351">
+<script src="assets/js/comum.js?v=202611202351"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -21,7 +21,7 @@
       <a href="aula02.html" class="num" title="Módulo 2: Centro de massa e momentos de inércia">2</a>
       <a href="aula03.html" class="num" title="Módulo 3: Momento angular, torque e equações de movimento">3</a>
       <a href="aula04.html" class="num" title="Módulo 4: Conservação e equilíbrio estático">4</a>
-      <a href="aula05.html" class="num ativo" title="Módulo 5: Vigas: cortante, momento fletor, linha elástica e torção">5</a>
+      <a href="aula05.html" class="num ativo" title="Módulo 5: Apoios elásticos e a relação constitutiva">5</a>
       <span class="grupo">Referenciais</span>
       <a href="aula06.html" class="num" title="Módulo 6: Matrizes de rotação e transformações de coordenadas">6</a>
       <a href="aula07.html" class="num" title="Módulo 7: Referenciais em rotação e forças fictícias">7</a>
@@ -37,54 +37,41 @@
   </div>
 </header>
 
-<!--SEQ-->
-<div class="sequencia">
-  <div class="sequencia-interno">
-    <span class="rot">Sequência de três semestres</span>
-    <a href="https://apianomorais.github.io/mecanica-classica-i/" title="Newton, oscilações e forças centrais">Mecânica Clássica I</a>
-    <span class="aqui" title="Corpo rígido, Lagrange e Hamilton">Mecânica Clássica II</span>
-    <a href="https://apianomorais.github.io/mecanica-classica-iii/" title="Tensores, modos normais e ondas">Mecânica Clássica III</a>
-  </div>
-</div>
-<!--/SEQ-->
-
 <div class="envoltorio">
 
 <aside class="lateral">
   <h4>Neste módulo</h4>
   <ol>
     <li><a href="#s1">1. Onde a estática para</a></li>
-    <li><a href="#s2">2. Esforços internos</a></li>
-    <li><a href="#s3">3. As duas relações</a></li>
-    <li><a href="#s4">4. Os diagramas</a></li>
-    <li><a href="#s5">5. A tensão de flexão</a></li>
-    <li><a href="#s6">6. O momento de inércia de área</a></li>
-    <li><a href="#s7">7. A linha elástica</a></li>
-    <li><a href="#s8">8. A viga hiperestática</a></li>
-    <li><a href="#s9">9. Torção</a></li>
-    <li><a href="#s10">10. Exercícios resolvidos</a></li>
-    <li><a href="#s11">11. Exercícios propostos</a></li>
+    <li><a href="#s2">2. Toda barra é uma mola</a></li>
+    <li><a href="#s3">3. As duas equações que resolvem tudo</a></li>
+    <li><a href="#s4">4. O centro de rigidez</a></li>
+    <li><a href="#s5">5. Viga rígida sobre três molas</a></li>
+    <li><a href="#s6">6. Viga pendurada por três tirantes</a></li>
+    <li><a href="#s7">7. A mesa de quatro pernas</a></li>
+    <li><a href="#s8">8. Base elástica contínua e o terço médio</a></li>
+    <li><a href="#s9">9. Quando a própria viga deforma</a></li>
+    <li><a href="#s10">10. No Spyder</a></li>
+    <li><a href="#s11">11. Exercícios resolvidos</a></li>
+    <li><a href="#s12">12. Exercícios propostos</a></li>
   </ol>
 </aside>
 
 <main class="conteudo">
 
   <p class="chapeu">Módulo 5 · Corpos rígidos</p>
-  <h1>Vigas: cortante, momento fletor, linha elástica e torção</h1>
-  <p class="subtitulo">O módulo 4 tratou a viga como um corpo rígido e achou as reações nos
-  apoios. Isso responde o que o chão sente, e não o que a viga sente. Para saber se ela
-  aguenta, e o quanto ela desce, é preciso abrir a viga e olhar o que atravessa cada seção,
-  e aceitar que a hipótese de corpo rígido tem de cair.</p>
+  <h1>Apoios elásticos e a relação constitutiva</h1>
+  <p class="subtitulo">Uma viga apoiada em três pontos tem três reações e duas equações de equilíbrio. O problema não é difícil, é insolúvel dentro da hipótese de corpo rígido, e a saída não é uma conta mais esperta: é admitir que os apoios cedem. Com uma lei constitutiva, por mais simples que seja, as equações que faltavam aparecem.</p>
 
   <div class="bloco def">
     <span class="rotulo">Objetivos</span>
     <ul>
-      <li>Reconhecer um problema hiperestático e dizer por que as equações de equilíbrio não bastam;</li>
-      <li>Traçar os diagramas de esforço cortante e de momento fletor;</li>
-      <li>Usar \(dV/dx=-q\) e \(dM/dx=V\) para conferir um diagrama sem refazer a conta;</li>
-      <li>Calcular a tensão de flexão e distinguir o momento de inércia de área do de massa;</li>
-      <li>Integrar a linha elástica e obter a flecha com as condições de contorno certas;</li>
-      <li>Dimensionar um eixo à torção e explicar por que ele é oco.</li>
+      <li>Reconhecer um problema hiperestático e saber por que a estática não o resolve;</li>
+      <li>Escrever a rigidez de uma barra, \(k=EA/L\), a partir da lei de Hooke;</li>
+      <li>Montar as duas equações de uma viga rígida sobre um número qualquer de apoios;</li>
+      <li>Definir o centro de rigidez e usá-lo como se usa o centro de massa;</li>
+      <li>Resolver quatro casos: molas discretas, tirantes, apoio no plano e base contínua;</li>
+      <li>Tratar apoios que só empurram, e saber quando um deles descola.</li>
     </ul>
   </div>
 
@@ -95,444 +82,488 @@
 
   <p>Na seção 9 do módulo 4, a viga apoiada em dois pontos entregou as suas reações sem
   resistência: duas incógnitas, duas equações, fim. Mude uma única coisa no problema e ele
-  deixa de funcionar. Engaste as duas pontas, em vez de apoiá-las.</p>
+  deixa de funcionar. Acrescente um terceiro apoio.</p>
 
-  <p>Agora cada extremidade exerce uma força vertical <em>e</em> um momento, porque um
-  engaste impede a rotação. São quatro incógnitas em problema plano com carga transversal, e
-  as equações disponíveis continuam sendo duas, \(\sum F_y=0\) e \(\sum M=0\). Faltam duas
-  equações, e não há truque de escolha de ponto que as produza: a seção 7 do módulo 4
-  provou que, em equilíbrio, trocar o ponto não gera informação nova.</p>
-
-  <div class="destaque">
-    <span class="anuncio">Problema hiperestático</span>
-    <p>Quando o número de reações desconhecidas excede o de equações de equilíbrio, a
-    estática do corpo rígido é insuficiente <em>por princípio</em>. As equações que faltam
-    só podem vir de como o material se deforma.</p>
-  </div>
-
-  <p>Repare no que isso significa. Não se trata de um problema mais difícil, que exigiria
-  uma conta mais esperta. Trata-se de um problema <strong>sem solução</strong> dentro da
-  hipótese de corpo rígido, e a razão é física, não matemática: num corpo perfeitamente
-  rígido, a distribuição das reações é indeterminada de verdade. Uma mesa de quatro pernas
-  perfeitamente rígidas sobre um chão perfeitamente plano não tem como decidir quanto cada
-  perna segura. Uma mesa real decide, porque as pernas comprimem, e a que comprime mais é a
-  que carrega mais.</p>
-
-  <p>A saída é abandonar a rigidez e admitir que o corpo se deforma pouco, mas se deforma.
-  A deformação entra por uma lei constitutiva do material, que no regime elástico é a lei de
-  Hooke, e a partir dela as equações que faltavam aparecem. É o que este módulo faz, no caso
-  mais útil de todos, que é o da peça comprida sob carga transversal.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s2">2. Esforços internos</h2>
-
-  <p>Antes de deformar, é preciso saber o que está sendo transmitido. Corte a viga numa
-  seção qualquer, a uma distância \(x\) da extremidade esquerda, e isole o pedaço da
-  esquerda. Esse pedaço está em equilíbrio, e no entanto sobre ele agem a reação do apoio e
-  parte da carga. Alguma coisa tem de estar sendo exercida pelo pedaço da direita sobre o da
-  esquerda, através da seção cortada.</p>
-
-  <p>Essa alguma coisa é a resultante das forças que as fibras de um lado exercem nas do
-  outro, e ela se reduz a três grandezas no problema plano:</p>
+  <p>Agora são três forças desconhecidas, e as equações disponíveis continuam sendo duas,
+  \(\sum F_y=0\) e \(\sum M=0\). Falta uma equação, e não há truque de escolha de ponto que a
+  produza: a seção 7 do módulo 4 provou que, em equilíbrio, trocar o ponto de momentos não
+  gera informação nova.</p>
 
   <div class="bloco def">
-    <span class="rotulo">Os três esforços internos</span>
-    <ul>
-      <li>a <strong>força normal</strong> \(N(x)\), na direção do eixo da viga, que traciona
-      ou comprime;</li>
-      <li>o <strong>esforço cortante</strong> \(V(x)\), transversal, que tende a fazer uma
-      seção deslizar sobre a vizinha;</li>
-      <li>o <strong>momento fletor</strong> \(M(x)\), que tende a encurvar a viga.</li>
-    </ul>
+    <span class="rotulo">Problema hiperestático</span>
+    <p>Quando o número de reações desconhecidas excede o de equações de equilíbrio, a estática
+    do corpo rígido é insuficiente <strong>por princípio</strong>. As equações que faltam só
+    podem vir de como o material se deforma.</p>
   </div>
 
-  <p>Para a viga carregada transversalmente, \(N=0\) e sobram dois. Eles se obtêm impondo o
-  equilíbrio do trecho isolado, e é a conta mais simples deste módulo: \(V(x)\) é a soma das
-  forças verticais à esquerda do corte, e \(M(x)\) é a soma dos momentos dessas mesmas
-  forças em relação ao corte.</p>
+  <p>Repare no que isso significa. Não se trata de um problema mais difícil, que exigiria uma
+  conta mais esperta. Trata-se de um problema <strong>sem solução</strong> dentro da hipótese
+  de corpo rígido, e a razão é física, não matemática: num corpo perfeitamente rígido apoiado
+  em apoios perfeitamente rígidos, a distribuição das reações é indeterminada de verdade. Uma
+  mesa de quatro pernas perfeitamente rígidas sobre um chão perfeitamente plano não tem como
+  decidir quanto cada perna segura. Uma mesa real decide, porque as pernas comprimem, e a que
+  comprime mais é a que carrega mais.</p>
 
-  <p>Há uma convenção de sinais, e ela merece atenção porque é fonte garantida de erro. O
-  momento fletor é <strong>positivo</strong> quando encurva a viga com a concavidade para
-  cima, isto é, quando traciona as fibras de baixo. O cortante é positivo quando o trecho da
-  esquerda tende a subir em relação ao da direita. As duas convenções são escolhidas
-  juntas para que as relações da próxima seção saiam sem sinais extras.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s3">3. As duas relações</h2>
-
-  <p>Isole agora não um trecho grande, e sim uma fatia de espessura \(dx\), sobre a qual
-  age uma carga distribuída \(q(x)\) por unidade de comprimento, dirigida para baixo. Nas
-  duas faces da fatia atuam \(V\) e \(M\) de um lado, \(V+dV\) e \(M+dM\) do outro.</p>
-
-  <p>O equilíbrio vertical da fatia dá \(V-(V+dV)-q\,dx=0\), e o equilíbrio de momentos em
-  torno da face direita dá \(M+V\,dx-(M+dM)=0\), descartado o termo em \(dx^2\). Daí:</p>
-
-  <div class="destaque">
-    <span class="anuncio">As relações diferenciais da viga</span>
-    \[\der{V}{x}=-q(x),\qquad \der{M}{x}=V(x)
-      \qquad\Longrightarrow\qquad \dder{M}{x}=-q(x).\]
-  </div>
-
-  <p>São duas linhas de conta e valem por meia aula de diagramas. Elas dizem, lidas de trás
-  para frente:</p>
-
-  <ul>
-    <li><strong>O momento é extremo onde o cortante passa por zero.</strong> Nenhuma conta é
-    necessária para localizar o ponto mais solicitado da viga: basta achar onde \(V\) cruza
-    o eixo.</li>
-    <li><strong>Onde não há carga, \(V\) é constante e \(M\) é reta.</strong> Com carga
-    uniforme, \(V\) é reta e \(M\) é parábola. Com carga triangular, \(M\) é cúbica. O grau
-    sobe um a cada integração, e isso basta para desenhar o diagrama antes de calculá-lo.</li>
-    <li><strong>Uma carga concentrada produz um salto em \(V\)</strong> igual à própria
-    carga, e um bico em \(M\), porque a derivada de \(M\) muda bruscamente. Um momento
-    aplicado produz um salto em \(M\).</li>
-    <li><strong>A variação de \(M\) entre dois pontos é a área do diagrama de \(V\)</strong>
-    entre eles. É assim que se traça um diagrama de momento sem integrar nada.</li>
-  </ul>
+  <p>A saída é abandonar a rigidez em um lugar só e manter em todos os outros. Neste módulo a
+  viga continua rígida, e quem cede são os apoios. É a escolha mais econômica possível, porque
+  preserva tudo o que o módulo 4 construiu sobre corpos rígidos e acrescenta uma única ideia
+  nova, a de que um apoio tem rigidez finita.</p>
 
   <!-- ================================================== -->
-  <h2 id="s4">4. Os diagramas</h2>
+  <h2 id="s2">2. Toda barra é uma mola</h2>
 
-  <p>O simulador abaixo integra o carregamento e devolve os três gráficos alinhados em
-  \(x\). Vale passar algum tempo nele antes de seguir, procurando as quatro leituras da
-  lista acima em cada caso.</p>
+  <p>A lei constitutiva mais simples que existe é a de Hooke, que para um material elástico
+  relaciona a tensão com a deformação por uma constante do material:</p>
 
-  <div data-widget="esforcos"></div>
+  <p>\[\sigma=E\varepsilon,\qquad
+  \sigma=\frac{F}{A},\qquad
+  \varepsilon=\frac{\delta}{L}.\]</p>
 
-  <p>O caso biapoiado com carga concentrada guarda uma surpresa que quase todo livro passa
-  por alto. Afaste a carga do meio e repare onde fica a <strong>flecha</strong> máxima: ela
-  não acompanha a carga. Com a carga a 0,80 do vão, o momento máximo está sob ela, mas o
-  ponto mais baixo da viga está em torno de 0,55 do vão, bem mais perto do centro. Momento
-  máximo e flecha máxima são perguntas diferentes, e só coincidem quando a simetria obriga.</p>
+  <p>O módulo de Young \(E\) é propriedade do material e só dele: vale cerca de 200 GPa para
+  aços, 70 GPa para alumínio, 13 GPa para madeiras ao longo da fibra e 2 GPa para o
+  polipropileno. Juntando as três relações,</p>
 
-  <p>O caso em balanço mostra a outra ponta do assunto: lá o momento máximo está no engaste,
-  cresce com \(PL\), e a flecha cresce com \(PL^3\). Dobrar o comprimento de uma prateleira
-  em balanço dobra a tensão e octuplica a flecha, o que explica por que prateleiras longas
-  parecem tortas muito antes de dar qualquer sinal de que vão quebrar.</p>
+  <p>\[F=\underbrace{\frac{EA}{L}}_{k}\,\delta,\]</p>
 
-  <!-- ================================================== -->
-  <h2 id="s5">5. A tensão de flexão</h2>
-
-  <p>Saber \(M(x)\) ainda não diz se a viga aguenta. Momento fletor é uma resultante, e o
-  material não se rompe por resultante: rompe por tensão. Falta distribuir \(M\) pela seção
-  transversal.</p>
-
-  <p>A hipótese que resolve tudo é geométrica, e é devida a Bernoulli: <strong>seções planas
-  permanecem planas</strong> e perpendiculares ao eixo deformado. Se a viga encurva com raio
-  de curvatura \(\rho\), uma fibra a uma distância \(y\) da linha que não muda de
-  comprimento tem deformação</p>
-
-  \[\varepsilon(y)=\frac{y}{\rho},\]
-
-  <p>porque o arco de raio \(\rho+y\) é mais longo que o de raio \(\rho\) na proporção
-  \(y/\rho\). A deformação é <em>linear</em> em \(y\), e isso não depende de material
-  nenhum: é geometria.</p>
-
-  <p>Entra agora a física, na forma mais simples possível, que é a lei de Hooke
-  \(\sigma=E\varepsilon\), com \(E\) o módulo de Young. A tensão também é linear em \(y\).
-  Duas exigências a determinam por completo. A primeira é que a força resultante na seção
-  seja nula, já que não há força normal:</p>
-
-  \[\int_A\sigma\,dA=\frac{E}{\rho}\int_A y\,dA=0,\]
-
-  <p>o que obriga o eixo \(y=0\) a passar pelo <strong>centroide</strong> da seção. Essa é a
-  <em>linha neutra</em>, onde o material não traciona nem comprime. A segunda exigência é
-  que o momento dessas tensões reproduza \(M\):</p>
-
-  \[M=\int_A y\,\sigma\,dA=\frac{E}{\rho}\int_A y^2\,dA\equiv\frac{EI}{\rho}.\]
-
-  <div class="destaque">
-    <span class="anuncio">Flexão elástica</span>
-    \[\frac{1}{\rho}=\frac{M}{EI},\qquad
-      \sigma(y)=\frac{M\,y}{I},\qquad
-      \sigma_{\max}=\frac{M}{W},\quad W=\frac{I}{c},\]
-    <p>com \(c\) a distância da linha neutra à fibra mais afastada e \(W\) o módulo de
-    resistência da seção.</p>
-  </div>
-
-  <p>O produto \(EI\) é a <strong>rigidez à flexão</strong>, e a separação de papéis nele é
-  limpa: \(E\) é do material e \(I\) é da forma. Dobrar \(E\) e dobrar \(I\) produzem
-  exatamente o mesmo efeito sobre a curvatura, e só o preço decide qual dos dois comprar.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s6">6. O momento de inércia de área</h2>
+  <p>que é exatamente a lei de uma mola. Esse é o ponto de partida de todo o módulo, e vale
+  enunciá-lo com clareza porque ele dispensa quase toda a resistência dos materiais.</p>
 
   <div class="bloco fisica">
-    <span class="rotulo">Dois objetos com o mesmo nome</span>
-    <p>O \(I\) desta aula, \(\int y^2\,dA\), <strong>não</strong> é o momento de inércia do
-    módulo 2. Aquele é \(\int r^2\,dm\) e se mede em kg·m²; este se mede em m⁴ e não
-    contém massa alguma. Chamam-se igual por acidente histórico, porque as duas integrais
-    têm a mesma forma, e a confusão entre eles é um clássico de prova. Quando houver risco
-    de ambiguidade, diga <em>momento de inércia de área</em>, ou <em>momento de segunda
-    ordem da área</em>, que é o nome mais honesto.</p>
-    <p>Há ainda outra diferença de fundo. O momento de inércia de massa é medido em torno de
-    um eixo de rotação; o de área é medido em torno da linha neutra, que não é eixo de
-    rotação nenhum. A semelhança é de fórmula, e não de significado.</p>
+    <span class="rotulo">Uma barra tracionada é uma mola de constante \(EA/L\)</span>
+    <p>A viga apoiada não precisa saber se o apoio é uma mola helicoidal, um tirante de aço, um
+    bloco de borracha ou uma camada de solo. Precisa saber apenas quanto aquele apoio recua por
+    newton aplicado, e esse número é \(1/k\). Toda a geometria e todo o material do apoio
+    entram na conta por essa única constante.</p>
+    <p>E repare na combinação: \(k\) cresce com a área e com o módulo, e cai com o comprimento.
+    Um tirante curto e fino pode ser mais rígido que um longo e grosso, e a seção 6 mostra que
+    é isso que decide quem carrega o quê.</p>
   </div>
-
-  <p>Como \(I=\int y^2\,dA\), o material rende <em>quadraticamente</em> com a distância à
-  linha neutra. É a frase inteira da engenharia de estruturas, e vale testá-la:</p>
-
-  <div data-widget="secao"></div>
-
-  <p>Para um retângulo de largura \(b\) e altura \(h\), a integral sai em uma linha:</p>
-
-  \[I=\int_{-h/2}^{h/2}y^2\,b\,dy=\frac{bh^3}{12},\qquad W=\frac{bh^2}{6}.\]
-
-  <p>O \(h^3\) é o que importa. Uma tábua de 5 cm por 15 cm tem
-  \(I=1406\) cm⁴ de pé e \(I=156\) cm⁴ deitada: <strong>nove vezes</strong> mais rígida na
-  posição certa, com a mesma madeira. A razão é \((15/5)^2=9\), e a tensão cai por três, na
-  razão \(h\). Ninguém que já tenha pisado numa prancha precisa de demonstração, mas poucos
-  sabem que o fator é exatamente nove.</p>
-
-  <p>O perfil I leva a ideia ao limite: joga quase toda a área para as duas mesas, o mais
-  longe possível da linha neutra, e deixa na alma só o necessário para transmitir o
-  cortante. Um tubo faz o mesmo em simetria circular, e é por isso que quadro de bicicleta,
-  andaime e osso longo são todos ocos.</p>
 
   <!-- ================================================== -->
-  <h2 id="s7">7. A linha elástica</h2>
+  <h2 id="s3">3. As duas equações que resolvem tudo</h2>
 
-  <p>Falta a flecha. A curvatura de uma curva \(y(x)\) suave é
-  \(y''/(1+y'^2)^{3/2}\), e numa viga de uso corrente a inclinação é de poucos milésimos, de
-  modo que \(y'^2\) é desprezível diante de 1. Com isso \(1/\rho\simeq y''\), e a relação da
-  seção 5 vira uma equação diferencial:</p>
+  <p>Considere uma viga rígida apoiada em \(n\) molas de constantes \(k_i\), nas posições
+  \(x_i\), sob cargas quaisquer. São \(n\) reações desconhecidas, e para \(n>2\) o problema é
+  hiperestático. A chave para resolvê-lo não está em contar incógnitas, e sim em contar graus
+  de liberdade.</p>
 
-  <div class="destaque">
-    <span class="anuncio">Equação da linha elástica</span>
-    \[EI\,\dder{y}{x}=M(x).\]
+  <p>A viga é rígida e o movimento é plano: ela pode descer e pode girar, e mais nada. O
+  deslocamento para baixo de um ponto qualquer dela é portanto uma função <em>linear</em> da
+  posição,</p>
+
+  <p>\[w\left(x\right)=a+b\,x,\]</p>
+
+  <p>com apenas dois parâmetros, quaisquer que sejam \(n\) e as rigidezes. Essa é a
+  <strong>condição de compatibilidade</strong>: os recalques dos apoios não são independentes,
+  porque todos pertencem à mesma reta.</p>
+
+  <p>O resto é substituição. Cada mola responde com \(R_i=k_i\,w(x_i)\), que é a lei
+  constitutiva, e as duas equações de equilíbrio viram duas equações em \(a\) e \(b\):</p>
+
+  <p>\[\begin{pmatrix}S_0 & S_1\\ S_1 & S_2\end{pmatrix}
+  \begin{pmatrix}a\\ b\end{pmatrix}
+  =\begin{pmatrix}P\\ M\end{pmatrix},
+  \qquad
+  S_m=\sum_i k_i\,x_i^{\,m},\]</p>
+
+  <p>em que \(P\) é a carga total e \(M\) o momento dela em relação à origem. Duas equações,
+  duas incógnitas, solução única, e o número de apoios já não importa.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">A receita, em três linhas</span>
+    <ol>
+      <li><strong>Compatibilidade:</strong> a viga é rígida, logo \(w=a+bx\).</li>
+      <li><strong>Constitutiva:</strong> cada apoio responde \(R_i=k_i w(x_i)\).</li>
+      <li><strong>Equilíbrio:</strong> as duas equações de sempre, agora escritas em \(a\) e \(b\).</li>
+    </ol>
+    <p>Em problemas hiperestáticos as três são sempre necessárias, e esquecer qualquer uma
+    delas é o erro mais comum do assunto. O equilíbrio sozinho não fecha, e é por isso que a
+    estática do módulo 4 parou aqui.</p>
   </div>
 
-  <p>É uma equação de segunda ordem, de modo que cada problema precisa de duas condições de
-  contorno, e é nelas que mora a diferença entre os casos. Num apoio simples, \(y=0\) e o
-  momento é livre. Num engaste, \(y=0\) <em>e</em> \(y'=0\), e é o momento que fica por
-  determinar. Numa ponta livre, \(M=0\) e \(V=0\).</p>
+  <div data-widget="apoios"></div>
 
-  <p>Integrando duas vezes nos casos de sempre:</p>
+  <!-- ================================================== -->
+  <h2 id="s4">4. O centro de rigidez</h2>
+
+  <p>As somas \(S_0\), \(S_1\) e \(S_2\) têm cara conhecida. Trocando a rigidez pela massa,
+  elas são a massa total, o momento estático e o momento de inércia do módulo 2. O paralelo é
+  exato, e vale a pena levá-lo até o fim.</p>
+
+  <p>Defina o <strong>centro de rigidez</strong> e a <strong>rigidez à rotação</strong>:</p>
+
+  <p>\[x_c=\frac{S_1}{S_0}=\frac{\sum k_ix_i}{\sum k_i},
+  \qquad
+  I_k=\sum_i k_i\left(x_i-x_c\right)^2.\]</p>
+
+  <p>Medindo o deslocamento a partir de \(x_c\), as duas equações se desacoplam, exatamente
+  como as equações de um corpo rígido se desacoplam quando escritas no centro de massa:</p>
+
+  <p>\[w_c=\frac{P}{S_0},
+  \qquad
+  b=\frac{P\left(x_P-x_c\right)}{I_k},\]</p>
+
+  <p>com \(w_c\) o recalque do centro de rigidez e \(x_P\) a posição da resultante. A leitura é
+  imediata: a carga faz a viga descer na razão da rigidez total, e a faz girar na razão do
+  braço medido a partir do centro de rigidez.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Carregando no centro de rigidez, a viga desce sem girar</span>
+    <p>É o análogo estático do centro de massa: empurrar um corpo livre pelo centro de massa o
+    translada sem girar, e carregar uma viga sobre molas pelo centro de rigidez a faz descer
+    sem girar. A diferença é que o centro de massa depende de como a matéria se distribui, e o
+    centro de rigidez depende de como a <em>rigidez</em> se distribui. Os dois pontos não
+    coincidem, e num projeto é comum querer aproximá-los de propósito, para que o peso próprio
+    não produza inclinação.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. Viga rígida sobre três molas</h2>
+
+  <p>Uma base de máquina de \(L=2{,}4\) m, rígida, assenta sobre três coxins elásticos iguais
+  de \(k=4\) MN/m, em \(x=0\), \(L/2\) e \(L\). Sobre ela atua uma carga de 60 kN, cuja posição
+  depende de onde o operador deixa a peça. Quanto cada coxim recebe?</p>
+
+  <p>Por simetria, \(x_c=L/2\), e a rigidez à rotação vale</p>
+
+  <p>\[I_k=k\left(\frac{L}{2}\right)^2+0+k\left(\frac{L}{2}\right)^2
+  =\frac{kL^2}{2}=1{,}152\times10^{7}\ \text{N·m}.\]</p>
 
   <div class="tabela-rolavel">
   <table>
-    <thead>
-      <tr><th>viga</th><th>momento máximo</th><th>flecha máxima</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>em balanço, carga \(P\) na ponta</td><td>\(PL\) no engaste</td>
-          <td>\(PL^3/3EI\) na ponta</td></tr>
-      <tr><td>em balanço, carga \(q\) distribuída</td><td>\(qL^2/2\) no engaste</td>
-          <td>\(qL^4/8EI\) na ponta</td></tr>
-      <tr><td>biapoiada, carga \(P\) no meio</td><td>\(PL/4\) no meio</td>
-          <td>\(PL^3/48EI\) no meio</td></tr>
-      <tr><td>biapoiada, carga \(q\) distribuída</td><td>\(qL^2/8\) no meio</td>
-          <td>\(5qL^4/384EI\) no meio</td></tr>
-      <tr><td>bi-engastada, carga \(q\) distribuída</td><td>\(qL^2/12\) nos engastes</td>
-          <td>\(qL^4/384EI\) no meio</td></tr>
-    </tbody>
+    <tr><th>carga em \(x\) (m)</th><th>\(R_1\) (kN)</th><th>\(R_2\) (kN)</th><th>\(R_3\) (kN)</th><th>recalque máximo</th></tr>
+    <tr><td>0,0</td><td>50,0</td><td>20,0</td><td>−10,0</td><td>12,50 mm</td></tr>
+    <tr><td>0,6</td><td>35,0</td><td>20,0</td><td>5,0</td><td>8,75 mm</td></tr>
+    <tr><td>1,2</td><td>20,0</td><td>20,0</td><td>20,0</td><td>5,00 mm</td></tr>
+    <tr><td>1,8</td><td>5,0</td><td>20,0</td><td>35,0</td><td>8,75 mm</td></tr>
+    <tr><td>2,4</td><td>−10,0</td><td>20,0</td><td>50,0</td><td>12,50 mm</td></tr>
   </table>
   </div>
 
-  <p>A dependência em \(L^3\) e \(L^4\) é o que torna o vão a variável mais perigosa de um
-  projeto. Aumentar o vão em 20 % aumenta a flecha em 107 %, mais que o dobro, enquanto a
-  tensão sobe apenas 44 %. Estruturas de vão grande quase nunca são governadas por
-  resistência: são governadas por deformação, e por vibração, que é o assunto do
-  <a href="https://apianomorais.github.io/mecanica-classica-iii/">terceiro semestre</a>.</p>
+  <p>Duas coisas merecem atenção nessa tabela. A primeira é a linha do meio: com a carga
+  centrada, cada coxim leva exatamente um terço. Isso parece óbvio e não é. Numa viga
+  <em>flexível</em> sobre três apoios rígidos, o apoio central leva \(11/16\) da carga, quase o
+  dobro de um terço. São dois problemas diferentes, e a seção 9 diz quando cada um vale.</p>
 
-  <!-- ================================================== -->
-  <h2 id="s8">8. A viga hiperestática</h2>
+  <p>A segunda é o sinal. Com a carga numa das pontas, a reação do coxim oposto dá −10 kN, isto
+  é, ele teria de <em>puxar</em> a viga para baixo.</p>
 
-  <p>Com a linha elástica em mãos, o problema da seção 1 se resolve. Na viga bi-engastada de
-  vão \(L\) sob carga uniforme \(q\), a simetria já dá as reações verticais,
-  \(R=qL/2\) em cada apoio, e restam os dois momentos de engastamento, iguais entre si por
-  simetria. Chame-os de \(M_0\) e escreva o momento fletor:</p>
-
-  \[M(x)=M_0+\frac{qL}{2}x-\frac{q x^2}{2}.\]
-
-  <p>Integrando \(EI\,y''=M\) com \(y(0)=y'(0)=0\):</p>
-
-  \[EI\,y'(x)=M_0x+\frac{qL}{4}x^2-\frac{q}{6}x^3.\]
-
-  <p>A condição que faltava é \(y'(L)=0\), porque o outro engaste também impede a rotação.
-  Ela dá \(M_0L+qL^3/4-qL^3/6=0\), isto é</p>
-
-  <div class="destaque">
-    <span class="anuncio">O momento de engastamento</span>
-    \[M_0=-\frac{qL^2}{12},\qquad M\left(\frac{L}{2}\right)=+\frac{qL^2}{24},
-      \qquad y_{\max}=\frac{qL^4}{384EI}.\]
+  <div class="bloco alerta">
+    <span class="rotulo">Reação negativa: o apoio puxa ou descola?</span>
+    <p>A conta está certa, e o que ela diz depende do apoio. Um coxim parafusado à viga puxa
+    mesmo, e −10 kN é a tração nos parafusos, que é um número que o projetista precisa. Um
+    simples calço apoiado não puxa: ali a viga descola, aquele apoio sai do problema, e sobram
+    dois apoios.</p>
+    <p>Repare no que acontece quando sobram dois: o problema volta a ser isostático, e as
+    reações passam a não depender mais das rigidezes. Com a carga na ponta sobre dois apoios,
+    sai \(R_2=0\) e \(R_3=60\) kN, e trocar a rigidez dos coxins não muda nada. A dependência
+    das reações com a rigidez é a assinatura da hiperestaticidade, e some junto com ela.</p>
   </div>
 
-  <p>Repare no que se ganhou engastando. Comparada à biapoiada, a mesma viga com a mesma
-  carga tem momento máximo \(qL^2/12\) em vez de \(qL^2/8\), isto é <strong>um terço
-  menor</strong>, e flecha cinco vezes menor. Engastar as pontas é de longe a intervenção
-  mais barata que existe numa viga, e é por isso que lajes são engastadas nas vigas, e vigas
-  nos pilares, sempre que se consegue.</p>
-
-  <p>Repare também na estrutura lógica da solução. A equação que faltava não veio de mais
-  uma condição de equilíbrio: veio de uma condição de <em>compatibilidade geométrica</em>,
-  \(y'(L)=0\), traduzida em equação de força pela lei constitutiva. Esse é o padrão de todo
-  problema hiperestático, da mesa de quatro pernas ao arco de concreto, e é o que se queria
-  mostrar neste módulo.</p>
-
-  <p>No simulador da seção 4, o caso bi-engastado é integrado com \(M_0=-qL^2/12\) e as
-  condições do engaste da esquerda apenas. Que \(y(L)\) e \(y'(L)\) saiam nulos sem terem
-  sido impostos é a verificação de que o \(M_0\) está certo.</p>
-
   <!-- ================================================== -->
-  <h2 id="s9">9. Torção</h2>
+  <h2 id="s6">6. Viga pendurada por três tirantes</h2>
 
-  <p>A última maneira de carregar uma peça comprida é torcê-la, e a conta é tão parecida com
-  a da flexão que cabe em meia página. Tome um eixo circular de raio \(R\) e comprimento
-  \(L\), com um torque \(T\) aplicado numa ponta e a outra presa.</p>
+  <p>A mesma matemática, de cabeça para baixo. Uma viga rígida de 3 m é suspensa por três
+  tirantes, em \(x=0\), 1,0 e 3,0 m, e cada tirante é uma mola de constante \(EA/L\):</p>
 
-  <p>A hipótese geométrica correspondente à de Bernoulli é que as seções circulares giram
-  como discos rígidos, sem empenar, o que para seção circular é exato. Se a seção em \(x\)
-  gira de \(\varphi(x)\), uma fibra à distância \(r\) do eixo sofre distorção angular</p>
-
-  \[\gamma(r)=r\,\der{\varphi}{x},\]
-
-  <p>e a lei de Hooke no cisalhamento, \(\tau=G\gamma\), com \(G\) o módulo de cisalhamento,
-  dá \(\tau=Gr\,\varphi'\). Impondo que essas tensões reproduzam o torque:</p>
-
-  \[T=\int_A r\,\tau\,dA=G\varphi'\int_A r^2\,dA\equiv GJ\varphi',\]
-
-  <p>com \(J\) o <strong>momento polar de área</strong>, que para o círculo maciço vale
-  \(\pi R^4/2\). Para torque constante ao longo do eixo:</p>
-
-  <div class="destaque">
-    <span class="anuncio">Torção de eixo circular</span>
-    \[\varphi=\frac{TL}{GJ},\qquad \tau(r)=\frac{T r}{J},\qquad
-      \tau_{\max}=\frac{TR}{J}.\]
+  <div class="tabela-rolavel">
+  <table>
+    <tr><th>tirante</th><th>material</th><th>\(E\) (GPa)</th><th>\(A\) (cm²)</th><th>\(L\) (m)</th><th>\(k=EA/L\) (MN/m)</th></tr>
+    <tr><td>1</td><td>aço</td><td>200</td><td>1,0</td><td>2,0</td><td>10,0</td></tr>
+    <tr><td>2</td><td>alumínio</td><td>70</td><td>2,0</td><td>2,0</td><td>7,0</td></tr>
+    <tr><td>3</td><td>aço</td><td>200</td><td>0,5</td><td>1,0</td><td>10,0</td></tr>
+  </table>
   </div>
 
-  <p>A correspondência com a flexão é termo a termo: \(EI\) e \(GJ\) são as duas rigidezes,
-  \(M\) e \(T\) os dois esforços, \(y''\) e \(\varphi'\) as duas deformações. A diferença de
-  ordem da derivada é que a flexão desloca e a torção apenas gira.</p>
-
-  <div data-widget="torcao"></div>
-
-  <p>E o \(r^2\) dentro da integral produz aqui a mesma conclusão da seção 6, de forma ainda
-  mais nítida porque a geometria é mais simples. O material perto do eixo trabalha pouco,
-  porque \(\tau\) é proporcional a \(r\), e furar o centro custa pouca rigidez e economiza
-  muita massa. Um eixo vazado com furo de três quartos do diâmetro perde 56 % da massa e
-  apenas 32 % da rigidez.</p>
-
-  <p>Há um limite que esta conta não enxerga, e convém dizê-lo. Parede fina o bastante
-  <em>enruga</em> antes de escoar, por instabilidade local, e aí a teoria acima deixa de
-  valer sem dar aviso. É a mesma razão pela qual uma lata de refrigerante vazia suporta o
-  peso de uma pessoa em pé sobre ela e cede instantaneamente a um toque lateral na parede.</p>
+  <p>Com uma carga de 90 kN aplicada no centro de rigidez, que aqui vale
+  \(x_c=S_1/S_0=1{,}37\) m, a viga desce sem girar e cada tirante recebe exatamente a sua
+  fração de rigidez: 37,0 %, 25,9 % e 37,0 %.</p>
 
   <div class="bloco fisica">
-    <span class="rotulo">Flexão mede \(E\), torção mede \(G\)</span>
-    <p>Um mesmo corpo de prova, flexionado e torcido, entrega as duas constantes elásticas
-    independentes de um sólido isotrópico. Delas sai o coeficiente de Poisson, por
-    \(G=E/2(1+\nu)\), e com ele toda a descrição elástica do material. Essa é a ponte entre
-    este módulo e o tratamento tensorial do terceiro semestre, no qual \(E\), \(G\) e
-    \(\nu\) aparecem como componentes de um único tensor de rigidez.</p>
+    <span class="rotulo">A carga procura o caminho mais rígido, não o mais forte</span>
+    <p>Olhe a tabela de novo. O tirante de alumínio tem o <em>dobro</em> da área do primeiro e
+    ainda assim puxa menos, porque o alumínio tem um terço do módulo do aço. O terceiro é o
+    mais fino de todos, com metade da área do primeiro, e é um dos que mais carregam, porque
+    tem metade do comprimento.</p>
+    <p>Essa é a lição mais cara do assunto, e vale fora da estática. Em qualquer sistema
+    hiperestático, a carga se distribui na razão das rigidezes, e a resistência de cada peça não
+    tem voto nenhum nessa distribuição. Trocar um elemento por outro mais rígido <em>aumenta</em>
+    a carga que ele recebe, e é perfeitamente possível reforçar uma peça e fazê-la falhar antes.</p>
+  </div>
+
+  <p>Essa observação tem consequência prática imediata: ao reparar uma estrutura, substituir um
+  tirante cansado por outro muito mais rígido transfere carga para ele, e pode aliviar os
+  vizinhos a ponto de eles descolarem, como na seção anterior. A conta de rigidez vem antes da
+  conta de resistência.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. A mesa de quatro pernas</h2>
+
+  <p>O caso da seção 1 agora pode ser resolvido. Um tampo rígido de \(1{,}2\times0{,}8\) m
+  sobre quatro pernas de \(k=10\) MN/m, com uma carga de 400 N. São quatro reações e três
+  equações de equilíbrio no plano, e a hiperestaticidade é de grau um.</p>
+
+  <p>A mudança em relação às seções anteriores é só de contagem: o tampo rígido tem agora três
+  graus de liberdade em vez de dois, porque pode descer e girar em torno de dois eixos. O
+  deslocamento vira</p>
+
+  <p>\[w\left(x,y\right)=a+b\,x+c\,y,\]</p>
+
+  <p>com três parâmetros, e as três equações de equilíbrio os determinam. Com a carga no
+  centro, cada perna recebe 100 N, como a simetria manda. Com ela em \((0{,}80;\ 0{,}25)\), as
+  reações saem 104,2, 170,8, 95,8 e 29,2 N, somando os 400 N.</p>
+
+  <p>Mesas reais, porém, não têm quatro pernas do mesmo comprimento. Encurtando uma delas e
+  refazendo a conta, com a carga em \((0{,}50;\ 0{,}30)\):</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <tr><th>perna 3 mais curta em</th><th>\(R_1\)</th><th>\(R_2\)</th><th>\(R_3\)</th><th>\(R_4\)</th></tr>
+    <tr><td>0</td><td>141,7 N</td><td>108,3 N</td><td>58,3 N</td><td>91,7 N</td></tr>
+    <tr><td>0,02 mm</td><td>91,7 N</td><td>158,3 N</td><td>8,3 N</td><td>141,7 N</td></tr>
+    <tr><td>0,10 mm</td><td>83,3 N</td><td>166,7 N</td><td>0</td><td>150,0 N</td></tr>
+    <tr><td>0,50 mm</td><td>83,3 N</td><td>166,7 N</td><td>0</td><td>150,0 N</td></tr>
+  </table>
+  </div>
+
+  <div class="bloco alerta">
+    <span class="rotulo">Um pé não puxa o chão</span>
+    <p>A folga que basta para a perna sair do chão é de 0,023 mm, um quadragésimo de milímetro:
+    uma folha de papel comum é quatro vezes mais grossa. A partir daí a quarta perna não fica
+    com reação pequena, fica com reação <strong>nula</strong>, e todo o acréscimo de folga é
+    absorvido sem mudar mais nada, como mostram as duas últimas linhas.</p>
+    <p>Daí o balanço da mesa. Com três pernas no chão o equilíbrio existe, mas há <em>dois</em>
+    desses equilíbrios, um apoiado em cada diagonal, e um empurrão leva de um para o outro. A
+    mesa não está mal calculada: ela tem duas soluções, e escolhe pela história.</p>
+    <p>Matematicamente isso se chama contato unilateral, e é o que quebra a linearidade do
+    problema: a condição \(R_i\ge0\) não é uma equação, é uma desigualdade. O programa da seção
+    10 trata disso removendo o apoio mais tracionado e refazendo a conta, uma vez de cada vez,
+    até que todos os que sobraram estejam comprimidos.</p>
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s10">10. Exercícios resolvidos</h2>
+  <h2 id="s8">8. Base elástica contínua e o terço médio</h2>
 
-  <div class="bloco def">
-    <span class="rotulo">Exercício resolvido 5.1 · A tábua de andaime</span>
-    <p>Uma tábua de madeira de 5,0 cm por 15,0 cm e 3,00 m de vão é apoiada nas duas pontas.
-    Um operário de 80 kg fica no meio. Com \(E=11\) GPa, calcule a flecha e a tensão máxima
-    com a tábua de pé e deitada.</p>
-    <p><strong>Solução.</strong> Os dois momentos de inércia de área são</p>
-    \[I_{\rm pé}=\frac{0{,}050\cruz0{,}150^3}{12}=1{,}406\cruz10^{-5}\ {\rm m^4},\qquad
-      I_{\rm deitada}=\frac{0{,}150\cruz0{,}050^3}{12}=1{,}563\cruz10^{-6}\ {\rm m^4}.\]
-    <p>Com \(P=80\cruz9{,}807=784{,}5\) N e \(M=PL/4=588{,}4\) N·m, a flecha
-    \(PL^3/48EI\) e a tensão \(Mc/I\) dão</p>
-    \[\text{de pé:}\quad \delta=2{,}85\ {\rm mm},\ \ \sigma=3{,}14\ {\rm MPa};\qquad
-      \text{deitada:}\quad \delta=25{,}7\ {\rm mm},\ \ \sigma=9{,}41\ {\rm MPa}.\]
-    <p>A flecha muda por nove e a tensão por três, exatamente como a seção 6 prevê. A tensão
-    admissível de uma madeira estrutural comum fica em torno de 10 MPa: de pé a tábua está
-    folgada, deitada está no limite, e em nenhum dos dois casos ela quebra. O que decide é a
-    flecha, porque 26 mm num vão de 3 m é um andaime em que ninguém quer subir. O critério
-    usual é \(L/300\), aqui 10 mm, que só a posição de pé atende.</p>
+  <p>O último caso troca apoios discretos por apoios distribuídos. Uma sapata rígida de
+  comprimento \(L\) assenta sobre solo que responde com uma pressão proporcional ao recalque
+  local, \(p=k\,w\), com \(k\) em pascal por metro. É o modelo de Winkler, e vale também para um
+  trilho sobre dormentes ou um navio na doca.</p>
+
+  <p>Nada de novo é preciso. As somas viram integrais,</p>
+
+  <p>\[S_0=\int_0^Lk\,dx=kL,\qquad
+  S_1=\int_0^Lkx\,dx=\frac{kL^2}{2},\qquad
+  S_2=\int_0^Lkx^2\,dx=\frac{kL^3}{3},\]</p>
+
+  <p>e o sistema é o mesmo de duas incógnitas. Como a viga é rígida, o recalque é linear em
+  \(x\), e portanto a <strong>pressão sob a sapata também é linear</strong>. Para uma carga
+  \(P\) aplicada a uma excentricidade \(e\) do centro,</p>
+
+  <p>\[p\left(x\right)=\frac{P}{L}
+  +\frac{12Pe}{L^3}\left(x-\frac{L}{2}\right),\]</p>
+
+  <p>que nas bordas vale \(p=\dfrac{P}{L}\left(1\pm\dfrac{6e}{L}\right).\)</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A regra do terço médio</span>
+    <p>A pressão de borda se anula quando \(6e/L=1\), isto é, quando a carga está a \(L/6\) do
+    centro. Como o solo não puxa a sapata, qualquer excentricidade maior que essa faz a sapata
+    levantar de um lado.</p>
+    <p>A carga tem portanto de cair dentro do <strong>terço médio</strong> da base, e essa é uma
+    das regras mais usadas em engenharia de fundações. Ela sai inteira das duas mesmas equações
+    das seções anteriores, sem nenhuma física nova, e repare que ela <em>não depende de
+    \(k\)</em>: dobrar a rigidez do solo dobra as pressões e dobra os recalques, e deixa o terço
+    médio onde estava, porque ele é geometria.</p>
   </div>
 
-  <div class="bloco def">
-    <span class="rotulo">Exercício resolvido 5.2 · Onde a flecha é máxima</span>
-    <p>Numa viga biapoiada de vão \(L\) com carga \(P\) a uma distância \(a\) do apoio
-    esquerdo, mostre que a flecha máxima não ocorre sob a carga, e ache o ponto onde ocorre,
-    supondo \(a>b=L-a\).</p>
-    <p><strong>Solução.</strong> No trecho à esquerda da carga,
-    \(M=(Pb/L)x\), e integrando \(EI y''=M\) duas vezes com \(y(0)=0\),</p>
-    \[EI\,y=\frac{Pb}{6L}x^3+C_1x.\]
-    <p>A constante sai da continuidade com o outro trecho, e vale
-    \(C_1=-Pb(L^2-b^2)/6L\). A flecha é máxima onde \(y'=0\):</p>
-    \[\frac{Pb}{2L}x^2=\frac{Pb(L^2-b^2)}{6L}
-      \quad\Longrightarrow\quad x=\sqrt{\frac{L^2-b^2}{3}}.\]
-    <p>Como \(a>b\), esse \(x\) é menor que \(a\): o ponto mais baixo fica entre o apoio
-    esquerdo e a carga, e não sob ela. No limite \(b\to0\), com a carga quase em cima do
-    apoio direito, \(x\to L/\sqrt3=0{,}577L\), que está quase no meio do vão. É o resultado
-    que o simulador da seção 4 mostra, e ele diz uma coisa útil: mover a carga não move
-    quase nada o ponto onde a viga mais desce, embora mova muito o ponto onde ela mais
-    sofre.</p>
-    <p>A flecha máxima vale \(Pb(L^2-b^2)^{3/2}/9\sqrt3\,LEI\), e no meio do vão a
-    expressão se reduz a \(PL^3/48EI\), como tem de ser.</p>
-  </div>
+  <p>Quando a excentricidade ultrapassa \(L/6\), a sapata descola de um lado e a área de
+  contato diminui. O problema deixa de ser linear pelo mesmo motivo da mesa, e a pressão
+  máxima no lado comprimido sobe mais depressa do que a fórmula linear previa, o que é
+  justamente o perigo que a regra existe para evitar.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. Quando a própria viga deforma</h2>
+
+  <p>Tudo neste módulo supôs a viga rígida e os apoios elásticos. É uma hipótese, e como toda
+  hipótese tem domínio de validade. Ela vale quando a viga é muito mais rígida que os seus
+  apoios, que é o caso de um bloco de máquina sobre coxins de borracha, de uma sapata de
+  concreto sobre solo e de um tampo de granito sobre pés de madeira.</p>
+
+  <p>Quando a viga é comparável aos apoios, ou mais flexível que eles, a hipótese cai e o
+  deslocamento deixa de ser uma reta. A viga passa a fletir entre os apoios, e para descrever
+  isso é preciso o que um curso de resistência dos materiais desenvolve: os esforços internos
+  de cortante e momento fletor, a hipótese de Bernoulli para a distribuição de tensões na
+  seção, o momento de inércia de área, e a equação da linha elástica \(EI\,y''=M\). Daí vem,
+  por exemplo, o \(11/16\) citado na seção 5.</p>
 
   <div class="bloco def">
-    <span class="rotulo">Exercício resolvido 5.3 · O eixo de transmissão</span>
-    <p>Um eixo de aço maciço de 40 mm transmite 500 N·m. Com \(G=79\) GPa, calcule o ângulo
-    de torção por metro e a tensão máxima. Depois compare com um eixo vazado de 40 mm
-    externos e 30 mm internos.</p>
-    <p><strong>Solução.</strong> Para o maciço,
-    \(J=\pi R^4/2=\pi(0{,}020)^4/2=2{,}513\cruz10^{-7}\) m⁴, e</p>
-    \[\varphi=\frac{TL}{GJ}=\frac{500\cruz1{,}0}{79\cruz10^9\cruz2{,}513\cruz10^{-7}}
-      =0{,}0252\ {\rm rad}=1{,}44^\circ,\qquad
-      \tau_{\max}=\frac{TR}{J}=39{,}8\ {\rm MPa}.\]
-    <p>Para o vazado, \(J=\pi(R_e^4-R_i^4)/2=1{,}718\cruz10^{-7}\) m⁴, que é
-    68,4 % do anterior, enquanto a área cai para 43,8 %. O ângulo sobe para 1,44/0,684 =
-    2,11°, mas a <strong>rigidez por quilo</strong> sobe por 1,56.</p>
-    <p>A leitura prática é esta: se o critério for rigidez absoluta, o maciço ganha; se for
-    rigidez por peso, que é o critério de qualquer coisa que se mova, o vazado ganha
-    sempre. Daí eixos de automóvel, hastes de bicicleta e ossos longos serem todos tubos. A
-    tensão máxima no vazado também sobe, para 58,2 MPa, e é ela que acaba limitando quanto
-    se pode furar, junto com a instabilidade de parede fina.</p>
+    <span class="rotulo">O que muda, e o que não muda</span>
+    <p>O que muda é a condição de compatibilidade, que deixa de ser \(w=a+bx\) e passa a ser uma
+    equação diferencial. O que <em>não</em> muda é a estrutura do argumento: continuam sendo
+    necessárias as três peças, equilíbrio, compatibilidade e lei constitutiva, e continua valendo
+    que a carga se distribui na razão das rigidezes. Quem entendeu este módulo tem a estrutura
+    inteira do problema, e o que falta é uma compatibilidade mais trabalhosa.</p>
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s11">11. Exercícios propostos</h2>
+  <h2 id="s10">10. No Spyder</h2>
+
+  <p>As quatro seções de exemplos acima são quatro instâncias do mesmo sistema de equações, e
+  é bom ver isso no código: o programa resolve as quatro com a mesma função de quinze linhas.
+  Além disso ele confere o resultado por um caminho que não usa equilíbrio nenhum.</p>
+
+  <div class="cartoes">
+    <a class="cartao" href="codigo/apoios.py">
+      <span class="numero">Programa</span>
+      <h3>apoios.py</h3>
+      <p>Resolve a viga rígida sobre molas e confere contra a minimização direta da energia
+      potencial, acha o centro de rigidez, trata as três molas, os três tirantes, a mesa de
+      quatro pernas com contato unilateral e a base contínua, localizando a regra do terço
+      médio por bisseção.</p>
+    </a>
+  </div>
+
+  <p><strong>O que ele imprime, e o que conferir.</strong></p>
+
+  <ul>
+  <li>As reações obtidas pelo equilíbrio coincidem com as que minimizam a energia potencial. A
+  segunda rota não usa nenhuma equação de equilíbrio, e por isso é conferência de verdade e não
+  repetição da mesma conta.</li>
+  <li>O resíduo das duas equações de equilíbrio fica em \(10^{-11}\) N·m.</li>
+  <li>Carregando no centro de rigidez, o giro calculado dá \(7\times10^{-20}\), isto é, zero em
+  precisão de máquina.</li>
+  <li>Com a carga no centro de rigidez, cada tirante recebe a sua fração de rigidez em seis
+  casas decimais.</li>
+  <li>A mesa com um pé curto: a bisseção acha 0,0233 mm para a folga em que a perna descola.</li>
+  <li>A excentricidade em que a pressão de borda zera sai em \(L/6\) com doze casas.</li>
+  </ul>
+
+  <div class="bloco ex">
+    <span class="rotulo">Para mexer</span>
+    <p>Acrescente uma mola com folga inicial, isto é, um apoio que só começa a trabalhar depois
+    que a viga desce um tanto, e veja a relação entre carga e reação deixar de ser linear num
+    joelho bem definido. Depois ponha duas cargas e verifique que a superposição vale enquanto
+    nenhum apoio descolar, e deixa de valer assim que um descola: é a não linearidade do contato
+    unilateral. Por fim, dê rigidez à própria viga, substituindo a reta \(w=a+bx\) por uma
+    cadeia de molas entre pontos vizinhos, e descubra numericamente a partir de que razão entre
+    a rigidez da viga e a dos apoios o resultado deixa de ser o deste módulo e se aproxima do
+    \(11/16\) da viga flexível.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. Exercícios resolvidos</h2>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Exercício resolvido 5.1 · Duas molas desiguais</span>
+    <p>Uma viga rígida de 2,0 m repousa sobre duas molas, de \(k_1=3\) MN/m em \(x=0\) e
+    \(k_2=6\) MN/m em \(x=2\) m. Uma carga de 30 kN atua em \(x=1{,}2\) m. Determine as reações,
+    o recalque de cada apoio e o ângulo de inclinação da viga.</p>
+    <p><strong>Solução.</strong> Com apenas dois apoios o problema é isostático, e as reações
+    saem só do equilíbrio: momentos em torno de \(x=0\) dão \(2R_2=30\times1{,}2\), logo
+    \(R_2=18\) kN e \(R_1=12\) kN. Repare que as rigidezes não entraram, e é assim mesmo.</p>
+    <p>Os recalques, esses dependem das rigidezes:</p>
+    <p>\[w_1=\frac{R_1}{k_1}=\frac{12\times10^3}{3\times10^6}=4{,}0\ \text{mm},
+    \qquad
+    w_2=\frac{R_2}{k_2}=\frac{18\times10^3}{6\times10^6}=3{,}0\ \text{mm}.\]</p>
+    <p>A viga desce e também se inclina, com</p>
+    <p>\[b=\frac{w_2-w_1}{L}=\frac{-1{,}0\ \text{mm}}{2000\ \text{mm}}=-5{,}0\times10^{-4},\]</p>
+    <p>ou seja, 0,029°, caindo para o lado da mola mais mole apesar de ela receber menos
+    carga.</p>
+    <p><strong>A moral.</strong> Num problema isostático a elasticidade não afeta as forças,
+    mas continua decidindo as deformações. É por isso que um equipamento nivelado na montagem
+    sai do nível quando carregado, mesmo quando o cálculo de reações nem menciona rigidez.</p>
+  </div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Exercício resolvido 5.2 · O apoio central que se quer aliviar</span>
+    <p>Na base de máquina da seção 5, com os três coxins de 4 MN/m e carga de 60 kN centrada,
+    cada coxim leva 20 kN. Deseja-se que o coxim central leve apenas 12 kN, trocando-o por outro
+    de rigidez diferente e mantendo os das pontas. Qual deve ser a nova rigidez?</p>
+    <p><strong>Solução.</strong> Com carga centrada e os dois coxins externos iguais, a simetria
+    garante que a viga desce sem girar, de modo que todos os apoios recalcam o mesmo \(w\).
+    Então</p>
+    <p>\[R_{\text{centro}}=k_cw,
+    \qquad
+    R_{\text{total}}=\left(2k_e+k_c\right)w=P,\]</p>
+    <p>e portanto a fração do centro é simplesmente a fração de rigidez:</p>
+    <p>\[\frac{R_c}{P}=\frac{k_c}{2k_e+k_c}=\frac{12}{60}=0{,}20
+    \;\Longrightarrow\;
+    k_c=\frac{0{,}20}{0{,}80}\,2k_e=2\ \text{MN/m}.\]</p>
+    <p>Bastou amolecer o coxim central pela metade. Conferindo: com \(k=(4;2;4)\) MN/m,
+    \(S_0=10\) MN/m, e o recalque comum vale \(60/10=6{,}0\) mm, de onde \(R_c=2\times6=12\) kN
+    e \(R_e=4\times6=24\) kN cada. Soma: 60 kN.</p>
+    <p><strong>Repare no preço.</strong> Aliviar o centro em 8 kN custou 4 kN a mais em cada
+    ponta e aumentou o recalque de 5,0 para 6,0 mm. Num sistema hiperestático a carga não
+    desaparece quando se amolece um caminho: ela vai para os outros.</p>
+  </div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Exercício resolvido 5.3 · Até onde a empilhadeira pode subir</span>
+    <p>Uma sapata rígida de 3,0 m de comprimento transmite 300 kN ao solo. Uma empilhadeira de
+    40 kN vai subir sobre a borda, a 1,4 m do centro. A sapata levanta?</p>
+    <p><strong>Solução.</strong> A resultante das duas cargas tem módulo
+    \(P=300+40=340\) kN, e a sua posição sai do momento em torno do centro:</p>
+    <p>\[e=\frac{300\times0+40\times1{,}4}{340}=0{,}165\ \text{m}.\]</p>
+    <p>O limite do terço médio é \(L/6=0{,}500\) m. Como \(0{,}165<0{,}500\), a sapata não
+    levanta. A pressão de borda mínima vale</p>
+    <p>\[p_{\min}=\frac{P}{L}\left(1-\frac{6e}{L}\right)
+    =\frac{340}{3}\left(1-\frac{6\times0{,}165}{3}\right)
+    =113{,}3\times0{,}670=75{,}9\ \text{kPa},\]</p>
+    <p>ainda folgadamente positiva.</p>
+    <p><strong>E se a empilhadeira fosse maior?</strong> Com 120 kN no mesmo lugar,
+    \(e=120\times1{,}4/420=0{,}40\) m, ainda dentro do limite. Com 200 kN,
+    \(e=200\times1{,}4/500=0{,}56\) m, e aí a sapata levanta. Repare que o que decide não é o
+    peso nem o braço isoladamente, e sim a excentricidade da <em>resultante</em>: a carga
+    permanente de 300 kN trabalha a favor, puxando a resultante para o centro, e é por isso
+    que uma fundação carregada tolera excentricidades que a mesma fundação vazia não
+    toleraria.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s12">12. Exercícios propostos</h2>
 
   <div class="bloco def">
     <ol>
-      <li><b>5.1</b> Trace os diagramas de \(V\) e \(M\) para uma viga biapoiada de 6 m com
-      duas cargas de 10 kN a 2 m de cada apoio. Onde o momento é máximo? Confira o resultado
-      pela regra da área do diagrama de cortante.</li>
+      <li><b>5.1</b> Uma viga rígida de 4 m repousa sobre três molas iguais em \(x=0\), 2 e 4 m.
+      Mostre que, para qualquer posição da carga, a reação central vale sempre \(P/3\),
+      independentemente de onde a carga esteja. Explique o resultado pelo centro de rigidez.</li>
 
-      <li><b>5.2</b> Uma viga em balanço de comprimento \(L\) suporta carga distribuída
-      \(q(x)=q_0x/L\), nula no engaste e máxima na ponta. Ache \(V(x)\), \(M(x)\) e a flecha
-      na ponta. Compare com a carga uniforme de mesma resultante e explique a diferença.</li>
+      <li><b>5.2</b> Quatro molas iguais sustentam uma viga rígida nas posições 0, 1, 2 e 3 m.
+      Calcule \(S_0\), \(S_1\), \(S_2\), o centro de rigidez e \(I_k\), e determine as quatro
+      reações para uma carga \(P\) em \(x=0{,}5\) m. Verifique que elas somam \(P\) e que alguma
+      delas é negativa.</li>
 
-      <li><b>5.3</b> Mostre que, para um retângulo, \(W=bh^2/6\), e use isso para decidir
-      qual das duas peças de mesma área resiste a maior momento: uma de 4 cm por 16 cm ou
-      uma de 8 cm por 8 cm. Depois compare as flechas.</li>
+      <li><b>5.3</b> Três tirantes de mesmo material e mesmo comprimento, com áreas \(A\),
+      \(2A\) e \(3A\), sustentam uma viga rígida igualmente espaçados. Onde fica o centro de
+      rigidez? Onde se deve aplicar a carga para que a viga suba sem girar?</li>
 
-      <li><b>5.4</b> Um perfil I tem duas mesas de 100 mm por 10 mm e alma de 180 mm por
-      6 mm. Calcule \(I\) e \(W\) em torno do eixo horizontal, e compare com um retângulo
-      maciço de mesma área e mesma altura. Quantas vezes o perfil é mais eficiente?</li>
+      <li><b>5.4</b> Mostre que, para uma viga rígida sobre molas com a carga aplicada no centro
+      de rigidez, a fração da carga que cada mola recebe é exatamente \(k_i/\sum k_j\). Mostre
+      também, com um contraexemplo, que isso é falso quando a carga está em outro lugar.</li>
 
-      <li><b>5.5</b> Demonstre que a linha neutra passa pelo centroide da seção partindo de
-      \(\int\sigma\,dA=0\). Em seguida explique por que isso <em>deixa</em> de valer se o
-      material tiver módulos diferentes à tração e à compressão, como o concreto.</li>
+      <li><b>5.5</b> Uma viga rígida de comprimento \(L\) apoia-se em duas molas de rigidezes
+      \(k\) e \(\lambda k\) nas extremidades. Determine a posição do centro de rigidez em função
+      de \(\lambda\), e mostre que ele tende à mola mais rígida quando \(\lambda\to\infty\).
+      Interprete fisicamente o limite.</li>
 
-      <li><b>5.6</b> Uma viga bi-engastada de vão \(L\) recebe uma carga concentrada \(P\)
-      no meio. Repita o argumento da seção 8 e mostre que os momentos de engastamento valem
-      \(PL/8\) e a flecha \(PL^3/192EI\). Compare com a biapoiada.</li>
+      <li><b>5.6</b> Na mesa da seção 7, com as quatro pernas iguais e o chão plano, mostre que a
+      região de posições da carga para as quais nenhuma perna descola é o losango cujos vértices
+      são os pontos médios dos lados do retângulo. Compare essa região com o terço médio da
+      seção 8 e comente o parentesco.</li>
 
-      <li><b>5.7</b> Um eixo vazado deve ter a mesma rigidez à torção de um maciço de
-      diâmetro \(d\), usando a menor massa possível e mantendo o diâmetro externo em
-      \(1{,}5d\). Qual o diâmetro interno, e quanta massa se economiza?</li>
+      <li><b>5.7</b> Uma sapata de 2,5 m recebe 200 kN no centro mais um empuxo horizontal que
+      produz um momento de 60 kN·m na base. Calcule a excentricidade equivalente, verifique a
+      regra do terço médio e calcule as pressões nas duas bordas.</li>
 
-      <li><b>5.8</b> Uma régua de aço de 30 cm, 2 cm de largura e 1 mm de espessura é
-      engastada numa ponta. Que carga na ponta livre a faz descer 1 cm? Essa carga a leva
-      perto do escoamento do aço, 250 MPa? Comente o resultado à luz da sua experiência com
-      réguas.</li>
+      <li><b>5.8</b> Uma viga rígida sobre base elástica contínua tem, além da carga vertical,
+      um momento \(M\) aplicado. Mostre que a distribuição de pressões continua linear e que o
+      problema é idêntico ao de uma carga excêntrica com \(e=M/P\). Esse é o motivo de
+      excentricidade e momento serem tratados como a mesma coisa em fundações.</li>
 
-      <li><b>5.9</b> Discuta em meia página: por que o critério de projeto de uma passarela
-      quase sempre é a flecha, e não a ruptura, enquanto o de um parafuso é quase sempre a
-      ruptura? Use a dependência em \(L\) de cada uma.</li>
+      <li><b>5.9</b> Um equipamento de 5 kN é apoiado em quatro coxins de borracha de
+      \(k=0{,}8\) MN/m cada, e precisa ficar nivelado dentro de 0,1 mm. Qual é a excentricidade
+      máxima admissível do centro de massa, para um tampo de \(0{,}6\times0{,}6\) m? Discuta o
+      que fazer se o equipamento real tiver o centro de massa fora dessa tolerância.</li>
     </ol>
   </div>
 
@@ -551,6 +582,6 @@
   <!--PORTAL--><p><small><a href="https://apianomorais.github.io/">Todas as disciplinas e a pesquisa em apianomorais.github.io</a></small></p><!--/PORTAL-->
 </footer>
 
-<script src="assets/js/widgets.js?v=202611201318"></script>
+<script src="assets/js/widgets.js?v=202611202351"></script>
 </body>
 </html>
